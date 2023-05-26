@@ -1,22 +1,22 @@
 {
-  "name": "mrvn",
-  "version": "3.0.0",
-  "description": "Apex Legends Discord LFG Bot",
-  "main": "index.js",
-  "scripts": {
-    "test": "test12"
-  },
-  "author": "zod",
-  "license": "ISC",
-  "dependencies": {
-    "@discordjs/voice": "^0.16.0",
-    "better-sqlite3": "^8.3.0",
-    "discord.js": "^14.11.0",
-    "node-cron": "^3.0.2",
-    "quick.db": "^9.1.6",
-    "sqlite3": "^5.1.6"
-  },
-  "devDependencies": {
-    "eslint": "^8.39.0"
-  }
+	"name": "mrvn",
+	"version": "3.0.0",
+	"description": "Apex Legends Discord LFG Bot",
+	"main": "index.js",
+	"scripts": {
+		"dev": "nodemon ."
+	},
+	"author": "zod",
+	"license": "ISC",
+	"dependencies": {
+		"@discordjs/voice": "^0.16.0",
+		"better-sqlite3": "^8.3.0",
+		"discord.js": "^14.11.0",
+		"node-cron": "^3.0.2",
+		"quick.db": "^9.1.6",
+		"sqlite3": "^5.1.6"
+	},
+	"devDependencies": {
+		"eslint": "^8.39.0"
+	}
 }

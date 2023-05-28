@@ -7,10 +7,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('kick')
 		.setDescription('Removes a member from their current voice channel.')
-		.addUserOption(option =>
-			option.setName('member-name')
-				.setDescription('The member to be removed from their voice channel.')
-				.setRequired(true)),
+		.addUserOption(option => option.setName('member-name').setDescription('The member to be removed from their voice channel.').setRequired(true)),
 	async execute(interaction) {
 		const user = interaction.options.getUser('member-name');
 		const member = interaction.guild.members.cache.get(user.id);
@@ -86,9 +83,7 @@ module.exports = {
 			if (entryCount4 >= 9) {
 				member.timeout(2419200_000);
 			}
-
-		}
-		catch (error) {
+		} catch (error) {
 			console.error(error);
 			await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
 		}

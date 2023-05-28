@@ -5,7 +5,9 @@ const { token } = require('./config.json');
 const Database = require('better-sqlite3');
 const moment = require('moment');
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates] });
+const client = new Client({
+	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates],
+});
 
 client.commands = new Collection();
 const foldersPath = path.join(__dirname, 'commands');
@@ -22,15 +24,13 @@ for (const folder of commandFolders) {
 		const command = require(filePath);
 		if ('data' in command && 'execute' in command) {
 			client.commands.set(command.data.name, command);
-		}
-		else {
+		} else {
 			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
 		}
 
 		if (commandsRequiringPermission.includes(command.data.name)) {
 			command.requiresPermission = true;
-		}
-		else {
+		} else {
 			command.requiresPermission = false;
 		}
 	}
@@ -48,19 +48,21 @@ client.once('ready', () => {
 	db2.prepare('DELETE FROM members2').run();
 	db2.prepare('DELETE FROM members3').run();
 	db2.prepare('DELETE FROM members4').run();
-
 });
 
 // Updating commands
 client.once('ready', async () => {
 	try {
-		const commands = client.commands.map((command) => command.data);
+		// Delete all registered slash commands. Only useful
+		// for debugging, should not be used in production.
+		// await client.application.commands.set([]);
+
+		const commands = client.commands.map(command => command.data);
 
 		await client.application.commands.set(commands);
 
 		console.log('Slash commands deployed or updated successfully!');
-	}
-	catch (error) {
+	} catch (error) {
 		console.error('Failed to deploy or update slash commands:', error);
 	}
 });
@@ -116,7 +118,7 @@ function deleteOldEntries4() {
 setInterval(deleteOldEntries4, 60 * 1000);
 
 // Check if member has the command permission
-client.on('interactionCreate', async (interaction) => {
+client.on('interactionCreate', async interaction => {
 	if (!interaction.isCommand()) return;
 
 	const command = client.commands.get(interaction.commandName);
@@ -129,16 +131,14 @@ client.on('interactionCreate', async (interaction) => {
 	if (hasPermission) {
 		try {
 			await command.execute(interaction);
-		}
-		catch (error) {
+		} catch (error) {
 			console.error(error);
 			await interaction.reply({
 				content: 'There was an error while executing this command!',
 				ephemeral: true,
 			});
 		}
-	}
-	else {
+	} else {
 		await interaction.reply({
 			content: 'You do not have permission to use this command.',
 			ephemeral: true,

@@ -9,8 +9,10 @@
 	"author": "zod",
 	"license": "ISC",
 	"dependencies": {
+		"@discordjs/rest": "^1.7.1",
 		"@discordjs/voice": "^0.16.0",
 		"better-sqlite3": "^8.4.0",
+		"discord-api-types": "^0.37.42",
 		"discord.js": "^14.11.0",
 		"node-cron": "^3.0.2",
 		"sqlite3": "^5.1.6"

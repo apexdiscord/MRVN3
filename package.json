@@ -4,7 +4,7 @@
 	"description": "Apex Legends Discord LFG Bot",
 	"main": "index.js",
 	"scripts": {
-		"dev": "nodemon ."
+		"dev": "nodemon --trace-warnings ."
 	},
 	"author": "zod",
 	"license": "ISC",

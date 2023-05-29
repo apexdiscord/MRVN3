@@ -53,7 +53,7 @@ module.exports = {
 				iconURL: interaction.member.displayAvatarURL({ dynamic: true }),
 			})
 			.setDescription(`<@${interaction.member.id}>'s message: ${description}`)
-			.setThumbnail('attachment://trios.png')
+			.setThumbnail('attachment://mixtape.png')
 			.setTimestamp()
 			.setFooter({
 				text: 'Read channel pins!',
@@ -87,8 +87,8 @@ module.exports = {
 			embeds: [embed],
 			files: [
 				{
-					attachment: `${__dirname}/../../images/nonRanked/trios.png`,
-					name: 'trios.png',
+					attachment: `${__dirname}/../../images/nonRanked/mixtape.png`,
+					name: 'mixtape.png',
 				},
 			],
 		});

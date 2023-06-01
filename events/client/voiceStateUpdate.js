@@ -16,17 +16,31 @@ module.exports = {
 		const memberId = newState.member.id;
 
 		// Check if the user joined an empty voice channel
-		if (voiceChannel && voiceChannel.members.size == 1) {
+		if (voiceChannel && voiceChannel.members.size === 1) {
 			console.log(`User ${newState.member.user.tag} joined an empty voice channel in ${guild.name}`);
-			const insertQuery = `INSERT OR REPLACE INTO members (id) VALUES (?) `;
+
+			// Check if id already exists in db
+			const selectQuery = 'SELECT id FROM members WHERE id = ?';
+			const selectResult = db.prepare(selectQuery).get(memberId);
+
+			// If id exists delete it
+			if (selectResult) {
+				const deleteQuery = 'DELETE FROM members WHERE id = ?';
+				db.prepare(deleteQuery).run(memberId);
+			}
+
+			// Insert the row into the 'members' table
+			const insertQuery = 'INSERT INTO members (id) VALUES (?)';
 			db.prepare(insertQuery).run(memberId);
 		}
-
 		// Check if a member left a voice channel
 		if (previousChannel && !newChannel) {
-			console.log(`Member ${newState.member.user.tag} left voice channel ${previousChannel.name}`);
+			console.log(`Member ${member.user.tag} left voice channel ${previousChannel.name}`);
 			const deleteQuery = 'DELETE FROM members WHERE id = ?';
 			db.prepare(deleteQuery).run(memberId);
+
+			// set the user limit of the voice channel back to 3
+			previousChannel.setUserLimit(3);
 		}
 
 		// Check if a member moved to a different voice channel
@@ -34,6 +48,18 @@ module.exports = {
 			console.log(`Member ${member.user.tag} moved from ${previousChannel.name} to ${newChannel.name}`);
 			const deleteQuery = 'DELETE FROM members WHERE id = ?';
 			db.prepare(deleteQuery).run(memberId);
+
+			// set the user limit of the previous channel to 3 (just in case)
+			previousChannel.setUserLimit(3);
+
+			// Check if a member moved to an empty voice channel
+			if (newChannel && newChannel.members.size === 1) {
+				console.log(`User ${newState.member.user.tag} joined an empty voice channel in ${guild.name}`);
+
+				// Insert the row into the 'members' table
+				const insertQuery = 'INSERT INTO members (id) VALUES (?)';
+				db.prepare(insertQuery).run(memberId);
+			}
 		}
 	},
 };

@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
 const Database = require('better-sqlite3');
 const db2 = new Database('database2.sqlite', { verbose: console.log });
 const moment = require('moment');

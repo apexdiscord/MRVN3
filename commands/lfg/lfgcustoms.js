@@ -131,7 +131,7 @@ module.exports = {
 			.addFields({ name: '__Code__', value: `${fieldc}`, inline: true })
 			.setFooter({
 				text: 'Read channel pins!',
-				iconURL: 'https://cdn.discordapp.com/attachments/1102189428966965299/1103018038896382012/09204f6a96455580e749454b7449aa82.png',
+				iconURL: 'attachment://pin.png',
 			});
 
 		await interaction.reply({
@@ -145,6 +145,10 @@ module.exports = {
 				{
 					attachment: `${__dirname}/../../images/nonRanked/trios.png`,
 					name: 'trios.png',
+				},
+				{
+					attachment: `${__dirname}/../../images/other/pin.png`,
+					name: 'pin.png',
 				},
 			],
 		});

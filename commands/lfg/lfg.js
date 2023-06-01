@@ -30,6 +30,7 @@ module.exports = {
 	async execute(interaction) {
 		const { options } = interaction;
 
+		const mode = options.getString('mode');
 		const description = options.getString('message');
 		const playerno = options.getString('players-needed');
 		const fieldmic = options.getString('mic-required');
@@ -51,17 +52,27 @@ module.exports = {
 		if (fieldmic == 'Yes') row.addComponents(micyes);
 		if (fieldmic == 'No') row.addComponents(micno);
 
+		if (mode == 'Duos') {
+			// set user limit of current voice channel to 2
+			interaction.member.voice.channel.setUserLimit(2);
+		} else {
+			// set user limit of current voice channel to 3
+			interaction.member.voice.channel.setUserLimit(3);
+		}
+
+		let playersNeeded = !playerno ? `is looking for a team` : `is looking for ${playerno}`;
+
 		const embed = new EmbedBuilder()
 			.setAuthor({
-				name: `${interaction.member.displayName} is looking for ${playerno}`,
+				name: `${interaction.member.displayName} ${playersNeeded}`,
 				iconURL: interaction.member.displayAvatarURL({ dynamic: true }),
 			})
 			.setDescription(`<@${interaction.member.id}>'s message: ${description}`)
-			.setThumbnail('attachment://trios.png')
+			.setThumbnail(`attachment://${mode}.png`)
 			.setTimestamp()
 			.setFooter({
 				text: 'Read channel pins!',
-				iconURL: 'https://cdn.discordapp.com/attachments/1102189428966965299/1103018038896382012/09204f6a96455580e749454b7449aa82.png',
+				iconURL: 'attachment://pin.png',
 			});
 		if (fieldp)
 			embed.addFields({
@@ -92,8 +103,12 @@ module.exports = {
 			components: [row],
 			files: [
 				{
-					attachment: `${__dirname}/../../images/nonRanked/trios.png`,
-					name: 'trios.png',
+					attachment: `${__dirname}/../../images/nonRanked/${mode}.png`,
+					name: `${mode}.png`,
+				},
+				{
+					attachment: `${__dirname}/../../images/other/pin.png`,
+					name: 'pin.png',
 				},
 			],
 		});

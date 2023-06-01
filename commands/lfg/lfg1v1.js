@@ -46,7 +46,7 @@ module.exports = {
 			.setTimestamp()
 			.setFooter({
 				text: 'Read channel pins!',
-				iconURL: 'https://cdn.discordapp.com/attachments/1102189428966965299/1103018038896382012/09204f6a96455580e749454b7449aa82.png',
+				iconURL: 'attachment://pin.png',
 			});
 		if (fieldm)
 			embed.addFields({
@@ -66,6 +66,9 @@ module.exports = {
 			ephemeral: true,
 		});
 
+		// set the user limit of the channel the user is in to 2
+		interaction.member.voice.channel.setUserLimit(2);
+
 		await interaction.channel.send({
 			embeds: [embed],
 			components: [row],
@@ -73,6 +76,10 @@ module.exports = {
 				{
 					attachment: `${__dirname}/../../images/nonRanked/1v1.png`,
 					name: '1v1.png',
+				},
+				{
+					attachment: `${__dirname}/../../images/other/pin.png`,
+					name: 'pin.png',
 				},
 			],
 		});

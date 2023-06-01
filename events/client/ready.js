@@ -19,11 +19,16 @@ module.exports = {
 		if (debug == true) {
 			// In dev environment, delete all rows to
 			// avoid conflicts on bot restart
-			db.prepare('DELETE FROM members').run();
-			db2.prepare('DELETE FROM members2').run();
-			db2.prepare('DELETE FROM members3').run();
-			db2.prepare('DELETE FROM members4').run();
+			// db.prepare('DELETE FROM members').run();
+			// db2.prepare('DELETE FROM members2').run();
+			// db2.prepare('DELETE FROM members3').run();
+			// db2.prepare('DELETE FROM members4').run();
 		}
+
+		db.prepare('DELETE FROM members').run();
+		db2.prepare('DELETE FROM members2').run();
+		db2.prepare('DELETE FROM members3').run();
+		db2.prepare('DELETE FROM members4').run();
 
 		// Delete all registered slash commands. Only useful
 		// for debugging, should not be used in production.

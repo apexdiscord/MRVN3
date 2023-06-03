@@ -14,7 +14,7 @@ module.exports = {
 			if (!command) return;
 
 			const memberId = interaction.member.id;
-			const hasPermission = !command.requiresPermission || db.prepare('SELECT id FROM members WHERE id = ?').get(memberId);
+			const hasPermission = !command.requiresPermission || db.prepare('SELECT id FROM vcOwnerList WHERE id = ?').get(memberId);
 
 			if (hasPermission) {
 				try {

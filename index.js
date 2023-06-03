@@ -12,8 +12,8 @@ const client = new Client({
 });
 
 // Connect to the SQLite database
-const db = new Database('database.sqlite');
-const db2 = new Database('database2.sqlite');
+const db = new Database('vcOwnerList.sqlite');
+const db2 = new Database('memberDecay.sqlite');
 
 client
 	.login(process.env.TOKEN)
@@ -26,7 +26,7 @@ client
 
 // Create tables to store member IDs for kick permission
 const createTableQuery = `
-CREATE TABLE IF NOT EXISTS members (
+CREATE TABLE IF NOT EXISTS vcOwnerList (
   id TEXT PRIMARY KEY
 );
 `;
@@ -34,19 +34,19 @@ db.exec(createTableQuery);
 
 // Create tables to store member IDs and timestamps for kick counter
 const createTableQuery2 = `
-CREATE TABLE IF NOT EXISTS members2 (
+CREATE TABLE IF NOT EXISTS memberDecay1 (
   id TEXT, timestamp INTEGER,
   PRIMARY KEY (id, timestamp)
 );
 `;
 const createTableQuery3 = `
-CREATE TABLE IF NOT EXISTS members3 (
+CREATE TABLE IF NOT EXISTS memberDecay2 (
   id TEXT, timestamp INTEGER,
   PRIMARY KEY (id, timestamp)
 );
 `;
 const createTableQuery4 = `
-CREATE TABLE IF NOT EXISTS members4 (
+CREATE TABLE IF NOT EXISTS memberDecay3 (
   id TEXT, timestamp INTEGER,
   PRIMARY KEY (id, timestamp)
 );
@@ -59,19 +59,19 @@ db2.exec(createTableQuery4);
 // Deleting expiring kick counts
 function deleteOldEntries2() {
 	const tenMinutesAgo = moment().subtract(10, 'minutes').unix();
-	db2.prepare('DELETE FROM members2 WHERE timestamp <= ?').run(tenMinutesAgo);
+	db2.prepare('DELETE FROM memberDecay1 WHERE timestamp <= ?').run(tenMinutesAgo);
 }
 setInterval(deleteOldEntries2, 60 * 1000);
 
 function deleteOldEntries3() {
 	const oneDayAgo1 = moment().subtract(1440, 'minutes').unix();
-	db2.prepare('DELETE FROM members3 WHERE timestamp <= ?').run(oneDayAgo1);
+	db2.prepare('DELETE FROM memberDecay2 WHERE timestamp <= ?').run(oneDayAgo1);
 }
 setInterval(deleteOldEntries3, 60 * 1000);
 
 function deleteOldEntries4() {
 	const oneDayAgo2 = moment().subtract(1440, 'minutes').unix();
-	db2.prepare('DELETE FROM members4 WHERE timestamp <= ?').run(oneDayAgo2);
+	db2.prepare('DELETE FROM memberDecay3 WHERE timestamp <= ?').run(oneDayAgo2);
 }
 setInterval(deleteOldEntries4, 60 * 1000);
 

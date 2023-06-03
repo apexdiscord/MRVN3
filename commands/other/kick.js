@@ -33,27 +33,27 @@ module.exports = {
 
 			// Store id and timestamp on kick
 			const insertEntry2 = db2.prepare(`
-  			INSERT INTO members2 (id, timestamp)
+  			INSERT INTO memberDecay1 (id, timestamp)
   			VALUES (?, ?)
 			`);
 			insertEntry2.run(userId, timestamp);
 
 			const insertEntry3 = db2.prepare(`
-  			INSERT INTO members3 (id, timestamp)
+  			INSERT INTO memberDecay2 (id, timestamp)
   			VALUES (?, ?)
 			`);
 			insertEntry3.run(userId, timestamp);
 
 			const insertEntry4 = db2.prepare(`
-  			INSERT INTO members4 (id, timestamp)
+  			INSERT INTO memberDecay3 (id, timestamp)
   			VALUES (?, ?)
 			`);
 			insertEntry4.run(userId, timestamp);
 
 			// Fetch the database count of id
-			const stmt2 = db2.prepare('SELECT COUNT(*) AS entry_count2 FROM members2 WHERE id = ?');
-			const stmt3 = db2.prepare('SELECT COUNT(*) AS entry_count3 FROM members3 WHERE id = ?');
-			const stmt4 = db2.prepare('SELECT COUNT(*) AS entry_count4 FROM members4 WHERE id = ?');
+			const stmt2 = db2.prepare('SELECT COUNT(*) AS entry_count2 FROM memberDecay1 WHERE id = ?');
+			const stmt3 = db2.prepare('SELECT COUNT(*) AS entry_count3 FROM memberDecay2 WHERE id = ?');
+			const stmt4 = db2.prepare('SELECT COUNT(*) AS entry_count4 FROM memberDecay3 WHERE id = ?');
 
 			// Execute the query and fetch the result
 			const result2 = stmt2.get(userId);

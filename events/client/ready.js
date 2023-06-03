@@ -20,16 +20,16 @@ module.exports = {
 		if (process.env.DEBUG == true) {
 			// In dev environment, delete all rows to
 			// avoid conflicts on bot restart
-			// db.prepare('DELETE FROM members').run();
-			// db2.prepare('DELETE FROM members2').run();
-			// db2.prepare('DELETE FROM members3').run();
-			// db2.prepare('DELETE FROM members4').run();
+			// db.prepare('DELETE FROM vcOwnerList').run();
+			// db2.prepare('DELETE FROM memberDecay1').run();
+			// db2.prepare('DELETE FROM memberDecay2').run();
+			// db2.prepare('DELETE FROM memberDecay3').run();
 		}
 
-		db.prepare('DELETE FROM members').run();
-		db2.prepare('DELETE FROM members2').run();
-		db2.prepare('DELETE FROM members3').run();
-		db2.prepare('DELETE FROM members4').run();
+		db.prepare('DELETE FROM vcOwnerList').run();
+		db2.prepare('DELETE FROM memberDecay1').run();
+		db2.prepare('DELETE FROM memberDecay2').run();
+		db2.prepare('DELETE FROM memberDecay3').run();
 
 		const commands = [];
 		const rest = new REST({ version: 10 }).setToken(process.env.TOKEN);

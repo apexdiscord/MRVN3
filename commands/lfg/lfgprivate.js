@@ -2,7 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('lfg-custom')
+		.setName('lfg-private')
 		.setDescription('This creates a LFG embed')
 		.addStringOption(option => option.setName('message').setDescription('This will be your lfg message').setRequired(true))
 		.addStringOption(option => option.setName('server-region').setDescription('Server region of the lobby').setRequired(true).addChoices(

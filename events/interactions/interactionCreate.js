@@ -2,7 +2,7 @@ const Database = require('better-sqlite3');
 const { InteractionType } = require('discord.js');
 
 // Connect to the SQLite database
-const db = new Database('database.sqlite');
+const db = new Database('vcOwnerList.sqlite');
 
 module.exports = {
 	name: 'interactionCreate',

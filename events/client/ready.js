@@ -1,10 +1,11 @@
 const fs = require('fs');
+const dotenv = require('dotenv');
 const Database = require('better-sqlite3');
 const { REST } = require('@discordjs/rest');
 const { Collection } = require('discord.js');
 const { Routes } = require('discord-api-types/v10');
 
-const { debug, token, guildId } = require('../../config.json');
+dotenv.config();
 
 // Connect to the SQLite database
 const db = new Database('database.sqlite');
@@ -16,7 +17,7 @@ module.exports = {
 	async execute(client) {
 		console.log(`Logged in as ${client.user.tag}`);
 
-		if (debug == true) {
+		if (process.env.DEBUG == true) {
 			// In dev environment, delete all rows to
 			// avoid conflicts on bot restart
 			// db.prepare('DELETE FROM members').run();
@@ -30,13 +31,8 @@ module.exports = {
 		db2.prepare('DELETE FROM members3').run();
 		db2.prepare('DELETE FROM members4').run();
 
-		// Delete all registered slash commands. Only useful
-		// for debugging, should not be used in production.
-		// await client.application.commands.set([]);
-
 		const commands = [];
-		const clientID = client.user.id;
-		const rest = new REST({ version: 10 }).setToken(token);
+		const rest = new REST({ version: 10 }).setToken(process.env.TOKEN);
 		const folders = fs.readdirSync(`${__dirname}/../../commands`);
 
 		client.commands = new Collection();
@@ -53,23 +49,34 @@ module.exports = {
 			}
 		}
 
+		// Delete all registered slash commands. Only useful
+		// for debugging, should not be used in production.
+		// if (process.env.DEBUG == 'true') {
+		// 	(async () => {
+		// 		await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: [] });
+		// 		await rest.put(Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID), { body: [] });
+
+		//		console.log('Deleted previous slash commands');
+		//	})();
+		// }
+
 		// Push the commands to Discord
-		async () => {
+		(async () => {
 			try {
-				if (debug == false) {
+				if (process.env.DEBUG == 'false') {
 					// Assume production and register global commands
-					await rest.put(Routes.applicationCommands(clientID), { body: commands });
+					await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands });
 
 					console.log('Successfully deployed global slash commands.');
 				} else {
 					// Assume dev and register guild commands
-					await rest.put(Routes.applicationGuildCommands(clientID, guildId), { body: commands });
+					await rest.put(Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID), { body: commands });
 
 					console.log('Successfully deployed guild slash commands.');
 				}
 			} catch (error) {
 				if (error) console.log(error);
 			}
-		};
+		})();
 	},
 };

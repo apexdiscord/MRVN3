@@ -1,9 +1,11 @@
 const moment = require('moment');
+const dotenv = require('dotenv');
 const Database = require('better-sqlite3');
 const { Client, GatewayIntentBits } = require('discord.js');
 
-const { token } = require('./config.json');
 const { loadEvents } = require('./events.js');
+
+dotenv.config();
 
 const client = new Client({
 	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates],
@@ -14,7 +16,7 @@ const db = new Database('database.sqlite');
 const db2 = new Database('database2.sqlite');
 
 client
-	.login(token)
+	.login(process.env.TOKEN)
 	.then(() => {
 		loadEvents(client);
 	})

@@ -73,6 +73,7 @@ module.exports = {
 		const vclink = new ButtonBuilder()
 			.setLabel('Join Voice')
 			.setStyle(ButtonStyle.Link)
+			.setEmoji('🔊')
 			.setURL('https://discord.com/channels/' + `${interaction.guild.id}` + '/' + `${interaction.member.voice.channel.id}`);
 
 		const micyes = new ButtonBuilder().setCustomId('micyes').setLabel('Mic Required').setStyle(ButtonStyle.Primary);

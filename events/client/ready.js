@@ -7,6 +7,8 @@ const { Routes } = require('discord-api-types/v10');
 
 dotenv.config();
 
+const commandsRequiringPermission = ['kick'];
+
 // Connect to the SQLite database
 const db = new Database(`${__dirname}/../../databases/vcOwnerList.sqlite`);
 const db2 = new Database(`${__dirname}/../../databases/memberDecay.sqlite`);
@@ -46,6 +48,13 @@ module.exports = {
 
 				commands.push(command.data.toJSON());
 				client.commands.set(command.data.name, command);
+
+				// Check if a command requires permission, and if so, set it to true
+				if (commandsRequiringPermission.includes(command.data.name)) {
+					command.requiresPermission = true;
+				} else {
+					command.requiresPermission = false;
+				}
 			}
 		}
 

@@ -1,9 +1,11 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
+var bannedWords = require('../../data/bannedWords.json');
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('lfg-tournament')
-		.setDescription('This creates a LFG embed')
+		.setDescription('Creates an LFG prompt for those participating in tournaments.')
 		.addStringOption(option => option.setName('message').setDescription('This will be your lfg message').setRequired(true))
 		.addStringOption(option =>
 			option
@@ -79,6 +81,17 @@ module.exports = {
 		const fieldi = options.getString('gamer-tag');
 		const fieldtn = options.getString('tournament-name');
 		const fielddot = options.getString('date-of-tournament');
+
+		if (bannedWords.some(i => description.toLowerCase().includes(i))) {
+			console.log(interaction.member.displayName + ' tried to use a banned word in their LFG message.');
+
+			await interaction.reply({
+				content: 'Your LFG message contains a bad word!',
+				ephemeral: true,
+			});
+
+			return;
+		}
 
 		const embed = new EmbedBuilder()
 			.setAuthor({

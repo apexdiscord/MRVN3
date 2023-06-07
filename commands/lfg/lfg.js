@@ -1,9 +1,11 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
+var bannedWords = require('../../data/bannedWords.json');
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('lfg')
-		.setDescription('This creates a LFG embed')
+		.setDescription('Creates an LFG prompt for Battle Royale Trios and Duos.')
 		.addStringOption(option =>
 			option.setName('mode').setDescription('Select the game mode').setRequired(true).addChoices({ name: 'Duos', value: 'Duos' }, { name: 'Trios', value: 'Trios' }),
 		)
@@ -59,6 +61,17 @@ module.exports = {
 		} else {
 			// set user limit of current voice channel to 3
 			interaction.member.voice.channel.setUserLimit(3);
+		}
+
+		if (bannedWords.some(i => description.toLowerCase().includes(i))) {
+			console.log(interaction.member.displayName + ' tried to use a banned word in their LFG message.');
+
+			await interaction.reply({
+				content: 'Your LFG message contains a bad word!',
+				ephemeral: true,
+			});
+
+			return;
 		}
 
 		let playersNeeded = !playerno ? `is looking for a team` : `is looking for ${playerno}`;

@@ -82,6 +82,10 @@ module.exports = {
 			}
 			if (entryCount4 >= 9) {
 				member.timeout(2419200_000);
+				
+			const channelId = '542737704266235914';
+			const channel = interaction.guild.channels.cache.get(channelId);
+			channel.send(`The kick counts for <@${member.user.id}> are now:\n${entryCount2} time(s) in the past 10m\n${entryCount3} time(s) in the past 1h\n${entryCount4} time(s) in the past 24h`);
 			}
 		} catch (error) {
 			console.error(error);

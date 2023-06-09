@@ -31,6 +31,10 @@ module.exports = {
 			// Insert the row into the 'vcOwnerList' table
 			const insertQuery = 'INSERT INTO vcOwnerList (id) VALUES (?)';
 			db.prepare(insertQuery).run(memberId);
+			
+			const channelId = '542737704266235914';
+			const channel = guild.channels.cache.get(channelId);
+			channel.send(`<@${member.user.id}> joined an empty voice channel.`);
 		}
 		// Check if a member left a voice channel
 		if (previousChannel && !newChannel) {

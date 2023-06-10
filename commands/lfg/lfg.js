@@ -85,11 +85,11 @@ module.exports = {
 				iconURL: interaction.member.displayAvatarURL({ dynamic: true }),
 			})
 			.setDescription(`<@${interaction.member.id}>'s message: ${description}`)
-			.setThumbnail(`attachment://${mode}.png`)
+			.setThumbnail(`https://cdn.jumpmaster.xyz/MRVN/nonRanked/${mode}.png`)
 			.setTimestamp()
 			.setFooter({
 				text: 'Read channel pins!',
-				iconURL: 'attachment://pin.png',
+				iconURL: 'https://cdn.jumpmaster.xyz/MRVN/other/pin.png',
 			});
 		if (fieldp)
 			embed.addFields({
@@ -118,16 +118,16 @@ module.exports = {
 		await interaction.channel.send({
 			embeds: [embed],
 			components: [row],
-			files: [
-				{
-					attachment: path.resolve(__dirname, `/images/nonRanked/${mode}.png`),
-					name: `${mode}.png`,
-				},
-				{
-					attachment: path.resolve(__dirname, `/images/other/pin.png`),
-					name: 'pin.png',
-				},
-			],
+			// files: [
+			// 	{
+			//		attachment: path.resolve(__dirname, `/images/nonRanked/${mode}.png`),
+			//		name: `${mode}.png`,
+			//	},
+			//	{
+			//		attachment: path.resolve(__dirname, `/images/other/pin.png`),
+			//		name: 'pin.png',
+			//	},
+			//],
 		});
 	},
 };

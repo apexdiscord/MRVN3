@@ -3,6 +3,9 @@ const Database = require('better-sqlite3');
 // Connect to the SQLite database
 const db = new Database(`${__dirname}/../../databases/vcOwnerList.sqlite`);
 
+// Grab the vc category whitelist
+var categoryWhitelist = require('../../data/categoryWhitelist.json');
+
 module.exports = {
 	name: 'voiceStateUpdate',
 	once: false,
@@ -16,7 +19,10 @@ module.exports = {
 
 		// Check if the user joined an empty voice channel
 		if (voiceChannel && voiceChannel.members.size === 1) {
-			console.log(`User ${newState.member.user.tag} joined an empty voice channel in ${guild.name}`);
+			// If the parent category of the VC is not in the list, ignore it
+			if (!categoryWhitelist.includes(voiceChannel.parent.id)) return;
+
+			console.log(`JOIN: ${newState.member.user.tag} joined an empty voice channel in ${guild.name}`);
 
 			// Check if id already exists in db
 			const selectQuery = 'SELECT id FROM vcOwnerList WHERE id = ?';
@@ -31,7 +37,7 @@ module.exports = {
 			// Insert the row into the 'vcOwnerList' table
 			const insertQuery = 'INSERT INTO vcOwnerList (id) VALUES (?)';
 			db.prepare(insertQuery).run(memberId);
-			
+
 			const channelId = '542737704266235914';
 			const channel = guild.channels.cache.get(channelId);
 			channel.send(`<@${member.user.id}> joined an empty voice channel.`);

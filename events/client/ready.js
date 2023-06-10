@@ -1,4 +1,5 @@
 const fs = require('fs');
+const chalk = require('chalk');
 const dotenv = require('dotenv');
 const Database = require('better-sqlite3');
 const { REST } = require('@discordjs/rest');
@@ -17,7 +18,7 @@ module.exports = {
 	name: 'ready',
 	once: true,
 	async execute(client) {
-		console.log(`Logged in as ${client.user.tag}`);
+		console.log(chalk.green(`Logged in as ${client.user.tag}`));
 
 		if (process.env.DEBUG == true) {
 			// In dev environment, delete all rows to

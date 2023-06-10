@@ -120,11 +120,11 @@ module.exports = {
 			components: [row],
 			files: [
 				{
-					attachment: path.resolve(__dirname, `/../../images/nonRanked/${mode}.png`),
+					attachment: path.resolve(__dirname, `/../images/nonRanked/${mode}.png`),
 					name: `${mode}.png`,
 				},
 				{
-					attachment: path.resolve(__dirname, `/../../images/other/pin.png`),
+					attachment: path.resolve(__dirname, `/../images/other/pin.png`),
 					name: 'pin.png',
 				},
 			],

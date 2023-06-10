@@ -1,4 +1,3 @@
-const path = require('path');
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
 var bannedWords = require('../../data/bannedWords.json');
@@ -31,8 +30,6 @@ module.exports = {
 		.addStringOption(option => option.setName('main-legends').setDescription('What legends do you usually pick').setRequired(false))
 		.addStringOption(option => option.setName('gamer-tag').setDescription('Enter your gamer tag').setRequired(false)),
 	async execute(interaction) {
-		console.log(process.cwd());
-
 		const { options } = interaction;
 
 		const mode = options.getString('mode');
@@ -85,11 +82,11 @@ module.exports = {
 				iconURL: interaction.member.displayAvatarURL({ dynamic: true }),
 			})
 			.setDescription(`<@${interaction.member.id}>'s message: ${description}`)
-			.setThumbnail(`https://cdn.jumpmaster.xyz/MRVN/nonRanked/${mode}.png`)
+			.setThumbnail(`attachment://${mode}.png`)
 			.setTimestamp()
 			.setFooter({
 				text: 'Read channel pins!',
-				iconURL: 'https://cdn.jumpmaster.xyz/MRVN/other/pin.png',
+				iconURL: 'attachment://pin.png',
 			});
 		if (fieldp)
 			embed.addFields({
@@ -118,16 +115,16 @@ module.exports = {
 		await interaction.channel.send({
 			embeds: [embed],
 			components: [row],
-			// files: [
-			// 	{
-			//		attachment: path.resolve(__dirname, `/images/nonRanked/${mode}.png`),
-			//		name: `${mode}.png`,
-			//	},
-			//	{
-			//		attachment: path.resolve(__dirname, `/images/other/pin.png`),
-			//		name: 'pin.png',
-			//	},
-			//],
+			files: [
+				{
+					attachment: `${__dirname}/../../images/nonRanked/${mode}.png`,
+					name: `${mode}.png`,
+				},
+				{
+					attachment: `${__dirname}/../../images/other/pin.png`,
+					name: 'pin.png',
+				},
+			],
 		});
 	},
 };

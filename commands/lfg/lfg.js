@@ -120,11 +120,11 @@ module.exports = {
 			components: [row],
 			files: [
 				{
-					attachment: `${process.cwd()}/images/nonRanked/${mode}.png`,
+					attachment: `/../images/nonRanked/${mode}.png`,
 					name: `${mode}.png`,
 				},
 				{
-					attachment: `${process.cwd()}/images/other/pin.png`,
+					attachment: `${process.cwd()}/../images/other/pin.png`,
 					name: 'pin.png',
 				},
 			],

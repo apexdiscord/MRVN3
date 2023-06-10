@@ -1,4 +1,4 @@
-const os = require('os');
+const path = require('path');
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
 var bannedWords = require('../../data/bannedWords.json');

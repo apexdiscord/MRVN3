@@ -31,6 +31,8 @@ module.exports = {
 		.addStringOption(option => option.setName('main-legends').setDescription('What legends do you usually pick').setRequired(false))
 		.addStringOption(option => option.setName('gamer-tag').setDescription('Enter your gamer tag').setRequired(false)),
 	async execute(interaction) {
+		console.log(process.cwd());
+
 		const { options } = interaction;
 
 		const mode = options.getString('mode');

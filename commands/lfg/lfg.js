@@ -1,3 +1,4 @@
+const os = require('os');
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
 var bannedWords = require('../../data/bannedWords.json');
@@ -117,11 +118,11 @@ module.exports = {
 			components: [row],
 			files: [
 				{
-					attachment: `${__dirname}/../../images/nonRanked/${mode}.png`,
+					attachment: `${process.cwd()}/images/nonRanked/${mode}.png`,
 					name: `${mode}.png`,
 				},
 				{
-					attachment: `${__dirname}/../../images/other/pin.png`,
+					attachment: `${process.cwd()}/images/other/pin.png`,
 					name: 'pin.png',
 				},
 			],

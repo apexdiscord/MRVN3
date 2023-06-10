@@ -156,7 +156,7 @@ module.exports = {
 			embeds: [embed],
 			files: [
 				{
-					attachment: `${__dirname}/../../images/nonRanked/trios.png`,
+					attachment: `${__dirname}/../../images/nonRanked/Trios.png`,
 					name: 'trios.png',
 				},
 				{

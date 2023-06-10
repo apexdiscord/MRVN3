@@ -33,14 +33,14 @@ module.exports = {
 				.setDescription('Select your rank')
 				.setRequired(true)
 				.addChoices(
-					{ name: 'Predator', value: 'Worlds Edge' },
-					{ name: 'Master', value: 'Storm Point' },
-					{ name: 'Diamond', value: 'Broken Moon' },
-					{ name: 'Platinum', value: 'Aggressive' },
-					{ name: 'Gold', value: 'Olympus' },
-					{ name: 'Silver', value: 'Skull Town' },
-					{ name: 'Bronze', value: 'Overflow' },
-					{ name: 'Rookie', value: 'Habitat 4' },
+					{ name: 'Apex Predator', value: 'Apex Predator' },
+					{ name: 'Master', value: 'Master' },
+					{ name: 'Diamond', value: 'Diamond' },
+					{ name: 'Platinum', value: 'Platinum' },
+					{ name: 'Gold', value: 'Gold' },
+					{ name: 'Silver', value: 'Silver' },
+					{ name: 'Bronze', value: 'Bronze' },
+					{ name: 'Rookie', value: 'Rookie' },
 				),
 		)
 		.addStringOption(option =>
@@ -49,14 +49,14 @@ module.exports = {
 				.setDescription('Select the preferred rank')
 				.setRequired(true)
 				.addChoices(
-					{ name: 'Predator', value: 'Worlds Edge' },
-					{ name: 'Master', value: 'Storm Point' },
-					{ name: 'Diamond', value: 'Broken Moon' },
-					{ name: 'Platinum', value: 'Aggressive' },
-					{ name: 'Gold', value: 'Olympus' },
-					{ name: 'Silver', value: 'Skull Town' },
-					{ name: 'Bronze', value: 'Overflow' },
-					{ name: 'Rookie', value: 'Habitat 4' },
+					{ name: 'Apex Predator', value: 'Apex Predator' },
+					{ name: 'Master', value: 'Master' },
+					{ name: 'Diamond', value: 'Diamond' },
+					{ name: 'Platinum', value: 'Platinum' },
+					{ name: 'Gold', value: 'Gold' },
+					{ name: 'Silver', value: 'Silver' },
+					{ name: 'Bronze', value: 'Bronze' },
+					{ name: 'Rookie', value: 'Rookie' },
 				),
 		)
 		.addStringOption(option => option.setName('self-mains').setDescription('Your main Legends').setRequired(true))
@@ -161,7 +161,7 @@ module.exports = {
 			embeds: [embed],
 			files: [
 				{
-					attachment: `${__dirname}/../../images/nonRanked/trios.png`,
+					attachment: `${__dirname}/../../images/nonRanked/Trios.png`,
 					name: 'trios.png',
 				},
 				{

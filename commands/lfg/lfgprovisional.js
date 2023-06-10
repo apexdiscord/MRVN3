@@ -97,8 +97,10 @@ module.exports = {
 			return;
 		}
 
+		let playersNeeded = !playerno ? `is looking for a team` : `is looking for ${playerno}`;
+
 		const embed = new EmbedBuilder()
-			.setAuthor({ name: `${interaction.member.displayName} is looking for ${playerno}`, iconURL: interaction.member.displayAvatarURL({ dynamic: true }) })
+			.setAuthor({ name: `${interaction.member.displayName} ${playersNeeded}`, iconURL: interaction.member.displayAvatarURL({ dynamic: true }) })
 			.setDescription(`<@${interaction.member.id}>'s message: ${description}`)
 			.setThumbnail('attachment://trios.png')
 			.setTimestamp()
@@ -117,7 +119,7 @@ module.exports = {
 			embeds: [embed],
 			files: [
 				{
-					attachment: `${__dirname}/../../images/nonRanked/trios.png`,
+					attachment: `${__dirname}/../../images/nonRanked/Trios.png`,
 					name: 'trios.png',
 				},
 				{

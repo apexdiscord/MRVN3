@@ -9,6 +9,7 @@ dotenv.config();
 
 const client = new Client({
 	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates],
+	allowedMentions: { users: [] },
 });
 
 // Connect to the SQLite database

@@ -77,12 +77,12 @@ module.exports = {
 					// Assume production and register global commands
 					await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands });
 
-					console.log('Successfully deployed global slash commands.');
+					console.log(chalk.green('Successfully deployed global slash commands.'));
 				} else {
 					// Assume dev and register guild commands
 					await rest.put(Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID), { body: commands });
 
-					console.log('Successfully deployed guild slash commands.');
+					console.log(chalk.green('Successfully deployed guild slash commands.'));
 				}
 			} catch (error) {
 				if (error) console.log(error);

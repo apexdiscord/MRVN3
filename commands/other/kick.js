@@ -85,7 +85,8 @@ module.exports = {
 
 			// Set Timeouts for User
 			if (entryCount4 >= 9) {
-				member.timeout(2419199_000);
+				// member.timeout(2419199_000); Temporarily disable, set to 60 seconds for testing
+				member.timeout(60_000);
 
 				// Send Log for 28 Day Timeout
 				const unmuteTime = Math.floor(new Date(Date.now() + 2419200000) / 1000);
@@ -109,7 +110,8 @@ module.exports = {
 
 				channel.send({ embeds: [timeoutEmbed28] });
 			} else if (entryCount3 >= 6) {
-				member.timeout(3600_000);
+				// member.timeout(3600_000); Temporarily disable, set to 60 seconds for testing
+				member.timeout(60_000);
 
 				const unmuteTime = Math.floor(new Date(Date.now() + 60 * 60 * 1000) / 1000);
 
@@ -133,7 +135,8 @@ module.exports = {
 
 				channel.send({ embeds: [timeoutEmbed60] });
 			} else if (entryCount2 >= 2) {
-				member.timeout(600_000);
+				// member.timeout(600_000); Temporarily disable, set to 60 seconds for testing
+				member.timeout(60_000);
 
 				const unmuteTime = Math.floor(new Date(Date.now() + 10 * 60 * 1000) / 1000);
 

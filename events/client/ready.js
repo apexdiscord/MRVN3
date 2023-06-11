@@ -3,8 +3,8 @@ const chalk = require('chalk');
 const dotenv = require('dotenv');
 const Database = require('better-sqlite3');
 const { REST } = require('@discordjs/rest');
-const { Collection } = require('discord.js');
 const { Routes } = require('discord-api-types/v10');
+const { Collection, ActivityType } = require('discord.js');
 
 dotenv.config();
 
@@ -19,6 +19,8 @@ module.exports = {
 	once: true,
 	async execute(client) {
 		console.log(chalk.green(`Logged in as ${client.user.tag}`));
+
+		client.user.setActivity('your games.', { type: ActivityType.Watching });
 
 		if (process.env.DEBUG == true) {
 			// In dev environment, delete all rows to

@@ -1,6 +1,7 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const Database = require('better-sqlite3');
-const db2 = new Database(`${__dirname}/../../databases/memberDecay.sqlite`, { verbose: console.log });
+// const db2 = new Database(`${__dirname}/../../databases/memberDecay.sqlite`, { verbose: console.log });
+const db2 = new Database(`${__dirname}/../../databases/memberDecay.sqlite`);
 const moment = require('moment');
 
 module.exports = {
@@ -32,23 +33,14 @@ module.exports = {
 			const timestamp = moment().unix();
 
 			// Store id and timestamp on kick
-			const insertEntry2 = db2.prepare(`
-  			INSERT INTO memberDecay1 (id, timestamp)
-  			VALUES (?, ?)
-			`);
-			insertEntry2.run(userId, timestamp);
+			const insertDecayEntry = `INSERT INTO memberDecay1 (id, timestamp) VALUES (?, ?)`;
+			db2.prepare(insertDecayEntry).run(userId, timestamp);
 
-			const insertEntry3 = db2.prepare(`
-  			INSERT INTO memberDecay2 (id, timestamp)
-  			VALUES (?, ?)
-			`);
-			insertEntry3.run(userId, timestamp);
+			const insertDecayEntry2 = `INSERT INTO memberDecay2 (id, timestamp) VALUES (?, ?)`;
+			db2.prepare(insertDecayEntry2).run(userId, timestamp);
 
-			const insertEntry4 = db2.prepare(`
-  			INSERT INTO memberDecay3 (id, timestamp)
-  			VALUES (?, ?)
-			`);
-			insertEntry4.run(userId, timestamp);
+			const insertDecayEntry3 = `INSERT INTO memberDecay3 (id, timestamp) VALUES (?, ?)`;
+			db2.prepare(insertDecayEntry3).run(userId, timestamp);
 
 			// Fetch the database count of id
 			const stmt2 = db2.prepare('SELECT COUNT(*) AS entry_count2 FROM memberDecay1 WHERE id = ?');
@@ -66,27 +58,104 @@ module.exports = {
 			const entryCount4 = result4.entry_count4;
 
 			// Display the entry count
-			const response2 = `The count of specific entry is: ${entryCount2}`;
+			const response2 = `10 Minute Kick Count for ${user.tag} (${userId}): ${entryCount2}`;
 			console.log(response2);
-			const response3 = `The count of specific entry is: ${entryCount3}`;
+
+			const response3 = `1 Hour Kick Count for ${user.tag} (${userId}): ${entryCount3}`;
 			console.log(response3);
-			const response4 = `The count of specific entry is: ${entryCount4}`;
+
+			const response4 = `24 Hour Kick Count for ${user.tag} (${userId}): ${entryCount4}`;
 			console.log(response4);
 
 			// Timeouts
-			if (entryCount2 >= 2) {
-				member.timeout(600_000);
-			}
-			if (entryCount3 >= 6) {
-				member.timeout(3600_000);
-			}
+			// if (entryCount2 >= 2) {
+			// 	member.timeout(600_000);
+			// }
+			// if (entryCount3 >= 6) {
+			// 	member.timeout(3600_000);
+			// }
+			// if (entryCount4 >= 9) {
+			// 	member.timeout(2419200_000);
+
+			// 	const channel = interaction.guild.channels.cache.get(process.env.VC_KICK);
+			// 	channel.send(
+			// 		`The kick counts for <@${member.user.id}> are now:\n${entryCount2} time(s) in the past 10m\n${entryCount3} time(s) in the past 1h\n${entryCount4} time(s) in the past 24h`,
+			// 	);
+			// }
+
+			// Set Timeouts for User
 			if (entryCount4 >= 9) {
-				member.timeout(2419200_000);
+				member.timeout(2419199_000);
+
+				// Send Log for 28 Day Timeout
+				const unmuteTime = Math.floor(new Date(Date.now() + 2419200000) / 1000);
 
 				const channel = interaction.guild.channels.cache.get(process.env.VC_KICK);
-				channel.send(
-					`The kick counts for <@${member.user.id}> are now:\n${entryCount2} time(s) in the past 10m\n${entryCount3} time(s) in the past 1h\n${entryCount4} time(s) in the past 24h`,
-				);
+				const timeoutEmbed28 = new EmbedBuilder()
+					.setTitle(`${member.user.username} was issued a 28 day timeout!`)
+					.addFields([
+						{
+							name: 'User',
+							value: `<@${member.user.id}>\n\`${member.user.id}\``,
+							inline: true,
+						},
+						{
+							name: 'Expires',
+							value: `<t:${unmuteTime}:f>\n<t:${unmuteTime}:R>`,
+							inline: true,
+						},
+					])
+					.setColor('CA2128');
+
+				channel.send({ embeds: [timeoutEmbed28] });
+			} else if (entryCount3 >= 6) {
+				member.timeout(3600_000);
+
+				const unmuteTime = Math.floor(new Date(Date.now() + 60 * 60 * 1000) / 1000);
+
+				// Send Log for 60 Minute Timeout
+				const channel = interaction.guild.channels.cache.get(process.env.VC_KICK);
+				const timeoutEmbed60 = new EmbedBuilder()
+					.setTitle(`${member.user.username} was issued a 60 minute timeout!`)
+					.addFields([
+						{
+							name: 'User',
+							value: `<@${member.user.id}>\n\`${member.user.id}\``,
+							inline: true,
+						},
+						{
+							name: 'Expires',
+							value: `<t:${unmuteTime}:t>\n<t:${unmuteTime}:R>`,
+							inline: true,
+						},
+					])
+					.setColor('E9BE1A');
+
+				channel.send({ embeds: [timeoutEmbed60] });
+			} else if (entryCount2 >= 2) {
+				member.timeout(600_000);
+
+				const unmuteTime = Math.floor(new Date(Date.now() + 10 * 60 * 1000) / 1000);
+
+				// Send Log for 10 Minute Timeout
+				const channel = interaction.guild.channels.cache.get(process.env.VC_KICK);
+				const timeoutEmbed10 = new EmbedBuilder()
+					.setTitle(`${member.user.username} was issued a 10 minute timeout!`)
+					.addFields([
+						{
+							name: 'User',
+							value: `<@${member.user.id}>\n\`${member.user.id}\``,
+							inline: true,
+						},
+						{
+							name: 'Expires',
+							value: `<t:${unmuteTime}:t>\n<t:${unmuteTime}:R>`,
+							inline: true,
+						},
+					])
+					.setColor('1A6EC8');
+
+				channel.send({ embeds: [timeoutEmbed10] });
 			}
 		} catch (error) {
 			console.error(error);

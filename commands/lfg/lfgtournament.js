@@ -93,6 +93,45 @@ module.exports = {
 			return;
 		}
 
+		if (fieldsm) {
+			if (bannedWords.some(i => fieldsm.toLowerCase().includes(i))) {
+				console.log(`${interaction.member.displayName} (${interaction.member.id}) tried to use a banned word in their LFG message.`);
+
+				await interaction.reply({
+					content: 'Your LFG message contains a bad word!',
+					ephemeral: true,
+				});
+
+				return;
+			}
+		}
+
+		if (fieldptm) {
+			if (bannedWords.some(i => fieldptm.toLowerCase().includes(i))) {
+				console.log(`${interaction.member.displayName} (${interaction.member.id}) tried to use a banned word in their LFG message.`);
+
+				await interaction.reply({
+					content: 'Your LFG message contains a bad word!',
+					ephemeral: true,
+				});
+
+				return;
+			}
+		}
+
+		if (fieldtn) {
+			if (bannedWords.some(i => fieldtn.toLowerCase().includes(i))) {
+				console.log(`${interaction.member.displayName} (${interaction.member.id}) tried to use a banned word in their LFG message.`);
+
+				await interaction.reply({
+					content: 'Your LFG message contains a bad word!',
+					ephemeral: true,
+				});
+
+				return;
+			}
+		}
+
 		const embed = new EmbedBuilder()
 			.setAuthor({
 				name: `${interaction.member.displayName} is looking for tournament teammates`,

@@ -59,9 +59,9 @@ module.exports = {
 			.setEmoji('🔊')
 			.setURL('https://discord.com/channels/' + `${interaction.guild.id}` + '/' + `${interaction.member.voice.channel.id}`);
 
-		const micyes = new ButtonBuilder().setCustomId('micyes').setLabel('Mic Required').setStyle(ButtonStyle.Primary);
+		const micyes = new ButtonBuilder().setCustomId('micyes').setLabel('Mic Required').setStyle(ButtonStyle.Success).setDisabled(true);
 
-		const micno = new ButtonBuilder().setCustomId('micno').setLabel('Mic Optional').setStyle(ButtonStyle.Secondary);
+		const micno = new ButtonBuilder().setCustomId('micno').setLabel('Mic Optional').setStyle(ButtonStyle.Danger).setDisabled(true);
 
 		const row = new ActionRowBuilder().addComponents(vclink);
 		if (fieldmic == 'Yes') row.addComponents(micyes);
@@ -78,9 +78,24 @@ module.exports = {
 			return;
 		}
 
+		if (fieldm) {
+			if (bannedWords.some(i => fieldm.toLowerCase().includes(i))) {
+				console.log(`${interaction.member.displayName} (${interaction.member.id}) tried to use a banned word in their LFG message.`);
+
+				await interaction.reply({
+					content: 'Your LFG message contains a bad word!',
+					ephemeral: true,
+				});
+
+				return;
+			}
+		}
+
+		let playersNeeded = !playerno ? `is looking for a team` : `is looking for ${playerno}`;
+
 		const embed = new EmbedBuilder()
 			.setAuthor({
-				name: `${interaction.member.displayName} is looking for ${playerno}`,
+				name: `${interaction.member.displayName} ${playersNeeded}`,
 				iconURL: interaction.member.displayAvatarURL({ dynamic: true }),
 			})
 			.setDescription(`<@${interaction.member.id}>'s message: ${description}`)

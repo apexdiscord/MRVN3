@@ -1,3 +1,4 @@
+const chalk = require('chalk');
 const moment = require('moment');
 const dotenv = require('dotenv');
 const Database = require('better-sqlite3');
@@ -59,20 +60,33 @@ db2.exec(createTableQuery4);
 
 // Deleting expiring kick counts
 function deleteOldEntries2() {
+	// TODO: Proper logging for when cleanup tasks run
+	// console.log(chalk.cyan(`DATABASE: Running 10 Minute Kick Counter Cleanup Check...`));
+
 	const tenMinutesAgo = moment().subtract(10, 'minutes').unix();
 	db2.prepare('DELETE FROM memberDecay1 WHERE timestamp <= ?').run(tenMinutesAgo);
+
+	// console.log(chalk.green(`DATABASE: 10 Minute Kick Counter Cleanup Complete!`));
 }
 setInterval(deleteOldEntries2, 60 * 1000);
 
 function deleteOldEntries3() {
+	// console.log(chalk.cyan(`DATABASE: Running 1 Hour Kick Counter Cleanup Check...`));
+
 	const oneDayAgo1 = moment().subtract(1440, 'minutes').unix();
 	db2.prepare('DELETE FROM memberDecay2 WHERE timestamp <= ?').run(oneDayAgo1);
+
+	// console.log(chalk.green(`DATABASE: 1 Hour Kick Counter Cleanup Complete!`));
 }
 setInterval(deleteOldEntries3, 60 * 1000);
 
 function deleteOldEntries4() {
+	// console.log(chalk.cyan(`DATABASE: Running 28 Day Kick Counter Cleanup Check...`));
+
 	const oneDayAgo2 = moment().subtract(1440, 'minutes').unix();
 	db2.prepare('DELETE FROM memberDecay3 WHERE timestamp <= ?').run(oneDayAgo2);
+
+	// console.log(chalk.green(`DATABASE: 28 Day Kick Counter Cleanup Complete!`));
 }
 setInterval(deleteOldEntries4, 60 * 1000);
 

@@ -7,23 +7,27 @@ module.exports = {
 		.setName('lfg')
 		.setDescription('Creates an LFG prompt for Battle Royale Trios and Duos.')
 		.addStringOption(option =>
-			option.setName('mode').setDescription('Select the game mode').setRequired(true).addChoices({ name: 'Duos', value: 'Duos' }, { name: 'Trios', value: 'Trios' }),
+			option
+				.setName('mode')
+				.setDescription("Select which Battle Royale mode you'll be playing.")
+				.setRequired(true)
+				.addChoices({ name: 'Duos', value: 'Duos' }, { name: 'Trios', value: 'Trios' }),
 		)
-		.addStringOption(option => option.setName('message').setDescription('This will be your lfg message').setRequired(true))
+		.addStringOption(option => option.setName('message').setDescription('Your message for the LFG post.').setRequired(true))
 		.addStringOption(option =>
-			option.setName('players-needed').setDescription('How many teammates do you need').setRequired(false).addChoices({ name: '1', value: '1' }, { name: '2', value: '2' }),
+			option.setName('players-needed').setDescription('How many teammates do you need?').setRequired(false).addChoices({ name: '1', value: '1' }, { name: '2', value: '2' }),
 		)
 		.addStringOption(option =>
 			option
 				.setName('mic-required')
-				.setDescription('Do you require your team to have mic')
+				.setDescription('Do you require your teammates to have mic?')
 				.setRequired(false)
 				.addChoices({ name: 'Yes', value: 'Yes' }, { name: 'No', value: 'No' }),
 		)
 		.addStringOption(option =>
 			option
 				.setName('play-style')
-				.setDescription('How do you play the matches')
+				.setDescription('What is your play style?')
 				.setRequired(false)
 				.addChoices({ name: 'Aggresive', value: 'Aggressive' }, { name: 'Defensive', value: 'Defensive' }, { name: 'Variable', value: 'Variable' }),
 		)
@@ -46,9 +50,9 @@ module.exports = {
 			.setEmoji('🔊')
 			.setURL('https://discord.com/channels/' + `${interaction.guild.id}` + '/' + `${interaction.member.voice.channel.id}`);
 
-		const micyes = new ButtonBuilder().setCustomId('micyes').setLabel('Mic Required').setStyle(ButtonStyle.Primary);
+		const micyes = new ButtonBuilder().setCustomId('micyes').setLabel('Mic Required').setStyle(ButtonStyle.Success).setDisabled(true);
 
-		const micno = new ButtonBuilder().setCustomId('micno').setLabel('Mic Optional').setStyle(ButtonStyle.Secondary);
+		const micno = new ButtonBuilder().setCustomId('micno').setLabel('Mic Optional').setStyle(ButtonStyle.Danger).setDisabled(true);
 
 		const row = new ActionRowBuilder();
 		if (interaction.member.voice.channel) row.addComponents(vclink);
@@ -74,6 +78,19 @@ module.exports = {
 			return;
 		}
 
+		if (fieldm) {
+			if (bannedWords.some(i => fieldm.toLowerCase().includes(i))) {
+				console.log(interaction.member.displayName + ' tried to use a banned word in their LFG message.');
+
+				await interaction.reply({
+					content: 'Your LFG message contains a bad word!',
+					ephemeral: true,
+				});
+
+				return;
+			}
+		}
+
 		let playersNeeded = !playerno ? `is looking for a team` : `is looking for ${playerno}`;
 
 		const embed = new EmbedBuilder()
@@ -88,18 +105,21 @@ module.exports = {
 				text: 'Read channel pins!',
 				iconURL: 'attachment://pin.png',
 			});
+
 		if (fieldp)
 			embed.addFields({
 				name: '__Play Style__',
 				value: `${fieldp}`,
 				inline: true,
 			});
+
 		if (fieldm)
 			embed.addFields({
 				name: '__Main Legends__',
 				value: `${fieldm}`,
 				inline: true,
 			});
+
 		if (fieldg)
 			embed.addFields({
 				name: '__Gamer Tag__',

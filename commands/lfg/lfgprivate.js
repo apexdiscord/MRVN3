@@ -62,7 +62,7 @@ module.exports = {
 		)
 		.addStringOption(option =>
 			option
-				.setName('aim-assis-override')
+				.setName('aim-assist-override')
 				.setDescription('Choose the correct option')
 				.setRequired(true)
 				.addChoices({ name: 'On', value: 'On' }, { name: 'Off', value: 'Off' }),

@@ -139,7 +139,7 @@ module.exports = {
 				components: [row],
 				files: [
 					{
-						attachment: `${__dirname}/../../images/nonRanked/provisional.png`,
+						attachment: `${__dirname}/../../images/ranked/Ranked_Provisional.png`,
 						name: 'trios.png',
 					},
 					{
@@ -153,7 +153,7 @@ module.exports = {
 				embeds: [embed],
 				files: [
 					{
-						attachment: `${__dirname}/../../images/nonRanked/provisional.png`,
+						attachment: `${__dirname}/../../images/ranked/Ranked_Provisional.png`,
 						name: 'trios.png',
 					},
 					{

@@ -114,6 +114,7 @@ module.exports = {
 
 		await interaction.channel.send({
 			embeds: [embed],
+			components: [row],
 			files: [
 				{
 					attachment: `${__dirname}/../../images/nonRanked/mixtape.png`,

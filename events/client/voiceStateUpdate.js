@@ -116,7 +116,7 @@ module.exports = {
 			if (newState.channel.members.size === 1) {
 				// User moved to an empty VC
 				// Log the join in the console for debugging
-				console.log(chalk.yellow(`Moved: ${member.user.tag} Moved to Empty VC "${newState.channel.name}"`));
+				console.log(chalk.yellow(`MOVE: ${member.user.tag} Moved to Empty VC "${newState.channel.name}"`));
 
 				// Log it in channel for reports
 				if (process.env.VC_MOVE !== undefined) {
@@ -159,7 +159,7 @@ module.exports = {
 			} else {
 				// User moved to occupied VC
 				// Log the join in the console for debugging
-				console.log(chalk.yellow(`Moved: ${member.user.tag} Moved to Occupied VC "${newState.channel.name}"`));
+				console.log(chalk.yellow(`MOVE: ${member.user.tag} Moved to Occupied VC "${newState.channel.name}"`));
 
 				// Log it in channel for reports
 				if (process.env.VC_MOVE !== undefined) {

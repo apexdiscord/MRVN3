@@ -15,16 +15,6 @@ module.exports = {
 
 			const memberId = interaction.member.id;
 
-			// If a user is not in a voice channel, return an ephemeral message
-			if (!interaction.member.voice.channel) {
-				await interaction.reply({
-					content: 'You must be in a voice channel to use this command.',
-					ephemeral: true,
-				});
-
-				return;
-			}
-
 			const hasPermission = !command.requiresPermission || db.prepare('SELECT id FROM vcOwnerList WHERE id = ?').get(memberId);
 
 			if (hasPermission) {
@@ -38,6 +28,16 @@ module.exports = {
 					});
 				}
 			} else {
+				// If a user is not in a voice channel, return an ephemeral message
+				if (!interaction.member.voice.channel) {
+					await interaction.reply({
+						content: 'You must be in a voice channel to use this command.',
+						ephemeral: true,
+					});
+
+					return;
+				}
+
 				await interaction.reply({
 					content: 'You do not have permission to use this command.',
 					ephemeral: true,

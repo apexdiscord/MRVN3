@@ -41,7 +41,7 @@ module.exports = {
 					{ name: 'Worlds Edge', value: 'Worlds Edge' },
 					{ name: 'Storm Point', value: 'Storm Point' },
 					{ name: 'Broken Moon', value: 'Broken Moon' },
-					{ name: 'Kings Canyon', value: 'Aggressive' },
+					{ name: 'Kings Canyon', value: 'Kings Canyon' },
 					{ name: 'Olympus', value: 'Olympus' },
 					{ name: 'Skull Town', value: 'Skull Town' },
 					{ name: 'Overflow', value: 'Overflow' },

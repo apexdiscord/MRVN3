@@ -1,6 +1,0 @@
-{
-	"debug": true or false,
-	"token": "Discord Bot Token",
-	"clientId": "Bot Client ID",
-	"guildId": "Dev Guild ID"
-}

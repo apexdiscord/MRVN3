@@ -86,7 +86,7 @@ module.exports = {
 
 			// Set Timeouts for User
 			if (entryCount4 >= 9) {
-				member.timeout(2419199_000);
+				member.timeout(2419199_000, 'User was timed out for 28 days due to being kicked from an LFG channel 9 times in the past 24 hours.');
 				// 28 days minus one second. For whatever reason, this worked
 				// just fine a few days ago with the full 28 days, but now
 				// it refuses to work and Discord returns an error. 28 days
@@ -134,7 +134,7 @@ module.exports = {
 
 				channel.send({ embeds: [timeoutEmbed28] });
 			} else if (entryCount3 >= 6) {
-				member.timeout(3600_000);
+				member.timeout(3600_000, 'User was timed out due to being kicked from an LFG channel 6 or more times in the past 24 hours.');
 
 				const unmuteTime = Math.floor(new Date(Date.now() + 60 * 60 * 1000) / 1000);
 
@@ -178,7 +178,7 @@ module.exports = {
 
 				channel.send({ embeds: [timeoutEmbed60] });
 			} else if (entryCount2 >= 2) {
-				member.timeout(600_000);
+				member.timeout(600_000, 'User was timed out due to being kicked from an LFG channel 2 or more times in the past hour.');
 
 				const unmuteTime = Math.floor(new Date(Date.now() + 10 * 60 * 1000) / 1000);
 

@@ -36,17 +36,22 @@ module.exports = {
 		const fieldm = options.getString('main-legends');
 		const fieldg = options.getString('gamer-tag');
 
-		const vclink = new ButtonBuilder()
-			.setLabel('Join Voice')
-			.setStyle(ButtonStyle.Link)
-			.setEmoji('🔊')
-			.setURL('https://discord.com/channels/' + `${interaction.guild.id}` + '/' + `${interaction.member.voice.channel.id}`);
+		if (interaction.member.voice.channel) {
+			var vclink = new ButtonBuilder()
+				.setLabel('Join Voice')
+				.setStyle(ButtonStyle.Link)
+				.setEmoji('🔊')
+				.setURL('https://discord.com/channels/' + `${interaction.guild.id}` + '/' + `${interaction.member.voice.channel.id}`);
+		} else {
+			var vclink = null;
+		}
 
 		const micyes = new ButtonBuilder().setCustomId('micyes').setLabel('Mic Required').setStyle(ButtonStyle.Success).setDisabled(true);
 
 		const micno = new ButtonBuilder().setCustomId('micno').setLabel('Mic Optional').setStyle(ButtonStyle.Danger).setDisabled(true);
 
-		const row = new ActionRowBuilder().addComponents(vclink);
+		const row = new ActionRowBuilder();
+		if (interaction.member.voice.channel) row.addComponents(vclink);
 		if (fieldmic == 'Yes') row.addComponents(micyes);
 		if (fieldmic == 'No') row.addComponents(micno);
 
@@ -112,19 +117,35 @@ module.exports = {
 			ephemeral: true,
 		});
 
-		await interaction.channel.send({
-			embeds: [embed],
-			components: [row],
-			files: [
-				{
-					attachment: `${__dirname}/../../images/nonRanked/mixtape.png`,
-					name: 'mixtape.png',
-				},
-				{
-					attachment: `${__dirname}/../../images/other/pin.png`,
-					name: 'pin.png',
-				},
-			],
-		});
+		if (interaction.member.voice.channel || row.components.length != 0) {
+			await interaction.channel.send({
+				embeds: [embed],
+				components: [row],
+				files: [
+					{
+						attachment: `${__dirname}/../../images/nonRanked/mixtape.png`,
+						name: 'mixtape.png',
+					},
+					{
+						attachment: `${__dirname}/../../images/other/pin.png`,
+						name: 'pin.png',
+					},
+				],
+			});
+		} else {
+			await interaction.channel.send({
+				embeds: [embed],
+				files: [
+					{
+						attachment: `${__dirname}/../../images/nonRanked/mixtape.png`,
+						name: 'mixtape.png',
+					},
+					{
+						attachment: `${__dirname}/../../images/other/pin.png`,
+						name: 'pin.png',
+					},
+				],
+			});
+		}
 	},
 };

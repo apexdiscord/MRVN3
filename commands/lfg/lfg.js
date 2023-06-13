@@ -44,11 +44,15 @@ module.exports = {
 		const fieldm = options.getString('main-legends');
 		const fieldg = options.getString('gamer-tag');
 
-		const vclink = new ButtonBuilder()
-			.setLabel('Join Voice')
-			.setStyle(ButtonStyle.Link)
-			.setEmoji('🔊')
-			.setURL('https://discord.com/channels/' + `${interaction.guild.id}` + '/' + `${interaction.member.voice.channel.id}`);
+		if (interaction.member.voice.channel) {
+			var vclink = new ButtonBuilder()
+				.setLabel('Join Voice')
+				.setStyle(ButtonStyle.Link)
+				.setEmoji('🔊')
+				.setURL('https://discord.com/channels/' + `${interaction.guild.id}` + '/' + `${interaction.member.voice.channel.id}`);
+		} else {
+			var vclink = null;
+		}
 
 		const micyes = new ButtonBuilder().setCustomId('micyes').setLabel('Mic Required').setStyle(ButtonStyle.Success).setDisabled(true);
 
@@ -59,10 +63,10 @@ module.exports = {
 		if (fieldmic == 'Yes') row.addComponents(micyes);
 		if (fieldmic == 'No') row.addComponents(micno);
 
-		if (mode == 'Duos') {
+		if (mode == 'Duos' && interaction.member.voice.channel) {
 			// set user limit of current voice channel to 2
 			interaction.member.voice.channel.setUserLimit(2);
-		} else {
+		} else if (interaction.member.voice.channel) {
 			// set user limit of current voice channel to 3
 			interaction.member.voice.channel.setUserLimit(3);
 		}
@@ -132,19 +136,35 @@ module.exports = {
 			ephemeral: true,
 		});
 
-		await interaction.channel.send({
-			embeds: [embed],
-			components: [row],
-			files: [
-				{
-					attachment: `${__dirname}/../../images/nonRanked/${mode}.png`,
-					name: `${mode}.png`,
-				},
-				{
-					attachment: `${__dirname}/../../images/other/pin.png`,
-					name: 'pin.png',
-				},
-			],
-		});
+		if (interaction.member.voice.channel || row.components.length != 0) {
+			await interaction.channel.send({
+				embeds: [embed],
+				components: [row],
+				files: [
+					{
+						attachment: `${__dirname}/../../images/nonRanked/${mode}.png`,
+						name: `${mode}.png`,
+					},
+					{
+						attachment: `${__dirname}/../../images/other/pin.png`,
+						name: 'pin.png',
+					},
+				],
+			});
+		} else {
+			await interaction.channel.send({
+				embeds: [embed],
+				files: [
+					{
+						attachment: `${__dirname}/../../images/nonRanked/${mode}.png`,
+						name: `${mode}.png`,
+					},
+					{
+						attachment: `${__dirname}/../../images/other/pin.png`,
+						name: 'pin.png',
+					},
+				],
+			});
+		}
 	},
 };

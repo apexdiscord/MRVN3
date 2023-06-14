@@ -9,6 +9,8 @@ module.exports = {
 	once: false,
 	async execute(interaction, client) {
 		if (interaction.type === InteractionType.ApplicationCommand) {
+			// await interaction.deferReply({ ephemeral: true });
+
 			const command = client.commands.get(interaction.commandName);
 
 			if (!command) return;
@@ -22,7 +24,10 @@ module.exports = {
 					await command.execute(interaction);
 				} catch (error) {
 					console.error(error);
-					await interaction.reply({
+
+					await interaction.deferReply({ ephemeral: true });
+
+					await interaction.editReply({
 						content: 'There was an error while executing this command!',
 						ephemeral: true,
 					});
@@ -30,7 +35,9 @@ module.exports = {
 			} else {
 				// If a user is not in a voice channel, return an ephemeral message
 				if (!interaction.member.voice.channel) {
-					await interaction.reply({
+					await interaction.deferReply({ ephemeral: true });
+
+					await interaction.editReply({
 						content: 'You must be in a voice channel to use this command.',
 						ephemeral: true,
 					});
@@ -38,7 +45,9 @@ module.exports = {
 					return;
 				}
 
-				await interaction.reply({
+				await interaction.deferReply({ ephemeral: true });
+
+				await interaction.editReply({
 					content: 'You do not have permission to use this command.',
 					ephemeral: true,
 				});

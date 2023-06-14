@@ -68,6 +68,8 @@ module.exports = {
 		.addStringOption(option => option.setName('tournament-name').setDescription('Name of the tournament you are participating').setRequired(true))
 		.addStringOption(option => option.setName('date-of-tournament').setDescription('Date of the tournament').setRequired(true)),
 	async execute(interaction) {
+		await interaction.deferReply({ ephemeral: false });
+
 		const { options } = interaction;
 
 		const description = options.getString('message');
@@ -82,55 +84,55 @@ module.exports = {
 		const fieldtn = options.getString('tournament-name');
 		const fielddot = options.getString('date-of-tournament');
 
-		if (bannedWords.some(i => description.toLowerCase().includes(i))) {
-			console.log(interaction.member.displayName + ' tried to use a banned word in their LFG message.');
+		// if (bannedWords.some(i => description.toLowerCase().includes(i))) {
+		// 	console.log(interaction.member.displayName + ' tried to use a banned word in their LFG message.');
 
-			await interaction.reply({
-				content: 'Your LFG message contains a bad word!',
-				ephemeral: true,
-			});
+		// 	await interaction.reply({
+		// 		content: 'Your LFG message contains a bad word!',
+		// 		ephemeral: true,
+		// 	});
 
-			return;
-		}
+		// 	return;
+		// }
 
-		if (fieldsm) {
-			if (bannedWords.some(i => fieldsm.toLowerCase().includes(i))) {
-				console.log(`${interaction.member.displayName} (${interaction.member.id}) tried to use a banned word in their LFG message.`);
+		// if (fieldsm) {
+		// 	if (bannedWords.some(i => fieldsm.toLowerCase().includes(i))) {
+		// 		console.log(`${interaction.member.displayName} (${interaction.member.id}) tried to use a banned word in their LFG message.`);
 
-				await interaction.reply({
-					content: 'Your LFG message contains a bad word!',
-					ephemeral: true,
-				});
+		// 		await interaction.reply({
+		// 			content: 'Your LFG message contains a bad word!',
+		// 			ephemeral: true,
+		// 		});
 
-				return;
-			}
-		}
+		// 		return;
+		// 	}
+		// }
 
-		if (fieldptm) {
-			if (bannedWords.some(i => fieldptm.toLowerCase().includes(i))) {
-				console.log(`${interaction.member.displayName} (${interaction.member.id}) tried to use a banned word in their LFG message.`);
+		// if (fieldptm) {
+		// 	if (bannedWords.some(i => fieldptm.toLowerCase().includes(i))) {
+		// 		console.log(`${interaction.member.displayName} (${interaction.member.id}) tried to use a banned word in their LFG message.`);
 
-				await interaction.reply({
-					content: 'Your LFG message contains a bad word!',
-					ephemeral: true,
-				});
+		// 		await interaction.reply({
+		// 			content: 'Your LFG message contains a bad word!',
+		// 			ephemeral: true,
+		// 		});
 
-				return;
-			}
-		}
+		// 		return;
+		// 	}
+		// }
 
-		if (fieldtn) {
-			if (bannedWords.some(i => fieldtn.toLowerCase().includes(i))) {
-				console.log(`${interaction.member.displayName} (${interaction.member.id}) tried to use a banned word in their LFG message.`);
+		// if (fieldtn) {
+		// 	if (bannedWords.some(i => fieldtn.toLowerCase().includes(i))) {
+		// 		console.log(`${interaction.member.displayName} (${interaction.member.id}) tried to use a banned word in their LFG message.`);
 
-				await interaction.reply({
-					content: 'Your LFG message contains a bad word!',
-					ephemeral: true,
-				});
+		// 		await interaction.reply({
+		// 			content: 'Your LFG message contains a bad word!',
+		// 			ephemeral: true,
+		// 		});
 
-				return;
-			}
-		}
+		// 		return;
+		// 	}
+		// }
 
 		const embed = new EmbedBuilder()
 			.setAuthor({
@@ -191,12 +193,12 @@ module.exports = {
 				iconURL: 'attachment://pin.png',
 			});
 
-		await interaction.reply({
-			content: 'Your LFG message has been sent below!',
-			ephemeral: true,
-		});
+		// await interaction.reply({
+		// 	content: 'Your LFG message has been sent below!',
+		// 	ephemeral: true,
+		// });
 
-		await interaction.channel.send({
+		await interaction.editReply({
 			embeds: [embed],
 			files: [
 				{
@@ -208,6 +210,7 @@ module.exports = {
 					name: 'pin.png',
 				},
 			],
+			ephemeral: false,
 		});
 	},
 };

@@ -10,38 +10,40 @@ module.exports = {
 		.setDescription('Removes a member from their current voice channel.')
 		.addUserOption(option => option.setName('member-name').setDescription('The member to be removed from their voice channel.').setRequired(true)),
 	async execute(interaction) {
+		await interaction.deferReply({ ephemeral: true });
+
 		const user = interaction.options.getUser('member-name');
 		const member = interaction.guild.members.cache.get(user.id);
 		const invokerMember = interaction.guild.members.cache.get(interaction.user.id);
 
 		// If the user they mentioned is not in a VC, do nonthing
 		if (!member.voice.channel) {
-			await interaction.reply({ content: `<@${user.id}> is not connected to a voice channel.`, ephemeral: true });
+			await interaction.editReply({ content: `<@${user.id}> is not connected to a voice channel.`, ephemeral: true });
 			return;
 		}
 
 		// If the user they mentioned is in a VC, but the invoker is not in the same VC, do nothing
 		if (!invokerMember.voice.channel || invokerMember.voice.channel.id !== member.voice.channel.id) {
-			await interaction.reply({ content: `You must be in the same voice channel as <@${user.id}> to remove them.`, ephemeral: true });
+			await interaction.editReply({ content: `You must be in the same voice channel as <@${user.id}> to remove them.`, ephemeral: true });
 			return;
 		}
 
 		// If the user they mentioned is themselves, do nothing
 		if (invokerMember.id == user.id) {
-			await interaction.reply({ content: 'You cannot kick yourself from the voice channel.', ephemeral: true });
+			await interaction.editReply({ content: 'You cannot kick yourself from the voice channel.', ephemeral: true });
 			return;
 		}
 
 		// If the user they mentioned is a moderator, do nothing
 		if (member.roles.cache.find(r => r.name === 'Discord Moderator')) {
 			// Your code
-			await interaction.reply({ content: 'You cannot kick a moderator from the voice channel.', ephemeral: true });
+			await interaction.editReply({ content: 'You cannot kick a moderator from the voice channel.', ephemeral: true });
 			return;
 		}
 
 		try {
 			await member.voice.disconnect();
-			await interaction.reply({
+			await interaction.editReply({
 				content: `Successfully removed <@${user.id}> from the voice channel.\nPlease report any rule breaking behaviour to <@542736472155881473> with the ID of the user you kicked.`,
 				ephemeral: true,
 			});
@@ -255,7 +257,7 @@ module.exports = {
 			}
 		} catch (error) {
 			console.error(error);
-			await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+			await interaction.editReply({ content: 'There was an error while executing this command!', ephemeral: true });
 		}
 	},
 };

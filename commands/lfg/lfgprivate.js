@@ -79,6 +79,8 @@ module.exports = {
 		)
 		.addStringOption(option => option.setName('code').setDescription('The private match code').setRequired(true)),
 	async execute(interaction) {
+		await interaction.deferReply({ ephemeral: false });
+
 		const { options } = interaction;
 
 		const description = options.getString('message');
@@ -91,16 +93,16 @@ module.exports = {
 		const fieldgmv = options.getString('game-mode-variant');
 		const fieldc = options.getString('code');
 
-		if (bannedWords.some(i => description.toLowerCase().includes(i))) {
-			console.log(interaction.member.displayName + ' tried to use a banned word in their LFG message.');
+		// if (bannedWords.some(i => description.toLowerCase().includes(i))) {
+		// 	console.log(interaction.member.displayName + ' tried to use a banned word in their LFG message.');
 
-			await interaction.reply({
-				content: 'Your LFG message contains a bad word!',
-				ephemeral: true,
-			});
+		// 	await interaction.editReply({
+		// 		content: 'Your LFG message contains a bad word!',
+		// 		ephemeral: true,
+		// 	});
 
-			return;
-		}
+		// 	return;
+		// }
 
 		const embed = new EmbedBuilder()
 			.setAuthor({
@@ -147,12 +149,12 @@ module.exports = {
 				iconURL: 'attachment://pin.png',
 			});
 
-		await interaction.reply({
-			content: 'Your LFG message has been sent below!',
-			ephemeral: true,
-		});
+		// await interaction.reply({
+		// 	content: 'Your LFG message has been sent below!',
+		// 	ephemeral: true,
+		// });
 
-		await interaction.channel.send({
+		await interaction.editReply({
 			embeds: [embed],
 			files: [
 				{

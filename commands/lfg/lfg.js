@@ -34,6 +34,8 @@ module.exports = {
 		.addStringOption(option => option.setName('main-legends').setDescription('What legends do you usually pick').setRequired(false))
 		.addStringOption(option => option.setName('gamer-tag').setDescription('Enter your gamer tag').setRequired(false)),
 	async execute(interaction) {
+		await interaction.deferReply({ ephemeral: true });
+
 		const { options } = interaction;
 
 		const mode = options.getString('mode');
@@ -74,7 +76,7 @@ module.exports = {
 		if (bannedWords.some(i => description.toLowerCase().includes(i))) {
 			console.log(interaction.member.displayName + ' tried to use a banned word in their LFG message.');
 
-			await interaction.reply({
+			await interaction.editReply({
 				content: 'Your LFG message contains a bad word!',
 				ephemeral: true,
 			});
@@ -86,7 +88,7 @@ module.exports = {
 			if (bannedWords.some(i => fieldm.toLowerCase().includes(i))) {
 				console.log(interaction.member.displayName + ' tried to use a banned word in their LFG message.');
 
-				await interaction.reply({
+				await interaction.editReply({
 					content: 'Your LFG message contains a bad word!',
 					ephemeral: true,
 				});
@@ -131,7 +133,7 @@ module.exports = {
 				inline: true,
 			});
 
-		await interaction.reply({
+		await interaction.editReply({
 			content: 'Your LFG message has been sent below!',
 			ephemeral: true,
 		});

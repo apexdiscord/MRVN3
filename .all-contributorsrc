@@ -15,6 +15,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "SDCore",
+      "name": "Michael",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5140203?v=4",
+      "profile": "https://github.com/SDCore",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

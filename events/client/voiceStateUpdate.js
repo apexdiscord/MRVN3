@@ -35,7 +35,7 @@ module.exports = {
 				if (process.env.VC_JOIN !== undefined) {
 					const channel = guild.channels.cache.get(process.env.VC_JOIN);
 					channel.send(
-						`<t:${logTimestamp}:f> :microphone2: :green_circle: <@${member.user.id}> (**${member.user.tag}**, \`${member.user.id}\`) Joined Empty VC: <#${newState.channel.id}> (**${newState.channel.name}**, \`${newState.channel.id}\`)`,
+						`<t:${logTimestamp}:f> :microphone2: <:MRVN_Join:1118671133802246296> <@${member.user.id}> (**${member.user.tag}**, \`${member.user.id}\`) Joined Empty VC: <#${newState.channel.id}> (**${newState.channel.name}**, \`${newState.channel.id}\`)`,
 					);
 				}
 
@@ -72,7 +72,7 @@ module.exports = {
 				if (process.env.VC_JOIN !== undefined) {
 					const channel = guild.channels.cache.get(process.env.VC_JOIN);
 					channel.send(
-						`<t:${logTimestamp}:f> :microphone2: :green_circle: <@${member.user.id}> (**${member.user.tag}**, \`${member.user.id}\`) Joined Occupied VC: <#${newState.channel.id}> (**${newState.channel.name}**, \`${newState.channel.id}\`)`,
+						`<t:${logTimestamp}:f> :microphone2: <:MRVN_Join:1118671133802246296> <@${member.user.id}> (**${member.user.tag}**, \`${member.user.id}\`) Joined Occupied VC: <#${newState.channel.id}> (**${newState.channel.name}**, \`${newState.channel.id}\`)`,
 					);
 				}
 			}
@@ -105,7 +105,7 @@ module.exports = {
 			if (process.env.VC_LEAVE !== undefined) {
 				const channel = guild.channels.cache.get(process.env.VC_LEAVE);
 				channel.send(
-					`<t:${logTimestamp}:f> :microphone2: :red_circle: <@${member.user.id}> (**${member.user.tag}**, \`${member.user.id}\`) Left VC: <#${oldState.channel.id}> (**${oldState.channel.name}**, \`${oldState.channel.id}\`)`,
+					`<t:${logTimestamp}:f> :microphone2: <:MRVN_Leave:1118671155960762489> <@${member.user.id}> (**${member.user.tag}**, \`${member.user.id}\`) Left VC: <#${oldState.channel.id}> (**${oldState.channel.name}**, \`${oldState.channel.id}\`)`,
 				);
 			}
 		} else if (oldState.channelId != newState.channelId) {
@@ -122,7 +122,7 @@ module.exports = {
 				if (process.env.VC_MOVE !== undefined) {
 					const channel = guild.channels.cache.get(process.env.VC_MOVE);
 					channel.send(
-						`<t:${logTimestamp}:f> :microphone2: :yellow_circle: <@${member.user.id}> (**${member.user.tag}**, \`${member.user.id}\`) Moved to Empty VC: <#${newState.channel.id}> (**${newState.channel.name}**, \`${newState.channel.id}\`)`,
+						`<t:${logTimestamp}:f> :microphone2: <:MRVN_Move:1118671145034596474> <@${member.user.id}> (**${member.user.tag}**, \`${member.user.id}\`) Moved to Empty VC: <#${newState.channel.id}> (**${newState.channel.name}**, \`${newState.channel.id}\`)`,
 					);
 				}
 
@@ -165,7 +165,7 @@ module.exports = {
 				if (process.env.VC_MOVE !== undefined) {
 					const channel = guild.channels.cache.get(process.env.VC_MOVE);
 					channel.send(
-						`<t:${logTimestamp}:f> :microphone2: :yellow_circle: <@${member.user.id}> (**${member.user.tag}**, \`${member.user.id}\`) Moved to Occupied VC: <#${newState.channel.id}> (**${newState.channel.name}**, \`${newState.channel.id}\`)`,
+						`<t:${logTimestamp}:f> :microphone2: <:MRVN_Move:1118671145034596474> <@${member.user.id}> (**${member.user.tag}**, \`${member.user.id}\`) Moved to Occupied VC: <#${newState.channel.id}> (**${newState.channel.name}**, \`${newState.channel.id}\`)`,
 					);
 				}
 

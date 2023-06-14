@@ -132,6 +132,7 @@ module.exports = {
 							inline: true,
 						},
 					])
+					.setTimestamp()
 					.setColor('CA2128');
 
 				channel.send({ embeds: [timeoutEmbed28] });
@@ -176,6 +177,7 @@ module.exports = {
 							inline: true,
 						},
 					])
+					.setTimestamp()
 					.setColor('E9BE1A');
 
 				channel.send({ embeds: [timeoutEmbed60] });
@@ -220,6 +222,7 @@ module.exports = {
 							inline: true,
 						},
 					])
+					.setTimestamp()
 					.setColor('1A6EC8');
 
 				channel.send({ embeds: [timeoutEmbed10] });
@@ -251,6 +254,7 @@ module.exports = {
 							inline: true,
 						},
 					])
+					.setTimestamp()
 					.setColor('1A6EC8');
 
 				channel.send({ embeds: [timeoutEmbed10] });

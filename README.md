@@ -12,3 +12,5 @@ LFG Bot for the Apex Legends Discord Server, handling LFG commands, voice state 
 <!-- prettier-ignore-end -->
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
+
+Copyright 2023.

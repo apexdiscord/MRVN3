@@ -13,7 +13,7 @@ LFG Bot for the Apex Legends Discord Server, handling LFG commands, voice state 
 <table>
   <tbody>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/SDCore"><img src="https://avatars.githubusercontent.com/u/5140203?v=4?s=100" width="100px;" alt="Michael"/><br /><sub><b>Michael</b></sub></a><br /><a href="https://github.com/apexdiscord/MRVN3/commits?author=sdcore" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/randomhuman9"><img src="https://avatars.githubusercontent.com/u/65187211?v=4?s=100" width="100px;" alt="randomhuman9"/><br /><sub><b>randomhuman9</b></sub></a><br /><a href="https://github.com/apexdiscord/MRVN3/commits?author=randomhuman9" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
@@ -29,3 +29,5 @@ LFG Bot for the Apex Legends Discord Server, handling LFG commands, voice state 
 <!-- prettier-ignore-end -->
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
+
+Copyright 2023.

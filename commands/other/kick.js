@@ -3,6 +3,7 @@ const Database = require('better-sqlite3');
 // const db2 = new Database(`${__dirname}/../../databases/memberDecay.sqlite`, { verbose: console.log });
 const db2 = new Database(`${__dirname}/../../databases/memberDecay.sqlite`);
 const moment = require('moment');
+const chalk = require('chalk');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -71,14 +72,14 @@ module.exports = {
 			const entryCount4 = result4.entry_count4;
 
 			// Display the entry count
-			const response2 = `10 Minute Kick Count for ${user.tag} (${userId}): ${entryCount2}`;
-			console.log(response2);
+			const response2 = `KICK: 10 Minute Kick Count for ${user.tag} (${userId}): ${entryCount2}`;
+			console.log(chalk.bgBlue(response2));
 
-			const response3 = `1 Hour Kick Count for ${user.tag} (${userId}): ${entryCount3}`;
-			console.log(response3);
+			const response3 = `KICK: 1 Hour Kick Count for ${user.tag} (${userId}): ${entryCount3}`;
+			console.log(chalk.bgBlue(response3));
 
-			const response4 = `24 Hour Kick Count for ${user.tag} (${userId}): ${entryCount4}`;
-			console.log(response4);
+			const response4 = `KICK: 24 Hour Kick Count for ${user.tag} (${userId}): ${entryCount4}`;
+			console.log(chalk.bgBlue(response4));
 
 			// Set Timeouts for User
 			if (entryCount4 >= 9) {

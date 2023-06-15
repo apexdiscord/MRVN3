@@ -42,12 +42,6 @@ module.exports = {
 		}
 
 		try {
-			await member.voice.disconnect();
-			await interaction.editReply({
-				content: `Successfully removed <@${user.id}> from the voice channel.\nPlease report any rule breaking behaviour to <@542736472155881473> with the ID of the user you kicked.`,
-				ephemeral: true,
-			});
-
 			const userId = user.id;
 			const timestamp = moment().unix();
 
@@ -100,6 +94,7 @@ module.exports = {
 				const channel = interaction.guild.channels.cache.get(process.env.VC_KICK);
 				const timeoutEmbed28 = new EmbedBuilder()
 					.setTitle(`${member.user.username} was issued a 28 day timeout!`)
+					.setDescription(`They were kicked from <#${member.voice.channelId}>.`)
 					.addFields([
 						{
 							name: 'User',
@@ -145,6 +140,7 @@ module.exports = {
 				const channel = interaction.guild.channels.cache.get(process.env.VC_KICK);
 				const timeoutEmbed60 = new EmbedBuilder()
 					.setTitle(`${member.user.username} was issued a 60 minute timeout!`)
+					.setDescription(`They were kicked from <#${member.voice.channelId}>.`)
 					.addFields([
 						{
 							name: 'User',
@@ -190,6 +186,7 @@ module.exports = {
 				const channel = interaction.guild.channels.cache.get(process.env.VC_KICK);
 				const timeoutEmbed10 = new EmbedBuilder()
 					.setTitle(`${member.user.username} was issued a 10 minute timeout!`)
+					.setDescription(`They were kicked from <#${member.voice.channelId}>.`)
 					.addFields([
 						{
 							name: 'User',
@@ -230,7 +227,7 @@ module.exports = {
 				// Send Log for Kick
 				const channel = interaction.guild.channels.cache.get(process.env.VC_KICK);
 				const timeoutEmbed10 = new EmbedBuilder()
-					.setTitle(`${member.user.username} was kicked from an LFG VC!`)
+					.setTitle(`${member.user.username} was kicked from <#${member.voice.channelId}>!`)
 					.setDescription('They were kicked from a VC, but were not issued a timeout.')
 					.addFields([
 						{
@@ -259,6 +256,13 @@ module.exports = {
 
 				channel.send({ embeds: [timeoutEmbed10] });
 			}
+
+			// Move disconnect to under logging to allow the ID to pass to the log embeds
+			await member.voice.disconnect();
+			await interaction.editReply({
+				content: `Successfully removed <@${user.id}> from the voice channel.\nPlease report any rule breaking behaviour to <@542736472155881473> with the ID of the user you kicked.`,
+				ephemeral: true,
+			});
 		} catch (error) {
 			console.error(error);
 			await interaction.editReply({ content: 'There was an error while executing this command!', ephemeral: true });

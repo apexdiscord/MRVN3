@@ -29,6 +29,18 @@ module.exports = {
 	async execute(interaction) {
 		await interaction.deferReply({ ephemeral: true });
 
+		if (
+			interaction.member.voice.channel &&
+			(interaction.member.voice.channel.parentId == process.env.GEN_CATEGORY || interaction.member.voice.channel.parentId == process.env.EVENT_CATEGORY)
+		) {
+			await interaction.editReply({
+				content: `You cannot use this command while in <#${interaction.member.voice.channel.id}>. Please disconnect or move to an LFG voice channel.`,
+				ephemeral: true,
+			});
+
+			return;
+		}
+
 		const { options } = interaction;
 
 		const description = options.getString('message');

@@ -98,7 +98,7 @@ module.exports = {
 				// If they are in the DB, set the channel limit back to 3
 				// If they aren't, then there's no point setting it back
 				// to 3 if they don't own the VC
-				if (oldState.channel != null && oldState.channel.parent.id != process.env.GEN_CAT) {
+				if (oldState.channel != null && oldState.channel.parent.id != process.env.GEN_CATEGORY && oldState.channel.parent.id != process.env.EVENT_CATEGORY) {
 					oldState.channel.setUserLimit(3);
 				}
 			}
@@ -156,7 +156,7 @@ module.exports = {
 					console.log(chalk.blue(`DATABASE: Added ${member.user.tag} (${member.user.id}) to the database.`));
 
 					// Also, set the previous VC channel limit back to 3
-					if (oldState.channel != null && oldState.channel.parent.id != process.env.GEN_CAT) {
+					if (oldState.channel != null && oldState.channel.parent.id != process.env.GEN_CATEGORY && oldState.channel.parent.id != process.env.EVENT_CATEGORY) {
 						oldState.channel.setUserLimit(3);
 					}
 				}
@@ -187,7 +187,7 @@ module.exports = {
 					console.log(chalk.cyan(`DATABASE: Removed ${member.user.tag} (${member.user.id}) from the database.`));
 
 					// Also, set the previous VC channel limit back to 3
-					if (oldState.channel != null && oldState.channel.parent.id != process.env.GEN_CAT) {
+					if (oldState.channel != null && oldState.channel.parent.id != process.env.GEN_CATEGORY && oldState.channel.parent.id != process.env.EVENT_CATEGORY) {
 						oldState.channel.setUserLimit(3);
 					}
 				}

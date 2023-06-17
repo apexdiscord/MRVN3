@@ -68,7 +68,21 @@ module.exports = {
 		.addStringOption(option => option.setName('tournament-name').setDescription('Name of the tournament you are participating').setRequired(true))
 		.addStringOption(option => option.setName('date-of-tournament').setDescription('Date of the tournament').setRequired(true)),
 	async execute(interaction) {
-		await interaction.deferReply({ ephemeral: false });
+		if (
+			interaction.member.voice.channel &&
+			(interaction.member.voice.channel.parentId == process.env.GEN_CATEGORY || interaction.member.voice.channel.parentId == process.env.EVENT_CATEGORY)
+		) {
+			await interaction.deferReply({ ephemeral: true });
+
+			await interaction.editReply({
+				content: `You cannot use this command while in <#${interaction.member.voice.channel.id}>. Please disconnect or move to an LFG voice channel.`,
+				ephemeral: true,
+			});
+
+			return;
+		} else {
+			await interaction.deferReply({ ephemeral: false });
+		}
 
 		const { options } = interaction;
 

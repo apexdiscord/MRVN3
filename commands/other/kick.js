@@ -178,8 +178,8 @@ module.exports = {
 					.setColor('E9BE1A');
 
 				channel.send({ embeds: [timeoutEmbed60] });
-			} else if (entryCount2 >= 2) {
-				member.timeout(600_000, 'User was timed out due to being kicked from an LFG channel 2 or more times in the past hour.');
+			} else if (entryCount2 >= 3) {
+				member.timeout(600_000, 'User was timed out due to being kicked from an LFG channel 3 or more times in the past hour.');
 
 				const unmuteTime = Math.floor(new Date(Date.now() + 10 * 60 * 1000) / 1000);
 

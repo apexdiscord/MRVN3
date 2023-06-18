@@ -79,7 +79,21 @@ module.exports = {
 		)
 		.addStringOption(option => option.setName('code').setDescription('The private match code').setRequired(true)),
 	async execute(interaction) {
-		await interaction.deferReply({ ephemeral: false });
+		if (
+			interaction.member.voice.channel &&
+			(interaction.member.voice.channel.parentId == process.env.GEN_CATEGORY || interaction.member.voice.channel.parentId == process.env.EVENT_CATEGORY)
+		) {
+			await interaction.deferReply({ ephemeral: true });
+
+			await interaction.editReply({
+				content: `You cannot use this command while in <#${interaction.member.voice.channel.id}>. Please disconnect or move to an LFG voice channel.`,
+				ephemeral: true,
+			});
+
+			return;
+		} else {
+			await interaction.deferReply({ ephemeral: false });
+		}
 
 		const { options } = interaction;
 
@@ -106,10 +120,10 @@ module.exports = {
 
 		const embed = new EmbedBuilder()
 			.setAuthor({
-				name: `${interaction.member.displayName} is looking for players for a private match`,
+				name: `${interaction.member.user.tag} is looking for players for a private match`,
 				iconURL: interaction.member.displayAvatarURL({ dynamic: true }),
 			})
-			.setDescription(`<@${interaction.member.id}>'s message: ${description}`)
+			.setDescription(`${description}`)
 			.setThumbnail('attachment://trios.png')
 			.setTimestamp()
 			.addFields({

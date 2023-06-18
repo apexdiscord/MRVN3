@@ -94,8 +94,8 @@ module.exports = {
 
 				const channel = interaction.guild.channels.cache.get(process.env.VC_KICK);
 				const timeoutEmbed28 = new EmbedBuilder()
-					.setTitle(`${member.user.username} was issued a 28 day timeout!`)
-					.setDescription(`They were kicked from <#${member.voice.channelId}>.`)
+					.setTitle(`${member.user.tag} was issued a 28 day timeout!`)
+					.setDescription(`Their timeout will expire <t:${unmuteTime}:R>, <t:${unmuteTime}:d> at <t:${unmuteTime}:t>.`)
 					.addFields([
 						{
 							name: 'User',
@@ -103,13 +103,13 @@ module.exports = {
 							inline: true,
 						},
 						{
-							name: 'Expires',
-							value: `<t:${unmuteTime}:f>\n<t:${unmuteTime}:R>`,
+							name: 'Kicked By',
+							value: `<@${interaction.user.id}>\n\`${interaction.user.id}\``,
 							inline: true,
 						},
 						{
-							name: `\u200b`,
-							value: `\u200b`,
+							name: 'Voice Channel',
+							value: `<#${member.voice.channelId}>\n\`${member.voice.channelId}\``,
 							inline: true,
 						},
 						{
@@ -133,15 +133,15 @@ module.exports = {
 
 				channel.send({ embeds: [timeoutEmbed28] });
 			} else if (entryCount3 >= 6) {
-				member.timeout(3600_000, 'User was timed out due to being kicked from an LFG channel 6 or more times in the past 24 hours.');
+				member.timeout(3600_000, 'User was timed out for 1 hour due to being kicked from an LFG channel 6 or more times in the past 24 hours.');
 
 				const unmuteTime = Math.floor(new Date(Date.now() + 60 * 60 * 1000) / 1000);
 
 				// Send Log for 60 Minute Timeout
 				const channel = interaction.guild.channels.cache.get(process.env.VC_KICK);
 				const timeoutEmbed60 = new EmbedBuilder()
-					.setTitle(`${member.user.username} was issued a 60 minute timeout!`)
-					.setDescription(`They were kicked from <#${member.voice.channelId}>.`)
+					.setTitle(`${member.user.tag} was issued a 60 minute timeout!`)
+					.setDescription(`Their timeout will expire <t:${unmuteTime}:R>, at <t:${unmuteTime}:t>.`)
 					.addFields([
 						{
 							name: 'User',
@@ -149,13 +149,13 @@ module.exports = {
 							inline: true,
 						},
 						{
-							name: 'Expires',
-							value: `<t:${unmuteTime}:t>\n<t:${unmuteTime}:R>`,
+							name: 'Kicked By',
+							value: `<@${interaction.user.id}>\n\`${interaction.user.id}\``,
 							inline: true,
 						},
 						{
-							name: `\u200b`,
-							value: `\u200b`,
+							name: 'Voice Channel',
+							value: `<#${member.voice.channelId}>\n\`${member.voice.channelId}\``,
 							inline: true,
 						},
 						{
@@ -178,16 +178,16 @@ module.exports = {
 					.setColor('E9BE1A');
 
 				channel.send({ embeds: [timeoutEmbed60] });
-			} else if (entryCount2 >= 2) {
-				member.timeout(600_000, 'User was timed out due to being kicked from an LFG channel 2 or more times in the past hour.');
+			} else if (entryCount2 >= 3) {
+				member.timeout(600_000, 'User was timed out for 10 minutes due to being kicked from an LFG channel 3 or more times in the past hour.');
 
 				const unmuteTime = Math.floor(new Date(Date.now() + 10 * 60 * 1000) / 1000);
 
 				// Send Log for 10 Minute Timeout
 				const channel = interaction.guild.channels.cache.get(process.env.VC_KICK);
 				const timeoutEmbed10 = new EmbedBuilder()
-					.setTitle(`${member.user.username} was issued a 10 minute timeout!`)
-					.setDescription(`They were kicked from <#${member.voice.channelId}>.`)
+					.setTitle(`${member.user.tag} was issued a 10 minute timeout!`)
+					.setDescription(`Their timeout will expire <t:${unmuteTime}:R>, at <t:${unmuteTime}:t>.`)
 					.addFields([
 						{
 							name: 'User',
@@ -195,13 +195,13 @@ module.exports = {
 							inline: true,
 						},
 						{
-							name: 'Expires',
-							value: `<t:${unmuteTime}:t>\n<t:${unmuteTime}:R>`,
+							name: 'Kicked By',
+							value: `<@${interaction.user.id}>\n\`${interaction.user.id}\``,
 							inline: true,
 						},
 						{
-							name: `\u200b`,
-							value: `\u200b`,
+							name: 'Voice Channel',
+							value: `<#${member.voice.channelId}>\n\`${member.voice.channelId}\``,
 							inline: true,
 						},
 						{
@@ -228,13 +228,23 @@ module.exports = {
 				// Send Log for Kick
 				const channel = interaction.guild.channels.cache.get(process.env.VC_KICK);
 				const timeoutEmbed10 = new EmbedBuilder()
-					.setTitle(`${member.user.username} was kicked from <#${member.voice.channelId}>!`)
+					.setTitle(`${member.user.tag} was kicked from a VC!`)
 					.setDescription('They were kicked from a VC, but were not issued a timeout.')
 					.addFields([
 						{
 							name: 'User',
 							value: `<@${member.user.id}>\n\`${member.user.id}\``,
-							inline: false,
+							inline: true,
+						},
+						{
+							name: 'Kicked By',
+							value: `<@${interaction.user.id}>\n\`${interaction.user.id}\``,
+							inline: true,
+						},
+						{
+							name: 'Voice Channel',
+							value: `<#${member.voice.channelId}>\n\`${member.voice.channelId}\``,
+							inline: true,
 						},
 						{
 							name: '10m Kick Count',

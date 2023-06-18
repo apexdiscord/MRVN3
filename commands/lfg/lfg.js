@@ -36,6 +36,18 @@ module.exports = {
 	async execute(interaction) {
 		await interaction.deferReply({ ephemeral: true });
 
+		if (
+			interaction.member.voice.channel &&
+			(interaction.member.voice.channel.parentId == process.env.GEN_CATEGORY || interaction.member.voice.channel.parentId == process.env.EVENT_CATEGORY)
+		) {
+			await interaction.editReply({
+				content: `You cannot use this command while in <#${interaction.member.voice.channel.id}>. Please disconnect or move to an LFG voice channel.`,
+				ephemeral: true,
+			});
+
+			return;
+		}
+
 		const { options } = interaction;
 
 		const mode = options.getString('mode');
@@ -56,9 +68,9 @@ module.exports = {
 			var vclink = null;
 		}
 
-		const micyes = new ButtonBuilder().setCustomId('micyes').setLabel('Mic Required').setStyle(ButtonStyle.Success).setDisabled(true);
+		const micyes = new ButtonBuilder().setCustomId('micyes').setLabel('Mic Required').setStyle(ButtonStyle.Danger).setDisabled(true);
 
-		const micno = new ButtonBuilder().setCustomId('micno').setLabel('Mic Optional').setStyle(ButtonStyle.Danger).setDisabled(true);
+		const micno = new ButtonBuilder().setCustomId('micno').setLabel('Mic Optional').setStyle(ButtonStyle.Success).setDisabled(true);
 
 		const row = new ActionRowBuilder();
 		if (interaction.member.voice.channel) row.addComponents(vclink);

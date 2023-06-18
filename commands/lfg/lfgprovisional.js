@@ -9,16 +9,9 @@ module.exports = {
 		.addStringOption(option => option.setName('message').setDescription('This will be your lfg message').setRequired(true))
 		.addStringOption(option =>
 			option
-				.setName('mic-required')
-				.setDescription('Do you require your team to have mic')
-				.setRequired(false)
-				.addChoices({ name: 'Yes', value: 'Yes' }, { name: 'No', value: 'No' }),
-		)
-		.addStringOption(option =>
-			option
 				.setName('match-number')
 				.setDescription('Set your current provisional match number')
-				.setRequired(false)
+				.setRequired(true)
 				.addChoices(
 					{ name: '0/10', value: '0/10' },
 					{ name: '1/10', value: '1/10' },
@@ -30,8 +23,14 @@ module.exports = {
 					{ name: '7/10', value: '7/10' },
 					{ name: '8/10', value: '8/10' },
 					{ name: '9/10', value: '9/10' },
-					{ name: '10/10', value: '10/10' },
 				),
+		)
+		.addStringOption(option =>
+			option
+				.setName('mic-required')
+				.setDescription('Do you require your team to have mic')
+				.setRequired(false)
+				.addChoices({ name: 'Yes', value: 'Yes' }, { name: 'No', value: 'No' }),
 		)
 		.addStringOption(option =>
 			option
@@ -64,6 +63,18 @@ module.exports = {
 	async execute(interaction) {
 		await interaction.deferReply({ ephemeral: true });
 
+		if (
+			interaction.member.voice.channel &&
+			(interaction.member.voice.channel.parentId == process.env.GEN_CATEGORY || interaction.member.voice.channel.parentId == process.env.EVENT_CATEGORY)
+		) {
+			await interaction.editReply({
+				content: `You cannot use this command while in <#${interaction.member.voice.channel.id}>. Please disconnect or move to an LFG voice channel.`,
+				ephemeral: true,
+			});
+
+			return;
+		}
+
 		const { options } = interaction;
 
 		const description = options.getString('message');
@@ -84,9 +95,9 @@ module.exports = {
 			var vclink = null;
 		}
 
-		const micyes = new ButtonBuilder().setCustomId('micyes').setLabel('Mic Required').setStyle(ButtonStyle.Success).setDisabled(true);
+		const micyes = new ButtonBuilder().setCustomId('micyes').setLabel('Mic Required').setStyle(ButtonStyle.Danger).setDisabled(true);
 
-		const micno = new ButtonBuilder().setCustomId('micno').setLabel('Mic Optional').setStyle(ButtonStyle.Danger).setDisabled(true);
+		const micno = new ButtonBuilder().setCustomId('micno').setLabel('Mic Optional').setStyle(ButtonStyle.Success).setDisabled(true);
 
 		const row = new ActionRowBuilder();
 		if (interaction.member.voice.channel) row.addComponents(vclink);

@@ -61,7 +61,7 @@ module.exports = {
 
 		const mode = options.getString('mode');
 		const description = options.getString('message');
-    const saveoption = options.getString('save');
+    	const saveoption = options.getString('save');
 		const playerno = options.getString('players-needed');
 		const fieldmic = options.getString('mic-required');
 		const fieldp = options.getString('play-style');
@@ -160,10 +160,12 @@ module.exports = {
 			ephemeral: true,
 		});
 
+	const timestamp = moment().unix();
+
     if (saveoption === 'Yes') {
       // Store the LFG data in the database
       const stmt = db3.prepare(`
-        INSERT OR REPLACE INTO savedlfg (user_id, mode, description, playerno, fieldmic, fieldp, fieldm, fieldg)
+        INSERT OR REPLACE INTO savedlfg (user_id, mode, description, playerno, fieldmic, fieldp, fieldm, fieldg, timestamp)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       `);
       stmt.run(

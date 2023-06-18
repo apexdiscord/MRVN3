@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const Database = require('better-sqlite3');
 const moment = require('moment');
-const db3 = new Database(`${__dirname}/../../databases/savedlfg.sqlite`, { verbose: console.log });
+const db3 = new Database(`${__dirname}/../../databases/savedLFGPosts.sqlite`, { verbose: console.log });
 
 var bannedWords = require('../../data/bannedWords.json');
 
@@ -166,7 +166,7 @@ module.exports = {
 		if (saveoption === 'Yes') {
 			// Store the LFG data in the database
 			const stmt = db3.prepare(`
-        INSERT OR REPLACE INTO savedlfg (user_id, mode, description, playerno, fieldmic, fieldp, fieldm, fieldg, timestamp)
+        INSERT OR REPLACE INTO savedPosts (user_id, mode, description, playerno, fieldmic, fieldp, fieldm, fieldg, timestamp)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
 			stmt.run(interaction.member.id, mode, description, playerno || '', fieldmic || '', fieldp || '', fieldm || '', fieldg || '', timestamp);

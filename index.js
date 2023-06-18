@@ -16,7 +16,7 @@ const client = new Client({
 // Connect to the SQLite database
 const db = new Database(`${__dirname}/databases/vcOwnerList.sqlite`);
 const db2 = new Database(`${__dirname}/databases/memberDecay.sqlite`);
-const db3 = new Database(`${__dirname}/databases/savedlfg.sqlite`);
+const db3 = new Database(`${__dirname}/databases/savedLFGPosts.sqlite`);
 
 client
 	.login(process.env.TOKEN)
@@ -61,7 +61,7 @@ db2.exec(createTableQuery4);
 
 // Create a table to store LFG data
 const createTableQuery5 = `
-  CREATE TABLE IF NOT EXISTS savedlfg (
+  CREATE TABLE IF NOT EXISTS savedPosts (
     user_id TEXT PRIMARY KEY,
     mode TEXT,
     description TEXT,
@@ -113,7 +113,7 @@ function deleteOldEntries5() {
 	// console.log(chalk.cyan(`DATABASE: Running 10 Minute Kick Counter Cleanup Check...`));
 
 	const tenMinutesAgo = moment().subtract(10, 'minutes').unix();
-	db3.prepare('DELETE FROM savedlfg WHERE timestamp <= ?').run(tenMinutesAgo);
+	db3.prepare('DELETE FROM savedPosts WHERE timestamp <= ?').run(tenMinutesAgo);
 
 	// console.log(chalk.green(`DATABASE: 10 Minute Kick Counter Cleanup Complete!`));
 }

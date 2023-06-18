@@ -113,7 +113,7 @@ function deleteOldEntries5() {
 	// console.log(chalk.cyan(`DATABASE: Running 10 Minute Kick Counter Cleanup Check...`));
 
 	const tenMinutesAgo = moment().subtract(10, 'minutes').unix();
-	db2.prepare('DELETE FROM savedlfg WHERE timestamp <= ?').run(tenMinutesAgo);
+	db3.prepare('DELETE FROM savedlfg WHERE timestamp <= ?').run(tenMinutesAgo);
 
 	// console.log(chalk.green(`DATABASE: 10 Minute Kick Counter Cleanup Complete!`));
 }

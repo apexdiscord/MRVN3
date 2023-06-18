@@ -120,10 +120,10 @@ module.exports = {
 
 		const embed = new EmbedBuilder()
 			.setAuthor({
-				name: `${interaction.member.displayName} is looking for players for a private match`,
+				name: `${interaction.member.user.tag} is looking for players for a private match`,
 				iconURL: interaction.member.displayAvatarURL({ dynamic: true }),
 			})
-			.setDescription(`<@${interaction.member.id}>'s message: ${description}`)
+			.setDescription(`${description}`)
 			.setThumbnail('attachment://trios.png')
 			.setTimestamp()
 			.addFields({

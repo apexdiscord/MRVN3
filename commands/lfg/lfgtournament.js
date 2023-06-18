@@ -150,10 +150,10 @@ module.exports = {
 
 		const embed = new EmbedBuilder()
 			.setAuthor({
-				name: `${interaction.member.displayName} is looking for tournament teammates`,
+				name: `${interaction.member.user.tag} is looking for tournament teammates`,
 				iconURL: interaction.member.displayAvatarURL({ dynamic: true }),
 			})
-			.setDescription(`<@${interaction.member.id}>'s message: ${description}`)
+			.setDescription(`${description}`)
 			.setThumbnail('attachment://trios.png')
 			.setTimestamp()
 			.addFields({ name: '__Region__', value: `${fieldr}`, inline: true })

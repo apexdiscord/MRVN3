@@ -133,7 +133,7 @@ module.exports = {
 
 				channel.send({ embeds: [timeoutEmbed28] });
 			} else if (entryCount3 >= 6) {
-				member.timeout(3600_000, 'User was timed out due to being kicked from an LFG channel 6 or more times in the past 24 hours.');
+				member.timeout(3600_000, 'User was timed out for 1 hour due to being kicked from an LFG channel 6 or more times in the past 24 hours.');
 
 				const unmuteTime = Math.floor(new Date(Date.now() + 60 * 60 * 1000) / 1000);
 
@@ -179,7 +179,7 @@ module.exports = {
 
 				channel.send({ embeds: [timeoutEmbed60] });
 			} else if (entryCount2 >= 3) {
-				member.timeout(600_000, 'User was timed out due to being kicked from an LFG channel 3 or more times in the past hour.');
+				member.timeout(600_000, 'User was timed out for 10 minutes due to being kicked from an LFG channel 3 or more times in the past hour.');
 
 				const unmuteTime = Math.floor(new Date(Date.now() + 10 * 60 * 1000) / 1000);
 

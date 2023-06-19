@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const Database = require('better-sqlite3');
-// const db2 = new Database(`${__dirname}/../../databases/memberDecay.sqlite`, { verbose: console.log });
-const db2 = new Database(`${__dirname}/../../databases/memberDecay.sqlite`);
+// const memberDecayTable = new Database(`${__dirname}/../../databases/memberDecay.sqlite`, { verbose: console.log });
+const memberDecayTable = new Database(`${__dirname}/../../databases/memberDecay.sqlite`);
 const moment = require('moment');
 const chalk = require('chalk');
 
@@ -47,19 +47,39 @@ module.exports = {
 			const timestamp = moment().unix();
 
 			// Store id and timestamp on kick
-			const insertDecayEntry = `INSERT INTO memberDecay1 (id, timestamp) VALUES (?, ?)`;
-			db2.prepare(insertDecayEntry).run(userId, timestamp);
+			// const insertDecayEntry = `INSERT INTO OR REPLACE memberDecay (id, timestamp) VALUES (?, ?)`;
+			// db2.prepare(insertDecayEntry).run(userId, timestamp);
 
-			const insertDecayEntry2 = `INSERT INTO memberDecay2 (id, timestamp) VALUES (?, ?)`;
-			db2.prepare(insertDecayEntry2).run(userId, timestamp);
+			// const insertDecayEntry2 = `INSERT INTO OR REPLACE memberDecay (id, timestamp) VALUES (?, ?)`;
+			// db2.prepare(insertDecayEntry2).run(userId, timestamp);
 
-			const insertDecayEntry3 = `INSERT INTO memberDecay3 (id, timestamp) VALUES (?, ?)`;
-			db2.prepare(insertDecayEntry3).run(userId, timestamp);
+			// const insertDecayEntry3 = `INSERT INTO OR REPLACE memberDecay (id, timestamp) VALUES (?, ?)`;
+			// db2.prepare(insertDecayEntry3).run(userId, timestamp);
+
+			const kickCount = memberDecayTable.prepare('SELECT COUNT(*) FROM memberDecay WHERE user_id == ?').get(userId)['COUNT(*)'];
+
+			if (kickCount == 0) {
+				// User has not been kick before, add them to the list
+				// An automatic cleanup task will remove them if they
+				// have 0 kicks across all decay columns after a day
+				const addDecayEntry = `INSERT INTO memberDecay (user_id, firstDecay, secondDecay, thirdDecay, timestamp) VALUES (?, ?, ?, ?, ?)`;
+				memberDecayTable.prepare(addDecayEntry).run(userId, 1, 1, 1, timestamp);
+			} else {
+				// User has been kicked before, and the cleanup task
+				// has not removed them because they have been kicked
+				// at least once in the past 24 hours. Increment each
+				// of the decaus by 1.
+				const updateDecayEntry = `UPDATE memberDecay SET firstDecay = firstDecay + 1, secondDecay = secondDecay + 1, thirdDecay = thirdDecay + 1, timestamp = ? WHERE user_id = ?`;
+				memberDecayTable.prepare(updateDecayEntry).run(timestamp, userId);
+			}
+
+			// 	// If the counter is greater than 0, delete the entries
+			// 	if (tenMinuteCount > 0) {
 
 			// Fetch the database count of id
-			const stmt2 = db2.prepare('SELECT COUNT(*) AS entry_count2 FROM memberDecay1 WHERE id = ?');
-			const stmt3 = db2.prepare('SELECT COUNT(*) AS entry_count3 FROM memberDecay2 WHERE id = ?');
-			const stmt4 = db2.prepare('SELECT COUNT(*) AS entry_count4 FROM memberDecay3 WHERE id = ?');
+			const stmt2 = memberDecayTable.prepare('SELECT firstDecay AS firstDecayCount FROM memberDecay WHERE user_id = ?');
+			const stmt3 = memberDecayTable.prepare('SELECT secondDecay AS secondDecayCount FROM memberDecay WHERE user_id = ?');
+			const stmt4 = memberDecayTable.prepare('SELECT thirdDecay AS thirdDecayCount FROM memberDecay WHERE user_id = ?');
 
 			// Execute the query and fetch the result
 			const result2 = stmt2.get(userId);
@@ -67,9 +87,9 @@ module.exports = {
 			const result4 = stmt4.get(userId);
 
 			// Fetch the entry count
-			const entryCount2 = result2.entry_count2;
-			const entryCount3 = result3.entry_count3;
-			const entryCount4 = result4.entry_count4;
+			const entryCount2 = result2.firstDecayCount;
+			const entryCount3 = result3.secondDecayCount;
+			const entryCount4 = result4.thirdDecayCount;
 
 			// Display the entry count
 			const response2 = `KICK: 10 Minute Kick Count for ${user.tag} (${userId}): ${entryCount2}`;

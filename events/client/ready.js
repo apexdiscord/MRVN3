@@ -12,7 +12,7 @@ const commandsRequiringPermission = ['kick'];
 
 // Connect to the SQLite database
 const db = new Database(`${__dirname}/../../databases/vcOwnerList.sqlite`);
-const db2 = new Database(`${__dirname}/../../databases/memberDecay.sqlite`);
+const memberDecayTable = new Database(`${__dirname}/../../databases/memberDecay.sqlite`);
 
 module.exports = {
 	name: 'ready',
@@ -32,9 +32,10 @@ module.exports = {
 		}
 
 		db.prepare('DELETE FROM vcOwnerList').run();
-		db2.prepare('DELETE FROM memberDecay1').run();
-		db2.prepare('DELETE FROM memberDecay2').run();
-		db2.prepare('DELETE FROM memberDecay3').run();
+		memberDecayTable.prepare('DELETE FROM memberDecay').run();
+		// db2.prepare('DELETE FROM memberDecay1').run();
+		// db2.prepare('DELETE FROM memberDecay2').run();
+		// db2.prepare('DELETE FROM memberDecay3').run();
 
 		const commands = [];
 		const rest = new REST({ version: 10 }).setToken(process.env.TOKEN);

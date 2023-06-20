@@ -59,9 +59,9 @@ db2.exec(createTableQuery2);
 db2.exec(createTableQuery3);
 db2.exec(createTableQuery4);
 
-// Create a table to store LFG data
+// Create a tables to store LFG data
 const createTableQuery5 = `
-  CREATE TABLE IF NOT EXISTS savedlfg (
+  CREATE TABLE IF NOT EXISTS savedLFGcasual (
     user_id TEXT PRIMARY KEY,
     mode TEXT,
     description TEXT,
@@ -73,7 +73,21 @@ const createTableQuery5 = `
 	timestamp
   );
 `;
+const createTableQuery6 = `
+  CREATE TABLE IF NOT EXISTS savedLFGranked (
+    user_id TEXT PRIMARY KEY,
+    description TEXT,
+    playerno TEXT,
+    fieldmic TEXT,
+    fieldp TEXT,
+    fieldm TEXT,
+    fieldg TEXT,
+	selectedrank TEXT,
+	timestamp
+  );
+`;
 db3.exec(createTableQuery5);
+db3.exec(createTableQuery6);
 
 // Deleting expiring kick counts
 function deleteOldEntries2() {
@@ -107,16 +121,28 @@ function deleteOldEntries4() {
 }
 setInterval(deleteOldEntries4, 60 * 1000);
 
-// Deleting expiring lfg messages
+// Deleting expiring casual lfg messages
 function deleteOldEntries5() {
 	// TODO: Proper logging for when cleanup tasks run
-	// console.log(chalk.cyan(`DATABASE: Running 10 Minute Kick Counter Cleanup Check...`));
+	// console.log(chalk.cyan(`DATABASE: Running 10 Minute saved LFG Cleanup Check...`));
 
-	const tenMinutesAgo = moment().subtract(10, 'minutes').unix();
-	db3.prepare('DELETE FROM savedlfg WHERE timestamp <= ?').run(tenMinutesAgo);
+	const twentyEightDaysAgo = moment().subtract(28, 'days').unix();
+	db3.prepare('DELETE FROM savedLFGcasual WHERE timestamp <= ?').run(twentyEightDaysAgo);
 
-	// console.log(chalk.green(`DATABASE: 10 Minute Kick Counter Cleanup Complete!`));
+	// console.log(chalk.green(`DATABASE: 28 days saved LFG Cleanup Complete!`));
 }
-setInterval(deleteOldEntries5, 60 * 1000);
+setInterval(deleteOldEntries5, 24 * 60 * 60 * 1000);
+
+// Deleting expiring ranked lfg messages
+function deleteOldEntries6() {
+	// TODO: Proper logging for when cleanup tasks run
+	// console.log(chalk.cyan(`DATABASE: Running 10 Minute saved LFG Cleanup Check...`));
+
+	const sevenDaysAgo = moment().subtract(7, 'days').unix();
+	db3.prepare('DELETE FROM savedLFGranked WHERE timestamp <= ?').run(sevenDaysAgo);
+
+	// console.log(chalk.green(`DATABASE: 7 days saved LFG Cleanup Complete!`));
+}
+setInterval(deleteOldEntries6, 24 * 60 * 60 * 1000);
 
 module.exports = { client };

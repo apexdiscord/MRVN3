@@ -1,4 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder } = require('discord.js');
+const Database = require('better-sqlite3');
+const moment = require('moment');
+const db3 = new Database(`${__dirname}/../../databases/savedlfg.sqlite`, { verbose: console.log });
 
 var bannedWords = require('../../data/bannedWords.json');
 
@@ -7,6 +10,13 @@ module.exports = {
 		.setName('lfg-ltm')
 		.setDescription('Creates an LFG prompt for any in-game LTMs.')
 		.addStringOption(option => option.setName('message').setDescription('This will be your lfg message').setRequired(true))
+		.addStringOption(option =>
+			option
+				.setName('save')
+				.setDescription('Choose whether to save the data or not')
+				.setRequired(false)
+				.addChoices({ name: 'Yes', value: 'Yes' }, { name: 'No', value: 'No' }),
+		)
 		.addStringOption(option =>
 			option
 				.setName('mic-required')
@@ -44,6 +54,8 @@ module.exports = {
 		const { options } = interaction;
 
 		const description = options.getString('message');
+		const mode = 'ltm';
+		const saveoption = options.getString('save');
 		const playerno = options.getString('players-needed');
 		const fieldmic = options.getString('mic-required');
 		const fieldp = options.getString('play-style');
@@ -126,10 +138,26 @@ module.exports = {
 				inline: true,
 			});
 
-		await interaction.editReply({
-			content: 'Your LFG message has been sent below!',
-			ephemeral: true,
-		});
+		const timestamp = moment().unix();
+
+		// Store the LFG data in the database
+		if (saveoption === 'Yes') {
+			const stmt = db3.prepare(`
+        INSERT OR REPLACE INTO savedLFGcasual (user_id, mode, description, playerno, fieldmic, fieldp, fieldm, fieldg, timestamp)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `);
+			stmt.run(interaction.member.id, mode, description, playerno || '', fieldmic || '', fieldp || '', fieldm || '', fieldg || '', timestamp);
+
+			await interaction.editReply({
+				content: 'Your LFG message has been saved and also sent below!',
+				ephemeral: true,
+			});
+		} else {
+			await interaction.editReply({
+				content: 'Your LFG message has been sent below!',
+				ephemeral: true,
+			});
+		}
 
 		if (interaction.member.voice.channel || row.components.length != 0) {
 			await interaction.channel.send({

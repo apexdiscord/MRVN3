@@ -5,7 +5,7 @@ const Database = require('better-sqlite3');
 const db3 = new Database(`${__dirname}/../../databases/savedlfg.sqlite`, { verbose: console.log });
 
 module.exports = {
-	data: new SlashCommandBuilder().setName('recalllfg').setDescription('Recalls and posts saved LFG data.'),
+	data: new SlashCommandBuilder().setName('rc').setDescription('Recalls your saved LFG and posts it.'),
 	async execute(interaction) {
 		await interaction.deferReply({ ephemeral: true });
 
@@ -25,7 +25,7 @@ module.exports = {
 
 		// Retrieve the saved LFG data for the member from the database
 		const selectStmt = db3.prepare(`
-            SELECT * FROM savedlfg WHERE user_id = ?
+            SELECT * FROM savedLFGcasual WHERE user_id = ?
         `);
 		const lfgData = selectStmt.get(member.id);
 

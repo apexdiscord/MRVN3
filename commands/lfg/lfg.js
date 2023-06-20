@@ -21,7 +21,7 @@ module.exports = {
 			option
 				.setName('save')
 				.setDescription('Choose whether to save the data or not')
-				.setRequired(true)
+				.setRequired(false)
 				.addChoices({ name: 'Yes', value: 'Yes' }, { name: 'No', value: 'No' }),
 		)
 		.addStringOption(option =>
@@ -156,17 +156,12 @@ module.exports = {
 				inline: true,
 			});
 
-		await interaction.editReply({
-			content: 'Your LFG message has been sent below!',
-			ephemeral: true,
-		});
-
 		const timestamp = moment().unix();
 
+		// Store the LFG data in the database
 		if (saveoption === 'Yes') {
-			// Store the LFG data in the database
 			const stmt = db3.prepare(`
-        INSERT OR REPLACE INTO savedlfg (user_id, mode, description, playerno, fieldmic, fieldp, fieldm, fieldg, timestamp)
+        INSERT OR REPLACE INTO savedLFGcasual (user_id, mode, description, playerno, fieldmic, fieldp, fieldm, fieldg, timestamp)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
 			stmt.run(interaction.member.id, mode, description, playerno || '', fieldmic || '', fieldp || '', fieldm || '', fieldg || '', timestamp);

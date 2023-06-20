@@ -5,7 +5,7 @@ const Database = require('better-sqlite3');
 const db3 = new Database(`${__dirname}/../../databases/savedlfg.sqlite`, { verbose: console.log });
 
 module.exports = {
-	data: new SlashCommandBuilder().setName('rc').setDescription('Recalls your saved LFG and posts it.'),
+	data: new SlashCommandBuilder().setName('rc').setDescription('Recalls your saved casual LFG and posts it.'),
 	async execute(interaction) {
 		await interaction.deferReply({ ephemeral: true });
 

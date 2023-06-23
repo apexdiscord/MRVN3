@@ -116,46 +116,74 @@ function deleteOldEntries2() {
 setInterval(deleteOldEntries2, 60 * 1000);
 
 function deleteOldEntries3() {
-	// console.log(chalk.cyan(`DATABASE: Running 1 Hour Kick Counter Cleanup Check...`));
-
 	const oneDayAgo1 = moment().subtract(1440, 'minutes').unix();
-	db2.prepare('DELETE FROM memberDecay2 WHERE timestamp <= ?').run(oneDayAgo1);
 
-	// console.log(chalk.green(`DATABASE: 1 Hour Kick Counter Cleanup Complete!`));
+	// Select the amount of entries in memberDecay2 that are older than 1 day (part 1)
+	const oneHourCount = db2.prepare('SELECT COUNT(*) FROM memberDecay2 WHERE timestamp <= ?').get(oneDayAgo1)['COUNT(*)'];
+
+	// If the counter is greater than 0, delete the entries
+	if (oneHourCount > 0) {
+		console.log(chalk.cyan(`DATABASE: Running 1 Hour Kick Counter Cleanup Check...`));
+
+		db2.prepare('DELETE FROM memberDecay2 WHERE timestamp <= ?').run(oneDayAgo1);
+
+		console.log(chalk.green(`DATABASE: 1 Hour Kick Counter Cleanup complete, deleted ${oneHourCount} ${checkEntryPlural(oneHourCount, 'entr')} from the database!`));
+	}
 }
 setInterval(deleteOldEntries3, 60 * 1000);
 
 function deleteOldEntries4() {
-	// console.log(chalk.cyan(`DATABASE: Running 28 Day Kick Counter Cleanup Check...`));
-
 	const oneDayAgo2 = moment().subtract(1440, 'minutes').unix();
-	db2.prepare('DELETE FROM memberDecay3 WHERE timestamp <= ?').run(oneDayAgo2);
 
-	// console.log(chalk.green(`DATABASE: 28 Day Kick Counter Cleanup Complete!`));
+	// Select the amount of entries in memberDecay3 that are older than 1 day (part 2)
+	const oneDay2Count = db2.prepare('SELECT COUNT(*) FROM memberDecay3 WHERE timestamp <= ?').get(oneDayAgo2)['COUNT(*)'];
+
+	// If the counter is greater than 0, delete the entries
+	if (oneDay2Count > 0) {
+		console.log(chalk.cyan(`DATABASE: Running 28 Day Kick Counter Cleanup Check...`));
+
+		db2.prepare('DELETE FROM memberDecay3 WHERE timestamp <= ?').run(oneDayAgo2);
+
+		console.log(chalk.green(`DATABASE: 28 Day Kick Counter Cleanup complete, deleted ${oneDay2Count} ${checkEntryPlural(oneDay2Count, 'entr')} from the database!`));
+	}
 }
 setInterval(deleteOldEntries4, 60 * 1000);
 
 // Deleting expiring casual lfg messages
 function deleteOldEntries5() {
-	// TODO: Proper logging for when cleanup tasks run
-	// console.log(chalk.cyan(`DATABASE: Running 10 Minute saved LFG Cleanup Check...`));
-
 	const twentyEightDaysAgo = moment().subtract(28, 'days').unix();
-	db3.prepare('DELETE FROM casualLFG WHERE timestamp <= ?').run(twentyEightDaysAgo);
 
-	// console.log(chalk.green(`DATABASE: 28 days saved LFG Cleanup Complete!`));
+	// Select the amount of entries in casualLFG that are older than 10 minutes
+	const savedCommandCount = db3.prepare('SELECT COUNT(*) FROM casualLFG WHERE timestamp <= ?').get(twentyEightDaysAgo)['COUNT(*)'];
+
+	// If the counter is greater than 0, delete the entries
+	if (savedCommandCount > 0) {
+		console.log(chalk.cyan(`DATABASE: Running Saved Command Cleanup Check...`));
+
+		db3.prepare('DELETE FROM casualLFG WHERE timestamp <= ?').run(twentyEightDaysAgo);
+
+		console.log(chalk.green(`DATABASE: Saved Command Cleanup complete, deleted ${savedCommandCount} ${checkEntryPlural(savedCommandCount, 'entr')} from the database!`));
+	}
 }
 setInterval(deleteOldEntries5, 24 * 60 * 60 * 1000);
 
 // Deleting expiring ranked lfg messages
 function deleteOldEntries6() {
-	// TODO: Proper logging for when cleanup tasks run
-	// console.log(chalk.cyan(`DATABASE: Running 10 Minute saved LFG Cleanup Check...`));
-
 	const sevenDaysAgo = moment().subtract(7, 'days').unix();
-	db3.prepare('DELETE FROM rankedLFG WHERE timestamp <= ?').run(sevenDaysAgo);
 
-	// console.log(chalk.green(`DATABASE: 7 days saved LFG Cleanup Complete!`));
+	// Select the amount of entries in casualLFG that are older than 10 minutes
+	const savedRankedCommandCount = db3.prepare('SELECT COUNT(*) FROM rankedLFG WHERE timestamp <= ?').get(sevenDaysAgo)['COUNT(*)'];
+
+	// If the counter is greater than 0, delete the entries
+	if (savedRankedCommandCount > 0) {
+		console.log(chalk.cyan(`DATABASE: Running Saved Command Cleanup Check...`));
+
+		db3.prepare('DELETE FROM rankedLFG WHERE timestamp <= ?').run(sevenDaysAgo);
+
+		console.log(
+			chalk.green(`DATABASE: Saved Command Cleanup complete, deleted ${savedRankedCommandCount} ${checkEntryPlural(savedRankedCommandCount, 'entr')} from the database!`),
+		);
+	}
 }
 setInterval(deleteOldEntries6, 24 * 60 * 60 * 1000);
 

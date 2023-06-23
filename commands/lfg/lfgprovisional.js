@@ -13,16 +13,16 @@ module.exports = {
 				.setDescription('Set your current provisional match number')
 				.setRequired(true)
 				.addChoices(
-					{ name: '0/10', value: '0/10' },
-					{ name: '1/10', value: '1/10' },
-					{ name: '2/10', value: '2/10' },
-					{ name: '3/10', value: '3/10' },
-					{ name: '4/10', value: '4/10' },
-					{ name: '5/10', value: '5/10' },
-					{ name: '6/10', value: '6/10' },
-					{ name: '7/10', value: '7/10' },
-					{ name: '8/10', value: '8/10' },
-					{ name: '9/10', value: '9/10' },
+					{ name: '0/10', value: '00' },
+					{ name: '1/10', value: '01' },
+					{ name: '2/10', value: '02' },
+					{ name: '3/10', value: '03' },
+					{ name: '4/10', value: '04' },
+					{ name: '5/10', value: '05' },
+					{ name: '6/10', value: '06' },
+					{ name: '7/10', value: '07' },
+					{ name: '8/10', value: '08' },
+					{ name: '9/10', value: '09' },
 				),
 		)
 		.addStringOption(option =>
@@ -152,7 +152,7 @@ module.exports = {
 				components: [row],
 				files: [
 					{
-						attachment: `${__dirname}/../../images/ranked/Ranked_Provisional.png`,
+						attachment: `${__dirname}/../../images/ranked/provisional/Provisional_${fieldmn}.png`,
 						name: 'trios.png',
 					},
 					{
@@ -166,7 +166,7 @@ module.exports = {
 				embeds: [embed],
 				files: [
 					{
-						attachment: `${__dirname}/../../images/ranked/Ranked_Provisional.png`,
+						attachment: `${__dirname}/../../images/ranked/provisional/Provisional_${fieldmn}.png`,
 						name: 'trios.png',
 					},
 					{

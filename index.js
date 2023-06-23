@@ -59,9 +59,9 @@ db2.exec(createTableQuery2);
 db2.exec(createTableQuery3);
 db2.exec(createTableQuery4);
 
-// Create a table to store LFG data
+// Create a tables to store LFG data
 const createTableQuery5 = `
-  CREATE TABLE IF NOT EXISTS savedPosts (
+  CREATE TABLE IF NOT EXISTS casualLFG (
     user_id TEXT PRIMARY KEY,
     mode TEXT,
     description TEXT,
@@ -73,7 +73,21 @@ const createTableQuery5 = `
 	timestamp
   );
 `;
+const createTableQuery6 = `
+  CREATE TABLE IF NOT EXISTS rankedLFG (
+    user_id TEXT PRIMARY KEY,
+    description TEXT,
+    playerno TEXT,
+    fieldmic TEXT,
+    fieldp TEXT,
+    fieldm TEXT,
+    fieldg TEXT,
+	selectedrank TEXT,
+	timestamp
+  );
+`;
 db3.exec(createTableQuery5);
+db3.exec(createTableQuery6);
 
 function checkEntryPlural(amount, string) {
 	if (amount == 1) {
@@ -135,22 +149,42 @@ function deleteOldEntries4() {
 }
 setInterval(deleteOldEntries4, 60 * 1000);
 
-// Deleting expiring lfg messages
+// Deleting expiring casual lfg messages
 function deleteOldEntries5() {
-	const tenMinutesAgo = moment().subtract(10, 'minutes').unix();
+	const twentyEightDaysAgo = moment().subtract(28, 'days').unix();
 
-	// Select the amount of entries in savedPosts that are older than 10 minutes
-	const savedCommandCount = db3.prepare('SELECT COUNT(*) FROM savedPosts WHERE timestamp <= ?').get(tenMinutesAgo)['COUNT(*)'];
+	// Select the amount of entries in casualLFG that are older than 10 minutes
+	const savedCommandCount = db3.prepare('SELECT COUNT(*) FROM casualLFG WHERE timestamp <= ?').get(twentyEightDaysAgo)['COUNT(*)'];
 
 	// If the counter is greater than 0, delete the entries
 	if (savedCommandCount > 0) {
 		console.log(chalk.cyan(`DATABASE: Running Saved Command Cleanup Check...`));
 
-		db3.prepare('DELETE FROM savedPosts WHERE timestamp <= ?').run(tenMinutesAgo);
+		db3.prepare('DELETE FROM casualLFG WHERE timestamp <= ?').run(twentyEightDaysAgo);
 
 		console.log(chalk.green(`DATABASE: Saved Command Cleanup complete, deleted ${savedCommandCount} ${checkEntryPlural(savedCommandCount, 'entr')} from the database!`));
 	}
 }
-setInterval(deleteOldEntries5, 60 * 1000);
+setInterval(deleteOldEntries5, 24 * 60 * 60 * 1000);
+
+// Deleting expiring ranked lfg messages
+function deleteOldEntries6() {
+	const sevenDaysAgo = moment().subtract(7, 'days').unix();
+
+	// Select the amount of entries in casualLFG that are older than 10 minutes
+	const savedRankedCommandCount = db3.prepare('SELECT COUNT(*) FROM rankedLFG WHERE timestamp <= ?').get(sevenDaysAgo)['COUNT(*)'];
+
+	// If the counter is greater than 0, delete the entries
+	if (savedRankedCommandCount > 0) {
+		console.log(chalk.cyan(`DATABASE: Running Saved Command Cleanup Check...`));
+
+		db3.prepare('DELETE FROM rankedLFG WHERE timestamp <= ?').run(sevenDaysAgo);
+
+		console.log(
+			chalk.green(`DATABASE: Saved Command Cleanup complete, deleted ${savedRankedCommandCount} ${checkEntryPlural(savedRankedCommandCount, 'entr')} from the database!`),
+		);
+	}
+}
+setInterval(deleteOldEntries6, 24 * 60 * 60 * 1000);
 
 module.exports = { client };

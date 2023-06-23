@@ -1,4 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const Database = require('better-sqlite3');
+const moment = require('moment');
+const db3 = new Database(`${__dirname}/../../databases/savedLFGPosts.sqlite`, { verbose: console.log });
 
 var bannedWords = require('../../data/bannedWords.json');
 
@@ -7,6 +10,13 @@ module.exports = {
 		.setName('lfg-1v1')
 		.setDescription('Creates an LFG prompt for 1v1s.')
 		.addStringOption(option => option.setName('message').setDescription('This will be your lfg message').setRequired(true))
+		.addStringOption(option =>
+			option
+				.setName('save')
+				.setDescription('Choose whether to save the data or not')
+				.setRequired(false)
+				.addChoices({ name: 'Yes', value: 'Yes' }, { name: 'No', value: 'No' }),
+		)
 		.addStringOption(option =>
 			option
 				.setName('mic-required')
@@ -34,6 +44,10 @@ module.exports = {
 		const { options } = interaction;
 
 		const description = options.getString('message');
+		const saveoption = options.getString('save');
+		const mode = '1v1';
+		const playerno = '';
+		const fieldp = '';
 		const fieldmic = options.getString('mic-required');
 		const fieldm = options.getString('main-legends');
 		const fieldg = options.getString('gamer-tag');
@@ -108,14 +122,30 @@ module.exports = {
 				inline: true,
 			});
 
-		await interaction.editReply({
-			content: 'Your LFG message has been sent below!',
-			ephemeral: true,
-		});
-
 		if (interaction.member.voice.channel) {
 			// set the user limit of the channel the user is in to 2
 			interaction.member.voice.channel.setUserLimit(2);
+		}
+
+		const timestamp = moment().unix();
+
+		// Store the LFG data in the database
+		if (saveoption === 'Yes') {
+			const stmt = db3.prepare(`
+        INSERT OR REPLACE INTO casualLFG (user_id, mode, description, playerno, fieldmic, fieldp, fieldm, fieldg, timestamp)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `);
+			stmt.run(interaction.member.id, mode, description, playerno || '', fieldmic || '', fieldp || '', fieldm || '', fieldg || '', timestamp);
+
+			await interaction.editReply({
+				content: 'Your LFG message has been saved and also sent below!',
+				ephemeral: true,
+			});
+		} else {
+			await interaction.editReply({
+				content: 'Your LFG message has been sent below!',
+				ephemeral: true,
+			});
 		}
 
 		if (interaction.member.voice.channel || row.components.length != 0) {

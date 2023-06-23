@@ -1,4 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder } = require('discord.js');
+const Database = require('better-sqlite3');
+const moment = require('moment');
+const db3 = new Database(`${__dirname}/../../databases/savedLFGPosts.sqlite`, { verbose: console.log });
 
 var bannedWords = require('../../data/bannedWords.json');
 
@@ -22,6 +25,13 @@ module.exports = {
 					{ name: 'Master', value: 'Master' },
 					{ name: 'Apex Predator', value: 'Predator' },
 				),
+		)
+		.addStringOption(option =>
+			option
+				.setName('save')
+				.setDescription('Choose whether to save the data or not')
+				.setRequired(false)
+				.addChoices({ name: 'Yes', value: 'Yes' }, { name: 'No', value: 'No' }),
 		)
 		.addStringOption(option =>
 			option
@@ -66,6 +76,7 @@ module.exports = {
 		const fieldm = options.getString('main-legends');
 		const fieldg = options.getString('gamer-tag');
 		const selectedrank = options.getString('rank');
+		const saveoption = options.getString('save');
 
 		if (interaction.member.voice.channel) {
 			var vclink = new ButtonBuilder()
@@ -143,10 +154,25 @@ module.exports = {
 			});
 		embed.setThumbnail(`attachment://Ranked_${selectedrank}.png`);
 
-		await interaction.editReply({
-			content: 'Your LFG message has been sent below!',
-			ephemeral: true,
-		});
+		const timestamp = moment().unix();
+
+		if (saveoption === 'Yes') {
+			const stmt = db3.prepare(`
+        INSERT OR REPLACE INTO rankedLFG (user_id, description, playerno, fieldmic, fieldp, fieldm, fieldg, selectedrank, timestamp)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `);
+			stmt.run(interaction.member.id, description, playerno || '', fieldmic || '', fieldp || '', fieldm || '', fieldg || '', selectedrank, timestamp);
+
+			await interaction.editReply({
+				content: 'Your LFG message has been saved and also sent below!',
+				ephemeral: true,
+			});
+		} else {
+			await interaction.editReply({
+				content: 'Your LFG message has been sent below!',
+				ephemeral: true,
+			});
+		}
 
 		if (interaction.member.voice.channel || row.components.length != 0) {
 			await interaction.channel.send({

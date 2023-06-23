@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const Database = require('better-sqlite3');
 const moment = require('moment');
-const db3 = new Database(`${__dirname}/../../databases/savedlfg.sqlite`, { verbose: console.log });
+const db3 = new Database(`${__dirname}/../../databases/savedLFGPosts.sqlite`, { verbose: console.log });
 
 var bannedWords = require('../../data/bannedWords.json');
 
@@ -161,13 +161,13 @@ module.exports = {
 		// Store the LFG data in the database
 		if (saveoption === 'Yes') {
 			const stmt = db3.prepare(`
-        INSERT OR REPLACE INTO savedLFGcasual (user_id, mode, description, playerno, fieldmic, fieldp, fieldm, fieldg, timestamp)
+        INSERT OR REPLACE INTO casualLFG (user_id, mode, description, playerno, fieldmic, fieldp, fieldm, fieldg, timestamp)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
 			stmt.run(interaction.member.id, mode, description, playerno || '', fieldmic || '', fieldp || '', fieldm || '', fieldg || '', timestamp);
 
 			await interaction.editReply({
-				content: 'Your LFG message has been saved and also sent below!',
+				content: 'Your LFG message has been saved and sent below!',
 				ephemeral: true,
 			});
 		} else {

@@ -16,7 +16,7 @@ const client = new Client({
 // Connect to the SQLite database
 const db = new Database(`${__dirname}/databases/vcOwnerList.sqlite`);
 const db2 = new Database(`${__dirname}/databases/memberDecay.sqlite`);
-const db3 = new Database(`${__dirname}/databases/savedlfg.sqlite`);
+const db3 = new Database(`${__dirname}/databases/savedLFGPosts.sqlite`);
 
 client
 	.login(process.env.TOKEN)
@@ -61,7 +61,7 @@ db2.exec(createTableQuery4);
 
 // Create a tables to store LFG data
 const createTableQuery5 = `
-  CREATE TABLE IF NOT EXISTS savedLFGcasual (
+  CREATE TABLE IF NOT EXISTS casualLFG (
     user_id TEXT PRIMARY KEY,
     mode TEXT,
     description TEXT,
@@ -74,7 +74,7 @@ const createTableQuery5 = `
   );
 `;
 const createTableQuery6 = `
-  CREATE TABLE IF NOT EXISTS savedLFGranked (
+  CREATE TABLE IF NOT EXISTS rankedLFG (
     user_id TEXT PRIMARY KEY,
     description TEXT,
     playerno TEXT,
@@ -89,15 +89,29 @@ const createTableQuery6 = `
 db3.exec(createTableQuery5);
 db3.exec(createTableQuery6);
 
+function checkEntryPlural(amount, string) {
+	if (amount == 1) {
+		return `${string}y`;
+	}
+
+	return `${string}ies`;
+}
+
 // Deleting expiring kick counts
 function deleteOldEntries2() {
-	// TODO: Proper logging for when cleanup tasks run
-	// console.log(chalk.cyan(`DATABASE: Running 10 Minute Kick Counter Cleanup Check...`));
-
 	const tenMinutesAgo = moment().subtract(10, 'minutes').unix();
-	db2.prepare('DELETE FROM memberDecay1 WHERE timestamp <= ?').run(tenMinutesAgo);
 
-	// console.log(chalk.green(`DATABASE: 10 Minute Kick Counter Cleanup Complete!`));
+	// Select the amount of entries in memberDecay1 that are older than 10 minutes
+	const tenMinuteCount = db2.prepare('SELECT COUNT(*) FROM memberDecay1 WHERE timestamp <= ?').get(tenMinutesAgo)['COUNT(*)'];
+
+	// If the counter is greater than 0, delete the entries
+	if (tenMinuteCount > 0) {
+		console.log(chalk.cyan(`DATABASE: Running 10 Minute Kick Counter Cleanup Check...`));
+
+		db2.prepare('DELETE FROM memberDecay1 WHERE timestamp <= ?').run(tenMinutesAgo);
+
+		console.log(chalk.green(`DATABASE: 10 Minute Kick Counter Cleanup complete, deleted ${tenMinuteCount} ${checkEntryPlural(tenMinuteCount, 'entr')} from the database!`));
+	}
 }
 setInterval(deleteOldEntries2, 60 * 1000);
 
@@ -127,7 +141,7 @@ function deleteOldEntries5() {
 	// console.log(chalk.cyan(`DATABASE: Running 10 Minute saved LFG Cleanup Check...`));
 
 	const twentyEightDaysAgo = moment().subtract(28, 'days').unix();
-	db3.prepare('DELETE FROM savedLFGcasual WHERE timestamp <= ?').run(twentyEightDaysAgo);
+	db3.prepare('DELETE FROM casualLFG WHERE timestamp <= ?').run(twentyEightDaysAgo);
 
 	// console.log(chalk.green(`DATABASE: 28 days saved LFG Cleanup Complete!`));
 }
@@ -139,7 +153,7 @@ function deleteOldEntries6() {
 	// console.log(chalk.cyan(`DATABASE: Running 10 Minute saved LFG Cleanup Check...`));
 
 	const sevenDaysAgo = moment().subtract(7, 'days').unix();
-	db3.prepare('DELETE FROM savedLFGranked WHERE timestamp <= ?').run(sevenDaysAgo);
+	db3.prepare('DELETE FROM rankedLFG WHERE timestamp <= ?').run(sevenDaysAgo);
 
 	// console.log(chalk.green(`DATABASE: 7 days saved LFG Cleanup Complete!`));
 }

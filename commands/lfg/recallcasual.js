@@ -2,7 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, Butt
 const Database = require('better-sqlite3');
 
 // Create or open the SQLite database
-const db3 = new Database(`${__dirname}/../../databases/savedlfg.sqlite`, { verbose: console.log });
+const db3 = new Database(`${__dirname}/../../databases/savedLFGPosts.sqlite`, { verbose: console.log });
 
 module.exports = {
 	data: new SlashCommandBuilder().setName('rc').setDescription('Recalls your saved casual LFG and posts it.'),
@@ -25,7 +25,7 @@ module.exports = {
 
 		// Retrieve the saved LFG data for the member from the database
 		const selectStmt = db3.prepare(`
-            SELECT * FROM savedLFGcasual WHERE user_id = ?
+            SELECT * FROM casualLFG WHERE user_id = ?
         `);
 		const lfgData = selectStmt.get(member.id);
 

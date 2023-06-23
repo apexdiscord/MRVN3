@@ -2,7 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, Butt
 const Database = require('better-sqlite3');
 
 // Create or open the SQLite database
-const db3 = new Database(`${__dirname}/../../databases/savedlfg.sqlite`, { verbose: console.log });
+const db3 = new Database(`${__dirname}/../../databases/savedLFGPosts.sqlite`, { verbose: console.log });
 
 module.exports = {
 	data: new SlashCommandBuilder().setName('rr').setDescription('Recalls your saved ranked LFG and posts it.'),
@@ -25,7 +25,7 @@ module.exports = {
 
 		// Retrieve the saved LFG data for the member from the database
 		const selectStmt = db3.prepare(`
-            SELECT * FROM savedLFGranked WHERE user_id = ?
+            SELECT * FROM rankedLFG WHERE user_id = ?
         `);
 		const lfgData = selectStmt.get(member.id);
 
@@ -96,36 +96,35 @@ module.exports = {
 			});
 		embed.setThumbnail(`attachment://Ranked_${selectedrank}.png`);
 
-			if (interaction.member.voice.channel || row.components.length != 0) {
-				await interaction.channel.send({
-					embeds: [embed],
-					components: [row],
-					files: [
-						{
-							attachment: `${__dirname}/../../images/ranked/Ranked_${selectedrank}.png`,
-							name: `Ranked_${selectedrank}.png`,
-						},
-						{
-							attachment: `${__dirname}/../../images/other/pin.png`,
-							name: 'pin.png',
-						},
-					],
-				});
-			} else {
-				await interaction.channel.send({
-					embeds: [embed],
-					files: [
-						{
-							attachment: `${__dirname}/../../images/ranked/Ranked_${selectedrank}.png`,
-							name: `Ranked_${selectedrank}.png`,
-						},
-						{
-							attachment: `${__dirname}/../../images/other/pin.png`,
-							name: 'pin.png',
-						},
-					],
-				});
-			}
-		},
-	};
-	
+		if (interaction.member.voice.channel || row.components.length != 0) {
+			await interaction.channel.send({
+				embeds: [embed],
+				components: [row],
+				files: [
+					{
+						attachment: `${__dirname}/../../images/ranked/Ranked_${selectedrank}.png`,
+						name: `Ranked_${selectedrank}.png`,
+					},
+					{
+						attachment: `${__dirname}/../../images/other/pin.png`,
+						name: 'pin.png',
+					},
+				],
+			});
+		} else {
+			await interaction.channel.send({
+				embeds: [embed],
+				files: [
+					{
+						attachment: `${__dirname}/../../images/ranked/Ranked_${selectedrank}.png`,
+						name: `Ranked_${selectedrank}.png`,
+					},
+					{
+						attachment: `${__dirname}/../../images/other/pin.png`,
+						name: 'pin.png',
+					},
+				],
+			});
+		}
+	},
+};

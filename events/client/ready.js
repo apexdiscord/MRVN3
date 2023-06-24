@@ -45,7 +45,7 @@ module.exports = {
 				client.commands.set(command.data.name, command);
 
 				// Check to see if a command required permission, and set it to true if so
-				if (commandPermission.includes(command.data.name)) command.permission = true;
+				if (commandPermission.includes(command.data.name)) command.requiresPermission = true;
 			}
 		}
 

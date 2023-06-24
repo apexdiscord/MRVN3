@@ -29,7 +29,7 @@ client
 		loadEvents(client);
 	})
 	.catch(err => {
-		console.error(`Error loading bot during login: ${err}`);
+		console.log(chalk.bold.red(`BOT: Login Error: ${err}`));
 	});
 
 // Create and load database files

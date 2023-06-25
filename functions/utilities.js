@@ -3,6 +3,7 @@ const moment = require('moment');
 const Database = require('better-sqlite3');
 const { ButtonStyle, ButtonBuilder } = require('discord.js');
 
+const emotes = require('../data/emotes.json');
 var bannedWords = require('../data/bannedWords.json');
 const db_savedLFGPosts = new Database(`${__dirname}/../databases/savedLFGPosts.sqlite`);
 
@@ -12,6 +13,15 @@ function setVCLimit(mode, channel) {
 	if (mode == 'Duos') return channel.member.voice.channel.setUserLimit(2);
 
 	return channel.member.voice.channel.setUserLimit(3);
+}
+
+function logFormatter(state, text, type) {
+	var logTimestamp = moment().unix();
+
+	if (type == 0) var amountText = 'Empty';
+	if (type == 1) var amountText = 'Occupied';
+
+	return `<t:${logTimestamp}:f> :microphone2: ${emotes[text]} <@${state.member.user.id}> (**${state.member.user.tag}**, \`${state.member.user.id}\`) ${text} ${amountText} VC <#${state.channel.id}> (**${state.channel.name}**, \`${state.channel.id}\`)`;
 }
 
 function checkBannedWords(message, interaction) {
@@ -69,4 +79,4 @@ function vcLinkButtonBuilder(interaction) {
 		.setURL(`https://discord.com/channels/${interaction.guild.id}/${interaction.member.voice.channel.id}`);
 }
 
-module.exports = { setVCLimit, checkBannedWords, checkEntryPlural, checkVoiceChannel, saveCasualLFGPost, vcLinkButtonBuilder };
+module.exports = { setVCLimit, logFormatter, checkBannedWords, checkEntryPlural, checkVoiceChannel, saveCasualLFGPost, vcLinkButtonBuilder };

@@ -20,7 +20,7 @@ module.exports = {
 				try {
 					await command.execute(interaction, client);
 				} catch (error) {
-					console.log(chalk.bold.red(`BOT: Error running /${command.data.name}. ${error}`));
+					console.log(chalk.bold.red(`BOT: Error running /${command.data.name}: ${error}`));
 
 					await interaction.deferReply({ ephemeral: true });
 

@@ -26,7 +26,7 @@ function loadEvents(client) {
 				}
 			}
 
-			console.log(chalk.blue.bold(`BOT: Event ${event.name}.js loaded.`));
+			console.log(chalk.blue.bold(`BOT: Event ${event.name}.js loaded`));
 		}
 	}
 }

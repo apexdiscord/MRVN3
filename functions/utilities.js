@@ -10,25 +10,38 @@ const db_savedLFGPosts = new Database(`${__dirname}/../databases/savedLFGPosts.s
 function setVCLimit(mode, channel) {
 	if (!channel.member.voice.channel) return;
 
-	if (mode == 'Duos') return channel.member.voice.channel.setUserLimit(2);
+	if (mode == 'Duos') {
+		if (channel.member.voice.channel.userLimit != 2) {
+			channel.member.voice.channel.setUserLimit(2);
 
-	return channel.member.voice.channel.setUserLimit(3);
+			return console.log(chalk.yellow(`${chalk.bold('VOICE:')} Set user limit of "${channel.member.voice.channel.name}" to 2`));
+		}
+
+		return;
+	} else if (mode == 'Trios') {
+		channel.member.voice.channel.setUserLimit(3);
+
+		if (channel.member.voice.channel.userLimit != 3) {
+			return console.log(chalk.yellow(`${chalk.bold('VOICE:')} Set user limit of "${channel.member.voice.channel.name}" to 3`));
+		}
+	}
 }
 
 function logFormatter(state, text, type) {
 	var logTimestamp = moment().unix();
 
-	if (type == 0) var amountText = 'Empty';
-	if (type == 1) var amountText = 'Occupied';
+	if (type == 0) var amountText = ' Empty';
+	if (type == 1) var amountText = ' Occupied';
+	if (type == 2) var amountText = '\u200b';
 
-	return `<t:${logTimestamp}:f> :microphone2: ${emotes[text]} <@${state.member.user.id}> (**${state.member.user.tag}**, \`${state.member.user.id}\`) ${text} ${amountText} VC <#${state.channel.id}> (**${state.channel.name}**, \`${state.channel.id}\`)`;
+	return `<t:${logTimestamp}:f> :microphone2: ${emotes[text]} <@${state.member.user.id}> (**${state.member.user.tag}**, \`${state.member.user.id}\`) ${text}${amountText} VC <#${state.channel.id}> (**${state.channel.name}**, \`${state.channel.id}\`)`;
 }
 
 function checkBannedWords(message, interaction) {
 	if (!message) return false;
 
 	if (bannedWords.some(i => message.toLowerCase().includes(i))) {
-		console.log(chalk.red(`USER WARNING: ${interaction.member.displayName} tried to use a banned word in their LFG message.`));
+		console.log(chalk.red(`USER WARNING: ${interaction.member.displayName} tried to use a banned word in their LFG message`));
 
 		interaction.editReply({
 			content: 'Your LFG message contains a banned word. Please try again.',
@@ -66,7 +79,7 @@ function saveCasualLFGPost(interaction, mode, description, playersNeeded, micReq
 
 	insertLFGPost.run(interaction.user.id, mode, description, playersNeeded, micRequired, playstyle, mains, gamertag, timestamp);
 
-	console.log(chalk.blue(`DATABASE: Saved LFG post from ${interaction.user.tag} to casualLFG table.`));
+	console.log(chalk.blue(`DATABASE: Saved LFG post from ${interaction.user.tag} to casualLFG table`));
 }
 
 function vcLinkButtonBuilder(interaction) {

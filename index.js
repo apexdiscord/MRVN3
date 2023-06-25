@@ -90,7 +90,7 @@ function deleteKickCounterEntries(dbName, timeInMinutes, text) {
 
 		db_memberDecay.prepare(`DELETE FROM ${dbName} WHERE timestamp <= ?`).run(timeSince);
 
-		console.log(chalk.green(`DATABASE: ${text} Cleanup Check complete, deleted ${timeSinceCount} ${checkEntryPlural(timeSinceCount, 'entr')} from ${dbName}.`));
+		console.log(chalk.green(`DATABASE: ${text} Cleanup Check complete, deleted ${timeSinceCount} ${checkEntryPlural(timeSinceCount, 'entr')} from ${dbName}`));
 	}
 }
 
@@ -108,7 +108,7 @@ function deleteLFGPostEntries(dbName, timeInMinutes, text) {
 
 		db_savedLFGPosts.prepare(`DELETE FROM ${dbName} WHERE timestamp <= ?`).run(timeSince);
 
-		console.log(chalk.green(`DATABASE: ${text} Cleanup Check complete, deleted ${timeSinceCount} ${checkEntryPlural(timeSinceCount, 'entr')} from ${dbName}.`));
+		console.log(chalk.green(`DATABASE: ${text} Cleanup Check complete, deleted ${timeSinceCount} ${checkEntryPlural(timeSinceCount, 'entr')} from ${dbName}`));
 	}
 }
 

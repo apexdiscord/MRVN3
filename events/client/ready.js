@@ -56,12 +56,12 @@ module.exports = {
 					// Production, register global slash commands
 					await rest.put(Routes.applicationCommands(client.user.id), { body: commands });
 
-					console.log(chalk.bold.green('BOT: Deployed global slash commands.'));
+					console.log(chalk.bold.green('BOT: Deployed global slash commands'));
 				} else {
 					// Development, register guild slash commands
 					await rest.put(Routes.applicationGuildCommands(client.user.id, process.env.GUILD_ID), { body: commands });
 
-					console.log(chalk.bold.yellow('BOT: Deployed guild slash commands for development environment.'));
+					console.log(chalk.bold.yellow('BOT: Deployed guild slash commands for development environment'));
 				}
 			} catch (error) {
 				if (error) console.log(chalk.bold.red(`BOT: ${error}`));

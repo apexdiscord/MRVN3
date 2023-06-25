@@ -1,5 +1,4 @@
 const chalk = require('chalk');
-const moment = require('moment');
 const Database = require('better-sqlite3');
 
 const db_vcOwnerList = new Database(`${__dirname}/../../databases/vcOwnerList.sqlite`);
@@ -11,8 +10,6 @@ module.exports = {
 	name: 'voiceStateUpdate',
 	once: false,
 	execute(oldState, newState) {
-		const logTimestamp = moment().unix();
-
 		// User Join
 		if (oldState.channelId === null) {
 			// If the parent category of the voice channel is no in the whitelist, ignore it

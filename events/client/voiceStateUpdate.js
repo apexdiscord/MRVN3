@@ -83,6 +83,14 @@ module.exports = {
 					logChannel.send(logFormatter(oldState, 'Left', 2));
 				}
 			}
+		} else if (oldState.channelId != newState.channelId) {
+			// User moved
+			// If the parent category of the voice channel is not in the whitelist, ignore it
+			if (!categoryWhitelist.includes(oldState.channel.parent.id)) return;
+
+			if (newState.channel.members.size === 1) {
+				// Do stuff
+			}
 		}
 	},
 };

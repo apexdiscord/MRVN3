@@ -38,7 +38,7 @@ const db_memberDecay = new Database(`${__dirname}/databases/memberDecay.sqlite`)
 const db_savedLFGPosts = new Database(`${__dirname}/databases/savedLFGPosts.sqlite`);
 
 // Create the quieries to create table if they don't exist
-const createOwnerVCTable = `CREATE TABLE IF NOT EXISTS vcOwnerList (id TEXT PRIMARY KEY);`;
+const createOwnerVCTable = `CREATE TABLE IF NOT EXISTS vcOwnerList (id TEXT, timestamp INTEGER, PRIMARY KEY (id));`;
 
 const createMemberDecayTable1 = `CREATE TABLE IF NOT EXISTS memberDecay1 (id TEXT, timestamp INTEGER, PRIMARY KEY (id, timestamp));`;
 const createMemberDecayTable2 = `CREATE TABLE IF NOT EXISTS memberDecay2 (id TEXT, timestamp INTEGER, PRIMARY KEY (id, timestamp));`;

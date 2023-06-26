@@ -60,12 +60,8 @@ function checkEntryPlural(amount, string) {
 	return `${string}ies`;
 }
 
-function checkVoiceChannel(interaction) {
-	if (
-		interaction.member.voice.channel &&
-		(interaction.member.voice.channel.parentId == process.env.GEN_CATEGORY || interaction.member.voice.channel.parentId == process.env.EVENT_CATEGORY)
-	)
-		return true;
+function checkVoiceChannel(voice) {
+	if (voice.channel && (voice.channel.parentId == process.env.GEN_CATEGORY || voice.channel.parentId == process.env.EVENT_CATEGORY)) return true;
 
 	return false;
 }

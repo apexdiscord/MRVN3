@@ -79,7 +79,7 @@ module.exports = {
 
 		// Check to see if they are in a VC that in a category
 		// that is not allowed to be edited.
-		if (checkVoiceChannel(interaction) == true) {
+		if (checkVoiceChannel(interaction.member.voice) == true) {
 			await interaction.editReply({
 				content: `You cannot use this command while in <#${interaction.member.voice.channel.id}>.\nPlease disconnect or move to an LFG channel.`,
 				ephemeral: true,

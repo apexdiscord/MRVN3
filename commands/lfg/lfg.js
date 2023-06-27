@@ -18,7 +18,7 @@ module.exports = {
 				},
 			),
 		)
-		.addStringOption(option => option.setName('message').setDescription('Enter what you want others to know.').setRequired(true))
+		.addStringOption(option => option.setName('message').setDescription('Enter any information you want others to know.').setRequired(true))
 		.addStringOption(option =>
 			option.setName('save').setDescription('Choose whether to save your LFG message for future use using /rc.').setRequired(false).addChoices(
 				{

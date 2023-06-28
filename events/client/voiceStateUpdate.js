@@ -4,7 +4,7 @@ const Database = require('better-sqlite3');
 
 const db_vcOwnerList = new Database(`${__dirname}/../../databases/vcOwnerList.sqlite`);
 
-const { logFormatter, checkVoiceChannel } = require('../../functions/utilities.js');
+const { logFormatter, checkVoiceChannel, movedLogFormatter } = require('../../functions/utilities.js');
 var categoryWhitelist = require('../../data/categoryWhitelist.json');
 
 module.exports = {
@@ -24,7 +24,7 @@ module.exports = {
 				if (process.env.VC_JOIN !== undefined) {
 					const logChannel = newState.guild.channels.cache.get(process.env.VC_JOIN);
 
-					logChannel.send(logFormatter(newState, 'Joined', 0));
+					logChannel.send(logFormatter(newState, 'Joined'));
 				}
 
 				// dbTimestamp
@@ -42,7 +42,7 @@ module.exports = {
 				if (process.env.VC_JOIN !== undefined) {
 					const logChannel = newState.guild.channels.cache.get(process.env.VC_JOIN);
 
-					logChannel.send(logFormatter(newState, 'Joined', 1));
+					logChannel.send(logFormatter(newState, 'Joined'));
 				}
 			}
 		} else if (newState.channelId === null) {
@@ -74,7 +74,7 @@ module.exports = {
 				if (process.env.VC_LEAVE !== undefined) {
 					const logChannel = newState.guild.channels.cache.get(process.env.VC_LEAVE);
 
-					logChannel.send(logFormatter(oldState, 'Left', 2));
+					logChannel.send(logFormatter(oldState, 'Left'));
 				}
 			}
 		} else if (oldState.channelId != newState.channelId) {
@@ -90,7 +90,7 @@ module.exports = {
 				if (process.env.VC_MOVE !== undefined) {
 					const logChannel = newState.guild.channels.cache.get(process.env.VC_MOVE);
 
-					logChannel.send(logFormatter(newState, 'Moved to', 0));
+					logChannel.send(movedLogFormatter(oldState, newState));
 				}
 
 				// dbTimestamp
@@ -117,7 +117,7 @@ module.exports = {
 				if (process.env.VC_MOVE !== undefined) {
 					const logChannel = newState.guild.channels.cache.get(process.env.VC_MOVE);
 
-					logChannel.send(logFormatter(newState, 'Moved to', 1));
+					logChannel.send(movedLogFormatter(oldState, newState));
 				}
 
 				// Find out if the user owned the previous VC. If they did,

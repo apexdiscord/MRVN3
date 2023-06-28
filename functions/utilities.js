@@ -27,14 +27,10 @@ function setVCLimit(mode, channel) {
 	}
 }
 
-function logFormatter(state, text, type) {
+function logFormatter(state, text) {
 	var logTimestamp = moment().unix();
 
-	if (type == 0) var amountText = ' Empty';
-	if (type == 1) var amountText = ' Occupied';
-	if (type == 2) var amountText = '\u200b';
-
-	return `<t:${logTimestamp}:f> :microphone2: ${emotes[text]} <@${state.member.user.id}> (**${state.member.user.tag}**, \`${state.member.user.id}\`) ${text}${amountText} VC <#${state.channel.id}> (**${state.channel.name}**, \`${state.channel.id}\`)`;
+	return `<t:${logTimestamp}:f> :microphone2: ${emotes[text]} <@${state.member.user.id}> (**${state.member.user.tag}**, \`${state.member.user.id}\`) ${text} <#${state.channel.id}> (**${state.channel.name}**, \`${state.channel.id}\`)`;
 }
 
 function checkBannedWords(message, interaction) {
@@ -66,6 +62,12 @@ function checkVoiceChannel(voice) {
 	return false;
 }
 
+function movedLogFormatter(oldState, newState) {
+	var logTimestamp = moment().unix();
+
+	return `<t:${logTimestamp}:f> :microphone2: ${emotes['Moved']} <@${newState.member.user.id}> (**${newState.member.user.tag}**, \`${newState.member.user.id}\`) Moved From <#${oldState.channel.id}> (**${oldState.channel.name}**, \`${oldState.channel.id}\`) to <#${newState.channel.id}> (**${newState.channel.name}**, \`${newState.channel.id}\`)`;
+}
+
 function saveCasualLFGPost(interaction, mode, description, playersNeeded, micRequired, playstyle, mains, gamertag) {
 	const timestamp = moment().unix();
 
@@ -88,4 +90,4 @@ function vcLinkButtonBuilder(interaction) {
 		.setURL(`https://discord.com/channels/${interaction.guild.id}/${interaction.member.voice.channel.id}`);
 }
 
-module.exports = { setVCLimit, logFormatter, checkBannedWords, checkEntryPlural, checkVoiceChannel, saveCasualLFGPost, vcLinkButtonBuilder };
+module.exports = { setVCLimit, logFormatter, checkBannedWords, checkEntryPlural, checkVoiceChannel, movedLogFormatter, saveCasualLFGPost, vcLinkButtonBuilder };

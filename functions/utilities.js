@@ -18,7 +18,7 @@ function setVCLimit(mode, channel) {
 		}
 
 		return;
-	} else if (mode == 'Trios' || mode == 'LTM') {
+	} else if (mode == 'Trios' || mode == 'LTM' || mode == 'Mixtape') {
 		channel.member.voice.channel.setUserLimit(3);
 
 		if (channel.member.voice.channel.userLimit != 3) {

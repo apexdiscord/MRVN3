@@ -18,7 +18,7 @@ function setVCLimit(mode, channel) {
 		}
 
 		return;
-	} else if (mode == 'Trios' || mode == 'LTM' || mode == 'Mixtape' || mode == 'Provisional') {
+	} else if (mode == 'Trios' || mode == 'LTM' || mode == 'Mixtape' || mode == 'Provisional' || mode == 'Ranked') {
 		if (channel.member.voice.channel.userLimit != 3) {
 			channel.member.voice.channel.setUserLimit(3);
 
@@ -80,6 +80,18 @@ function saveCasualLFGPost(interaction, mode, description, playersNeeded, micReq
 	console.log(chalk.blue(`DATABASE: Saved LFG post from ${interaction.user.tag} to casualLFG table`));
 }
 
+function saveRankedLFGPost(interaction, mode, description, currentRank, previousRank, playersNeeded, micRequired, playstyle, mains, gamertag) {
+	const timestamp = moment().unix();
+
+	const insertLFGPost = db_savedLFGPosts.prepare(
+		`INSERT OR REPLACE INTO rankedLFG (user_id, mode, description, currentRank, previousRank, playersNeeded, micRequired, playStyle, main, gamerTag, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+	);
+
+	insertLFGPost.run(interaction.user.id, mode, description, currentRank, previousRank, playersNeeded, micRequired, playstyle, mains, gamertag, timestamp);
+
+	console.log(chalk.blue(`DATABASE: Saved LFG post from ${interaction.user.tag} to rankedLFG table`));
+}
+
 function vcLinkButtonBuilder(interaction) {
 	if (!interaction.member.voice.channel) return null;
 
@@ -90,4 +102,4 @@ function vcLinkButtonBuilder(interaction) {
 		.setURL(`https://discord.com/channels/${interaction.guild.id}/${interaction.member.voice.channel.id}`);
 }
 
-module.exports = { setVCLimit, logFormatter, checkBannedWords, checkEntryPlural, checkVoiceChannel, movedLogFormatter, saveCasualLFGPost, vcLinkButtonBuilder };
+module.exports = { setVCLimit, logFormatter, checkBannedWords, checkEntryPlural, checkVoiceChannel, movedLogFormatter, saveCasualLFGPost, saveRankedLFGPost, vcLinkButtonBuilder };

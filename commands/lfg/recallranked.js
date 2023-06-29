@@ -42,7 +42,7 @@ module.exports = {
 			});
 		}
 
-		const { description, playerno, fieldmic, fieldp, fieldm, fieldg, selectedrank } = lfgData;
+		const { description, playerno, fieldmic, fieldp, fieldm, fieldg, currentRank } = lfgData;
 
 		if (interaction.member.voice.channel) {
 			var vclink = new ButtonBuilder()
@@ -94,7 +94,7 @@ module.exports = {
 				value: `${fieldg}`,
 				inline: true,
 			});
-		embed.setThumbnail(`attachment://Ranked_${selectedrank}.png`);
+		embed.setThumbnail(`attachment://Ranked_${currentRank}.png`);
 
 		if (interaction.member.voice.channel || row.components.length != 0) {
 			await interaction.channel.send({
@@ -102,8 +102,8 @@ module.exports = {
 				components: [row],
 				files: [
 					{
-						attachment: `${__dirname}/../../images/ranked/Ranked_${selectedrank}.png`,
-						name: `Ranked_${selectedrank}.png`,
+						attachment: `${__dirname}/../../images/ranked/Ranked_${currentRank}.png`,
+						name: `Ranked_${currentRank}.png`,
 					},
 					{
 						attachment: `${__dirname}/../../images/other/pin.png`,
@@ -116,8 +116,8 @@ module.exports = {
 				embeds: [embed],
 				files: [
 					{
-						attachment: `${__dirname}/../../images/ranked/Ranked_${selectedrank}.png`,
-						name: `Ranked_${selectedrank}.png`,
+						attachment: `${__dirname}/../../images/ranked/Ranked_${currentRank}.png`,
+						name: `Ranked_${currentRank}.png`,
 					},
 					{
 						attachment: `${__dirname}/../../images/other/pin.png`,

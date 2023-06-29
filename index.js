@@ -58,13 +58,15 @@ const createCasualLFGPostsTable = `CREATE TABLE IF NOT EXISTS casualLFG (
 
 const createRankedLFGPostsTable = `CREATE TABLE IF NOT EXISTS rankedLFG (
     user_id TEXT PRIMARY KEY,
+    mode TEXT,
     description TEXT,
+    currentRank TEXT,
+    previousRank TEXT,
     playersNeeded TEXT,
     micRequired TEXT,
     playStyle TEXT,
     main TEXT,
     gamerTag TEXT,
-    selectedRank TEXT,
     timestamp INTEGER
 );`;
 

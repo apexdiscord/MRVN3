@@ -22,7 +22,7 @@ module.exports = {
 				} catch (error) {
 					console.log(chalk.bold.red(`BOT: Error running /${command.data.name}: ${error}`));
 
-					await interaction.deferReply({ ephemeral: true });
+					// await interaction.deferReply({ ephemeral: true });
 
 					await interaction.editReply({
 						content: 'There was an error while executing this command!',

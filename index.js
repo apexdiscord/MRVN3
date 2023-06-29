@@ -53,7 +53,7 @@ const createCasualLFGPostsTable = `CREATE TABLE IF NOT EXISTS casualLFG (
     playStyle TEXT,
     main TEXT,
     gamerTag TEXT,
-    timestamp
+    timestamp INTEGER
 );`;
 
 const createRankedLFGPostsTable = `CREATE TABLE IF NOT EXISTS rankedLFG (
@@ -65,7 +65,7 @@ const createRankedLFGPostsTable = `CREATE TABLE IF NOT EXISTS rankedLFG (
     main TEXT,
     gamerTag TEXT,
     selectedRank TEXT,
-    timestamp
+    timestamp INTEGER
 );`;
 
 // Execute the queries to create the tables

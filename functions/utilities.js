@@ -10,7 +10,7 @@ const db_savedLFGPosts = new Database(`${__dirname}/../databases/savedLFGPosts.s
 function setVCLimit(mode, channel) {
 	if (!channel.member.voice.channel) return;
 
-	if (mode == 'Duos') {
+	if (mode == 'Duos' || mode == '1v1') {
 		if (channel.member.voice.channel.userLimit != 2) {
 			channel.member.voice.channel.setUserLimit(2);
 

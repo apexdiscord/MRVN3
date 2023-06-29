@@ -271,7 +271,7 @@ module.exports = {
 			// Move disconnect to under logging to allow the ID to pass to the log embeds
 			await member.voice.disconnect();
 			await interaction.editReply({
-				content: `Successfully removed <@${user.id}> from the voice channel.\nPlease report any rule breaking behaviour to <@542736472155881473> with the ID of the user you kicked.`,
+				content: `Successfully removed <@${user.id}> from the voice channel.\nPlease report any repeated rule breaking behaviour to <@542736472155881473> with the ID of the user you kicked.`,
 				ephemeral: true,
 			});
 		} catch (error) {

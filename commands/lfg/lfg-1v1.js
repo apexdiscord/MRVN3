@@ -33,6 +33,7 @@ module.exports = {
 		)
 		.addStringOption(option => option.setName('mains').setDescription('What legend(s) do you main?').setRequired(false))
 		.addStringOption(option => option.setName('gamertag').setDescription('Enter your gamertag.').setRequired(false)),
+
 	async execute(interaction) {
 		await interaction.deferReply({ ephemeral: true });
 
@@ -47,6 +48,7 @@ module.exports = {
 			return;
 		}
 
+		const mode = '1v1';
 		const description = interaction.options.getString('message');
 		const save = interaction.options.getString('save');
 		const micRequired = interaction.options.getString('mic-required');
@@ -63,7 +65,7 @@ module.exports = {
 		if (micRequired == 'Yes') buttonRow.addComponents(new ButtonBuilder().setCustomId('MicType').setLabel('Mic Required').setStyle(ButtonStyle.Danger).setDisabled(true));
 		if (micRequired == 'No') buttonRow.addComponents(new ButtonBuilder().setCustomId('MicType').setLabel('Mic Optional').setStyle(ButtonStyle.Success).setDisabled(true));
 
-		setVCLimit('1v1', interaction);
+		setVCLimit(mode, interaction);
 
 		const lfg1v1Embed = new EmbedBuilder()
 			.setAuthor({
@@ -71,7 +73,7 @@ module.exports = {
 				iconURL: interaction.member.displayAvatarURL({ dynamic: true }),
 			})
 			.setDescription(`<@${interaction.member.id}>'s Message: ${description}`)
-			.setThumbnail(`attachment://1v1.png`)
+			.setThumbnail(`attachment://${mode}.png`)
 			.setTimestamp()
 			.setFooter({
 				text: 'Read channel pins!',
@@ -93,7 +95,7 @@ module.exports = {
 			});
 
 		if (save == 'Yes') {
-			saveCasualLFGPost(interaction, '1v1', description, null, micRequired, null, mains, gamertag);
+			saveCasualLFGPost(interaction, mode, description, null, micRequired, null, mains, gamertag);
 
 			await interaction.editReply({
 				content: 'Your LFG message has been posted and saved, use the `/rc` command to post it again!',
@@ -111,8 +113,8 @@ module.exports = {
 				embeds: [lfg1v1Embed],
 				files: [
 					{
-						attachment: `${__dirname}/../../images/nonRanked/1v1.png`,
-						name: `1v1.png`,
+						attachment: `${__dirname}/../../images/nonRanked/${mode}.png`,
+						name: `${mode}.png`,
 					},
 					{
 						attachment: `${__dirname}/../../images/other/pin.png`,
@@ -126,8 +128,8 @@ module.exports = {
 				components: [buttonRow],
 				files: [
 					{
-						attachment: `${__dirname}/../../images/nonRanked/1v1.png`,
-						name: `1v1.png`,
+						attachment: `${__dirname}/../../images/nonRanked/${mode}.png`,
+						name: `${mode}.png`,
 					},
 					{
 						attachment: `${__dirname}/../../images/other/pin.png`,

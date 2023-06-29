@@ -18,10 +18,10 @@ function setVCLimit(mode, channel) {
 		}
 
 		return;
-	} else if (mode == 'Trios' || mode == 'LTM' || mode == 'Mixtape') {
-		channel.member.voice.channel.setUserLimit(3);
-
+	} else if (mode == 'Trios' || mode == 'LTM' || mode == 'Mixtape' || mode == 'Provisional') {
 		if (channel.member.voice.channel.userLimit != 3) {
+			channel.member.voice.channel.setUserLimit(3);
+
 			return console.log(chalk.yellow(`${chalk.bold('VOICE:')} Set user limit of "${channel.member.voice.channel.name}" to 3`));
 		}
 	}

@@ -76,6 +76,7 @@ module.exports = {
 			return;
 		}
 
+		const mode = 'Mixtape';
 		const description = interaction.options.getString('message');
 		const save = interaction.options.getString('save');
 		const playersNeeded = interaction.options.getString('players-needed');
@@ -94,17 +95,17 @@ module.exports = {
 		if (micRequired == 'Yes') buttonRow.addComponents(new ButtonBuilder().setCustomId('MicType').setLabel('Mic Required').setStyle(ButtonStyle.Danger).setDisabled(true));
 		if (micRequired == 'No') buttonRow.addComponents(new ButtonBuilder().setCustomId('MicType').setLabel('Mic Optional').setStyle(ButtonStyle.Success).setDisabled(true));
 
-		setVCLimit('Mixtape', interaction);
+		setVCLimit(mode, interaction);
 
 		let playersNeededText = !playersNeeded ? `is looking for a team` : `is looking for ${playersNeeded} more`;
 
-		const lfgEmbed = new EmbedBuilder()
+		const lfgMixtapeEmbed = new EmbedBuilder()
 			.setAuthor({
 				name: `${interaction.member.displayName} ${playersNeededText}`,
 				iconURL: interaction.member.displayAvatarURL({ dynamic: true }),
 			})
 			.setDescription(`<@${interaction.member.id}>'s Message: ${description}`)
-			.setThumbnail(`attachment://Mixtape.png`)
+			.setThumbnail(`attachment://${mode}.png`)
 			.setTimestamp()
 			.setFooter({
 				text: 'Read channel pins!',
@@ -112,28 +113,28 @@ module.exports = {
 			});
 
 		if (playstyle)
-			lfgEmbed.addFields({
+			lfgMixtapeEmbed.addFields({
 				name: '__Playstyle__',
 				value: `${playstyle}`,
 				inline: true,
 			});
 
 		if (mains)
-			lfgEmbed.addFields({
+			lfgMixtapeEmbed.addFields({
 				name: '__Main(s)__',
 				value: `${mains}`,
 				inline: true,
 			});
 
 		if (gamertag)
-			lfgEmbed.addFields({
+			lfgMixtapeEmbed.addFields({
 				name: '__Gamertag__',
 				value: `${gamertag}`,
 				inline: true,
 			});
 
 		if (save == 'Yes') {
-			saveCasualLFGPost(interaction, 'Mixtape', description, playersNeeded, micRequired, playstyle, mains, gamertag);
+			saveCasualLFGPost(interaction, mode, description, playersNeeded, micRequired, playstyle, mains, gamertag);
 
 			await interaction.editReply({
 				content: 'Your LFG message has been posted and saved, use the `/rc` command to post it again!',
@@ -148,11 +149,11 @@ module.exports = {
 
 		if (buttonRow.components.length == 0) {
 			await interaction.channel.send({
-				embeds: [lfgEmbed],
+				embeds: [lfgMixtapeEmbed],
 				files: [
 					{
-						attachment: `${__dirname}/../../images/nonRanked/Mixtape.png`,
-						name: `Mixtape.png`,
+						attachment: `${__dirname}/../../images/nonRanked/${mode}.png`,
+						name: `${mode}.png`,
 					},
 					{
 						attachment: `${__dirname}/../../images/other/pin.png`,
@@ -162,12 +163,12 @@ module.exports = {
 			});
 		} else {
 			await interaction.channel.send({
-				embeds: [lfgEmbed],
+				embeds: [lfgMixtapeEmbed],
 				components: [buttonRow],
 				files: [
 					{
-						attachment: `${__dirname}/../../images/nonRanked/Mixtape.png`,
-						name: `Mixtape.png`,
+						attachment: `${__dirname}/../../images/nonRanked/${mode}.png`,
+						name: `${mode}.png`,
 					},
 					{
 						attachment: `${__dirname}/../../images/other/pin.png`,

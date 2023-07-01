@@ -50,6 +50,18 @@ function checkBannedWords(message, interaction) {
 	return false;
 }
 
+function checkBannedWordsCustom(message, interaction) {
+	if (!message) return false;
+
+	if (bannedWords.some(i => message.toLowerCase().includes(i))) {
+		console.log(chalk.red(`USER WARNING: ${interaction.member.displayName} tried to use a banned word in their LFG message`));
+
+		return true;
+	}
+
+	return false;
+}
+
 function checkEntryPlural(amount, string) {
 	if (amount == 1) return `${string}y`;
 
@@ -102,4 +114,15 @@ function vcLinkButtonBuilder(interaction) {
 		.setURL(`https://discord.com/channels/${interaction.guild.id}/${interaction.member.voice.channel.id}`);
 }
 
-module.exports = { setVCLimit, logFormatter, checkBannedWords, checkEntryPlural, checkVoiceChannel, movedLogFormatter, saveCasualLFGPost, saveRankedLFGPost, vcLinkButtonBuilder };
+module.exports = {
+	setVCLimit,
+	logFormatter,
+	checkBannedWords,
+	checkEntryPlural,
+	checkVoiceChannel,
+	movedLogFormatter,
+	saveCasualLFGPost,
+	saveRankedLFGPost,
+	vcLinkButtonBuilder,
+	checkBannedWordsCustom,
+};

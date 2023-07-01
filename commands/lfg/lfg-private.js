@@ -49,7 +49,6 @@ module.exports = {
 					{ name: 'Habitat 4', value: 'Habitat 4' },
 					{ name: 'Hammond Labs', value: 'Hammond Labs' },
 					{ name: 'Lava Siphon', value: 'Lava Siphon' },
-					{ name: 'Caustic Treatment', value: 'Caustic Treatment' },
 					{ name: 'Barometer', value: 'Barometer' },
 					{ name: 'Skull Town', value: 'Skull Town' },
 					{ name: 'Fragment East', value: 'Fragment East' },

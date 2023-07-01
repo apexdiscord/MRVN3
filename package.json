@@ -12,7 +12,7 @@
 		"@discordjs/rest": "^1.7.1",
 		"@discordjs/voice": "^0.16.0",
 		"better-sqlite3": "^8.4.0",
-		"chalk": "4.1.2",
+		"chalk": "^4.1.2",
 		"discord-api-types": "^0.37.47",
 		"discord.js": "^14.11.0",
 		"dotenv": "^16.3.1",
@@ -20,7 +20,7 @@
 		"node-cron": "^3.0.2"
 	},
 	"devDependencies": {
-		"eslint": "^8.44.0",
+		"eslint": "^8.43.0",
 		"nodemon": "2.0.22"
 	}
 }

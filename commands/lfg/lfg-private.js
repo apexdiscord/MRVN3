@@ -109,18 +109,7 @@ module.exports = {
 		const gameModeVarient = interaction.options.getString('game-mode-variant');
 		const matchCode = interaction.options.getString('match-code');
 
-		if (checkBannedWordsCustom(description, interaction, false) == true) {
-			await interaction.deferReply({ ephemeral: true });
-
-			await interaction.editReply({
-				content: 'Your LFG message contains a banned word. Please try again.',
-				ephemeral: true,
-			});
-
-			return;
-		}
-
-		if (checkBannedWordsCustom(matchCode, interaction, false) == true) {
+		if (checkBannedWordsCustom(description, interaction, false) == true || checkBannedWordsCustom(matchCode, interaction, false) == true) {
 			await interaction.deferReply({ ephemeral: true });
 
 			await interaction.editReply({
@@ -135,7 +124,7 @@ module.exports = {
 
 		const lfgPrivateEmbed = new EmbedBuilder()
 			.setAuthor({
-				name: `${interaction.user.tag} is looking for players for a private match`,
+				name: `${interaction.user.tag} is looking for teammates for a private match`,
 				iconURL: interaction.member.displayAvatarURL({ dynamic: true }),
 			})
 			.setDescription(`${description}`)

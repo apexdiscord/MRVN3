@@ -269,9 +269,13 @@ module.exports = {
 			}
 
 			// Move disconnect to under logging to allow the ID to pass to the log embeds
+			// If the kick count is less than 2, don't show the "Message ModMail" portion of the kick message
+			var kickModMailText = entryCount2 <= 2 ? '' : '\nPlease report any repeated rule breaking behaviour to <@542736472155881473> with the ID of the user you kicked.';
+
 			await member.voice.disconnect();
+
 			await interaction.editReply({
-				content: `Successfully removed <@${user.id}> from the voice channel.\nPlease report any repeated rule breaking behaviour to <@542736472155881473> with the ID of the user you kicked.`,
+				content: `Successfully removed <@${user.id}> from the voice channel.${kickModMailText}`,
 				ephemeral: true,
 			});
 		} catch (error) {

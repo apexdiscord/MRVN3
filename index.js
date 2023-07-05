@@ -19,7 +19,7 @@ dotenv.config();
 // all of the intents
 const client = new Client({
 	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates],
-	allowedMentions: { users: [] },
+	allowedMentions: { parse: ['roles'], repliedUser: true },
 });
 
 // Log the bot in to Discord and load the event handlers

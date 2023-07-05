@@ -177,6 +177,9 @@ module.exports = {
 				iconURL: 'attachment://pin.png',
 			});
 
+		// Ping private match role on post
+		await interaction.channel.send({ content: `<@&${process.env.PRIVATEMATCH_PING}>` });
+
 		await interaction.editReply({
 			embeds: [lfgPrivateEmbed],
 			files: [

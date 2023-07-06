@@ -123,7 +123,7 @@ module.exports = {
 
 			if (newState.channel.members.size === 1) {
 				// User moved to an empty VC
-				console.log(chalk.yellow(`${chalk.bold('MOVE:')} ${newState.member.user.tag} moved to empty voice channel "${newState.channel.name}"`));
+				console.log(chalk.yellow(`${chalk.bold('MOVE:')} ${newState.member.user.tag} moved from "${oldState.channel.name}" to "${newState.channel.name}"`));
 
 				// Log it in the log channel
 				if (process.env.VC_MOVE !== undefined) {
@@ -150,7 +150,7 @@ module.exports = {
 				console.log(chalk.blue(`${chalk.bold('DATABASE:')} ${oldState.member.user.tag} moved to an empty VC; database entry inserted or updated`));
 			} else {
 				// User moved to an occupied VC
-				console.log(chalk.yellow(`${chalk.bold('MOVE:')} ${newState.member.user.tag} moved to occupied voice channel "${newState.channel.name}"`));
+				console.log(chalk.yellow(`${chalk.bold('MOVE:')} ${newState.member.user.tag} moved from "${oldState.channel.name}" to "${newState.channel.name}"`));
 
 				// Log it in the log channel
 				if (process.env.VC_MOVE !== undefined) {

@@ -1,7 +1,7 @@
 const chalk = require('chalk');
 const moment = require('moment');
 const Database = require('better-sqlite3');
-const { ButtonStyle, ButtonBuilder } = require('discord.js');
+const { ButtonStyle, EmbedBuilder, ButtonBuilder } = require('discord.js');
 
 const emotes = require('../data/emotes.json');
 var bannedWords = require('../data/bannedWords.json');
@@ -104,6 +104,78 @@ function saveRankedLFGPost(interaction, mode, description, currentRank, previous
 	console.log(chalk.blue(`DATABASE: Saved LFG post from ${interaction.user.tag} to rankedLFG table`));
 }
 
+async function timeoutController(length, lengthFull, memberKicked, interaction, entryOne, entryTwo, entryThree) {
+	const unmuteTimestamp = Math.floor(new Date(Date.now() + lengthFull) / 1000);
+
+	if (length == 2419199_000) {
+		var textTitle = `${memberKicked.user.tag} was issued a 28 day timeout!`;
+		var textInfo = `Thier timeout will expire <t:${unmuteTimestamp}:R>, <t:${unmuteTimestamp}:d> at <t:${unmuteTimestamp}:t>`;
+		var embedColor = 'CA2128';
+
+		memberKicked.timeout(length, 'User was timed out for 28 days due to being kicked from an LFG channel 9 or more times in the past 24 hours.').catch(console.error);
+	} else if (length == 3600_000) {
+		var textTitle = `${memberKicked.user.tag} was issued a 1 hour timeout!`;
+		var textInfo = `Their timeout will expire <t:${unmuteTimestamp}:R>, at <t:${unmuteTimestamp}:t>`;
+		var embedColor = 'E9BE1A';
+
+		memberKicked.timeout(length, 'User was timed out for 1 hour due to being kicked from an LFG channel 6 or more times in the past 24 hours.').catch(console.error);
+	} else if (length == 600_000) {
+		var textTitle = `${memberKicked.user.tag} was issued a 10 minute timeout!`;
+		var textInfo = `Their timeout will expire <t:${unmuteTimestamp}:R>, at <t:${unmuteTimestamp}:t>`;
+		var embedColor = '1A6EC8';
+
+		memberKicked.timeout(length, 'User was timed out for 10 minutes due to being kicked from an LFG channel 3 or more times in the past hour.').catch(console.error);
+	} else {
+		var textTitle = `${memberKicked.user.tag} was kicked from a voice channel!`;
+		var textInfo = 'They were kicked, but were not issued a timeout.';
+		var embedColor = '1A6EC8';
+	}
+
+	const kickChannel = interaction.guild.channels.cache.get(process.env.VC_KICK);
+
+	const timeoutEmbed = new EmbedBuilder()
+		.setTitle(`${textTitle}`)
+		.setDescription(`${textInfo}`)
+		.addFields([
+			{
+				name: 'Kicked User',
+				value: `<@${memberKicked.user.id}>\n\`${memberKicked.user.id}\``,
+				inline: true,
+			},
+			{
+				name: 'Kicked By',
+				value: `<@${interaction.user.id}>\n\`${interaction.user.id}\``,
+				inline: true,
+			},
+			{
+				name: 'Voice Channel',
+				value: `<#${memberKicked.voice.channelId}>\n\`${memberKicked.voice.channelId}\``,
+				inline: true,
+			},
+			{
+				name: '10m Timeout Count',
+				value: `${entryOne}`,
+				inline: true,
+			},
+			{
+				name: '1h Timeout Count',
+				value: `${entryTwo}`,
+				inline: true,
+			},
+			{
+				name: '28d Timeout Count',
+				value: `${entryThree}`,
+				inline: true,
+			},
+		])
+		.setTimestamp()
+		.setColor(embedColor);
+
+	kickChannel.send({ embeds: [timeoutEmbed] });
+
+	await memberKicked.voice.disconnect();
+}
+
 function vcLinkButtonBuilder(interaction) {
 	if (!interaction.member.voice.channel) return null;
 
@@ -123,6 +195,7 @@ module.exports = {
 	movedLogFormatter,
 	saveCasualLFGPost,
 	saveRankedLFGPost,
+	timeoutController,
 	vcLinkButtonBuilder,
 	checkBannedWordsCustom,
 };

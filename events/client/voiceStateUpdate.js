@@ -79,8 +79,47 @@ module.exports = {
 			}
 		} else if (oldState.channelId != newState.channelId) {
 			// User moved
-			// If the parent category of the voice channel is not in the whitelist, ignore it
-			if (!categoryWhitelist.includes(oldState.channel.parent.id)) return;
+			// If the parent category of the voice channel is
+			// not in the whitelist, ignore it
+			if (!categoryWhitelist.includes(oldState.channel.parent.id)) {
+				// Disconnect the user and force them to reconnect
+				// ...simply because I'm too lazy to figure out the
+				// logic needed to make this work properly (atm)
+				newState.member.voice.disconnect();
+
+				return;
+			}
+
+			// If the new VC is not in the whitelist, remove
+			// any VC owner entries for the user
+			if (!categoryWhitelist.includes(newState.channel.parent.id)) {
+				// User moved to a VC that is not in the
+				// category whitelist
+				console.log(chalk.yellow(`${chalk.bold('LEAVE:')} ${oldState.member.user.tag} left voice channel "${oldState.channel.name}"`));
+
+				const findUser = db_vcOwnerList.prepare('SELECT * FROM vcOwnerList WHERE id = ?').get(oldState.member.user.id);
+
+				if (findUser) {
+					db_vcOwnerList.prepare('DELETE FROM vcOwnerList WHERE id = ?').run(oldState.member.user.id);
+
+					console.log(chalk.blue(`${chalk.bold('DATABASE:')} Removed ${oldState.member.user.tag} from vcOwnerList`));
+				}
+
+				if (checkVoiceChannel(oldState) == false && oldState.channel.userLimit != 3) {
+					oldState.channel.setUserLimit(3);
+
+					console.log(chalk.yellow(`${chalk.bold('VOICE:')} Set user limit of "${oldState.channel.name}" to 3`));
+				}
+
+				// Log it in the log channel
+				if (process.env.VC_LEAVE !== undefined) {
+					const logChannel = newState.guild.channels.cache.get(process.env.VC_LEAVE);
+
+					logChannel.send(logFormatter(oldState, 'Left'));
+				}
+
+				return;
+			}
 
 			if (newState.channel.members.size === 1) {
 				// User moved to an empty VC

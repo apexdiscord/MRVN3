@@ -36,13 +36,44 @@ function logFormatter(state, text) {
 function checkBannedWords(message, interaction) {
 	if (!message) return false;
 
-	if (bannedWords.some(i => message.toLowerCase().includes(i))) {
+	const findBannedWords = bannedWords.find(i => message.toLowerCase().includes(i));
+
+	if (findBannedWords) {
 		console.log(chalk.red(`USER WARNING: ${interaction.member.displayName} tried to use a banned word in their LFG message`));
 
 		interaction.editReply({
 			content: 'Your LFG message contains a banned word. Please try again.',
 			ephemeral: true,
 		});
+
+		if (process.env.LFG_ALERTS !== undefined) {
+			const lfgAlertChannel = interaction.guild.channels.cache.get(process.env.LFG_ALERTS);
+
+			const alertEmbed = new EmbedBuilder().setTitle('LFG Command - Blocked Banned Word').addFields([
+				{
+					name: `User`,
+					value: `<@${interaction.user.id}>\n${interaction.user.tag}\n\`${interaction.user.id}\``,
+					inline: true,
+				},
+				{
+					name: 'Channel',
+					value: `<#${interaction.channel.id}>\n\`${interaction.channel.id}\``,
+					inline: true,
+				},
+				{
+					name: 'Detected Word',
+					value: findBannedWords,
+					inline: true,
+				},
+				{
+					name: 'Blocked Message',
+					value: message,
+					inline: false,
+				},
+			]);
+
+			lfgAlertChannel.send({ embeds: [alertEmbed] });
+		}
 
 		return true;
 	}
@@ -53,8 +84,39 @@ function checkBannedWords(message, interaction) {
 function checkBannedWordsCustom(message, interaction) {
 	if (!message) return false;
 
-	if (bannedWords.some(i => message.toLowerCase().includes(i))) {
+	const findBannedWords = bannedWords.find(i => message.toLowerCase().includes(i));
+
+	if (findBannedWords) {
 		console.log(chalk.red(`USER WARNING: ${interaction.member.displayName} tried to use a banned word in their LFG message`));
+
+		if (process.env.LFG_ALERTS !== undefined) {
+			const lfgAlertChannel = interaction.guild.channels.cache.get(process.env.LFG_ALERTS);
+
+			const alertEmbed = new EmbedBuilder().setTitle('LFG Command - Blocked Banned Word').addFields([
+				{
+					name: `User`,
+					value: `<@${interaction.user.id}>\n${interaction.user.tag}\n\`${interaction.user.id}\``,
+					inline: true,
+				},
+				{
+					name: 'Channel',
+					value: `<#${interaction.channel.id}>\n\`${interaction.channel.id}\``,
+					inline: true,
+				},
+				{
+					name: 'Detected Word',
+					value: findBannedWords,
+					inline: true,
+				},
+				{
+					name: 'Blocked Message',
+					value: message,
+					inline: false,
+				},
+			]);
+
+			lfgAlertChannel.send({ embeds: [alertEmbed] });
+		}
 
 		return true;
 	}

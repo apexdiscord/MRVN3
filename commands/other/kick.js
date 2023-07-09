@@ -47,9 +47,9 @@ module.exports = {
 			db_memberDecay.prepare(`INSERT INTO memberDecay3 (id, timestamp) VALUES (?, ?)`).run(userToKickID, timestamp);
 
 			// Fetch the amount of times they are counted in the database
-			const entryCount1 = db_memberDecay.prepare(`SELECT COUNT(*) AS countOne FROM memberDecay1 WHERE id = ?`).get(userToKickID);
-			const entryCount2 = db_memberDecay.prepare(`SELECT COUNT(*) AS countTwo FROM memberDecay2 WHERE id = ?`).get(userToKickID);
-			const entryCount3 = db_memberDecay.prepare(`SELECT COUNT(*) AS countThree FROM memberDecay3 WHERE id = ?`).get(userToKickID);
+			const entryCount1 = db_memberDecay.prepare(`SELECT COUNT(*) FROM memberDecay1 WHERE id = ?`).get(userToKickID)['COUNT(*)'];
+			const entryCount2 = db_memberDecay.prepare(`SELECT COUNT(*) FROM memberDecay2 WHERE id = ?`).get(userToKickID)['COUNT(*)'];
+			const entryCount3 = db_memberDecay.prepare(`SELECT COUNT(*) FROM memberDecay3 WHERE id = ?`).get(userToKickID)['COUNT(*)'];
 
 			const entryCountTable = new Table({
 				title: `Kick Count for ${memberToKick.user.tag} (${memberToKick.user.id})`,
@@ -62,28 +62,27 @@ module.exports = {
 
 			entryCountTable.addRows([
 				{
-					entryCount1: entryCount1.countOne,
-					entryCount2: entryCount2.countTwo,
-					entryCount3: entryCount3.countThree,
+					entryCount1: entryCount1,
+					entryCount2: entryCount2,
+					entryCount3: entryCount3,
 				},
 			]);
 
 			entryCountTable.printTable();
 
 			// Set timeouts for kicked user
-			if (entryCount3.countThree >= 9) {
-				timeoutController(2419199_000, 2419199000, memberToKick, interaction, entryCount1.countOne, entryCount2.countTwo, entryCount3.countThree);
-			} else if (entryCount2.countTwo >= 6) {
-				timeoutController(3600_000, 3600000, memberToKick, interaction, entryCount1.countOne, entryCount2.countTwo, entryCount3.countThree);
-			} else if (entryCount1.countOne >= 3) {
-				timeoutController(600_000, 600000, memberToKick, interaction, entryCount1.countOne, entryCount2.countTwo, entryCount3.countThree);
+			if (entryCount3 >= 9) {
+				timeoutController(2419199_000, 2419199000, memberToKick, interaction, entryCount1, entryCount2, entryCount3);
+			} else if (entryCount2 >= 6) {
+				timeoutController(3600_000, 3600000, memberToKick, interaction, entryCount1, entryCount2, entryCount3);
+			} else if (entryCount1 >= 3) {
+				timeoutController(600_000, 600000, memberToKick, interaction, entryCount1, entryCount2, entryCount3);
 			} else {
-				timeoutController(0, 0, memberToKick, interaction, entryCount1.countOne, entryCount2.countTwo, entryCount3.countThree);
+				timeoutController(0, 0, memberToKick, interaction, entryCount1, entryCount2, entryCount3);
 			}
 
 			// If the kick count is less than 2, don't show the "Message ModMail" portion of the kick message
-			var kickModMailText =
-				entryCount2.countTwo <= 2 ? '' : '\nPlease report any repeated rule breaking behaviour to <@542736472155881473> with the ID of the user you kicked.';
+			var kickModMailText = entryCount2 <= 2 ? '' : '\nPlease report any repeated rule breaking behaviour to <@542736472155881473> with the ID of the user you kicked.';
 
 			await interaction.editReply({
 				content: `Successfully removed <@${userToKick.id}> from the voice channel.${kickModMailText}`,

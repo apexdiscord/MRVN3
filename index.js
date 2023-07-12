@@ -1,190 +1,219 @@
 const chalk = require('chalk');
-const moment = require('moment');
 const dotenv = require('dotenv');
+const moment = require('moment');
 const Database = require('better-sqlite3');
+const { Table } = require('console-table-printer');
 const { Client, GatewayIntentBits } = require('discord.js');
 
+// Load utilities
+const { checkEntryPlural } = require('./functions/utilities.js');
+
+// Load client and interaction event handlers
 const { loadEvents } = require('./events.js');
 
+// Load .env config file
 dotenv.config();
 
+// Load client with guild and voice state intents
+// Bot should have server members intent enabled in
+// the developer portal, but to be safe, just enable
+// all of the intents
 const client = new Client({
 	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates],
-	allowedMentions: { users: [] },
+	allowedMentions: { parse: ['roles'], repliedUser: true },
 });
 
-// Connect to the SQLite database
-const db = new Database(`${__dirname}/databases/vcOwnerList.sqlite`);
-const db2 = new Database(`${__dirname}/databases/memberDecay.sqlite`);
-const db3 = new Database(`${__dirname}/databases/savedLFGPosts.sqlite`);
-
+// Log the bot in to Discord and load the event handlers
 client
 	.login(process.env.TOKEN)
 	.then(() => {
 		loadEvents(client);
 	})
 	.catch(err => {
-		console.error(`Error loading bot during login: ${err}`);
+		console.log(chalk.bold.red(`BOT: Login Error: ${err}`));
 	});
 
-// Create tables to store member IDs for kick permission
-const createTableQuery = `
-CREATE TABLE IF NOT EXISTS vcOwnerList (
-  id TEXT PRIMARY KEY
-);
-`;
-db.exec(createTableQuery);
+// Create and load database files
+const db_vcOwnerList = new Database(`${__dirname}/databases/vcOwnerList.sqlite`);
+const db_memberDecay = new Database(`${__dirname}/databases/memberDecay.sqlite`);
+const db_savedLFGPosts = new Database(`${__dirname}/databases/savedLFGPosts.sqlite`);
 
-// Create tables to store member IDs and timestamps for kick counter
-const createTableQuery2 = `
-CREATE TABLE IF NOT EXISTS memberDecay1 (
-  id TEXT, timestamp INTEGER,
-  PRIMARY KEY (id, timestamp)
-);
-`;
-const createTableQuery3 = `
-CREATE TABLE IF NOT EXISTS memberDecay2 (
-  id TEXT, timestamp INTEGER,
-  PRIMARY KEY (id, timestamp)
-);
-`;
-const createTableQuery4 = `
-CREATE TABLE IF NOT EXISTS memberDecay3 (
-  id TEXT, timestamp INTEGER,
-  PRIMARY KEY (id, timestamp)
-);
-`;
+// Create the quieries to create table if they don't exist
+const createOwnerVCTable = `CREATE TABLE IF NOT EXISTS vcOwnerList (id TEXT, timestamp INTEGER, PRIMARY KEY (id));`;
 
-db2.exec(createTableQuery2);
-db2.exec(createTableQuery3);
-db2.exec(createTableQuery4);
+const createMemberDecayTable1 = `CREATE TABLE IF NOT EXISTS memberDecay1 (id TEXT, timestamp INTEGER, PRIMARY KEY (id, timestamp));`;
+const createMemberDecayTable2 = `CREATE TABLE IF NOT EXISTS memberDecay2 (id TEXT, timestamp INTEGER, PRIMARY KEY (id, timestamp));`;
+const createMemberDecayTable3 = `CREATE TABLE IF NOT EXISTS memberDecay3 (id TEXT, timestamp INTEGER, PRIMARY KEY (id, timestamp));`;
 
-// Create a tables to store LFG data
-const createTableQuery5 = `
-  CREATE TABLE IF NOT EXISTS casualLFG (
+const createCasualLFGPostsTable = `CREATE TABLE IF NOT EXISTS casualLFG (
     user_id TEXT PRIMARY KEY,
     mode TEXT,
     description TEXT,
-    playerno TEXT,
-    fieldmic TEXT,
-    fieldp TEXT,
-    fieldm TEXT,
-    fieldg TEXT,
-	timestamp
-  );
-`;
-const createTableQuery6 = `
-  CREATE TABLE IF NOT EXISTS rankedLFG (
+    playersNeeded TEXT,
+    micRequired TEXT,
+    playStyle TEXT,
+    main TEXT,
+    gamerTag TEXT,
+    timestamp INTEGER
+);`;
+
+const createRankedLFGPostsTable = `CREATE TABLE IF NOT EXISTS rankedLFG (
     user_id TEXT PRIMARY KEY,
+    mode TEXT,
     description TEXT,
-    playerno TEXT,
-    fieldmic TEXT,
-    fieldp TEXT,
-    fieldm TEXT,
-    fieldg TEXT,
-	selectedrank TEXT,
-	timestamp
-  );
-`;
-db3.exec(createTableQuery5);
-db3.exec(createTableQuery6);
+    currentRank TEXT,
+    previousRank TEXT,
+    playersNeeded TEXT,
+    micRequired TEXT,
+    playStyle TEXT,
+    main TEXT,
+    gamerTag TEXT,
+    timestamp INTEGER
+);`;
 
-function checkEntryPlural(amount, string) {
-	if (amount == 1) {
-		return `${string}y`;
-	}
+// Execute the queries to create the tables
+db_vcOwnerList.exec(createOwnerVCTable);
+db_memberDecay.exec(createMemberDecayTable1);
+db_memberDecay.exec(createMemberDecayTable2);
+db_memberDecay.exec(createMemberDecayTable3);
+db_savedLFGPosts.exec(createCasualLFGPostsTable);
+db_savedLFGPosts.exec(createRankedLFGPostsTable);
 
-	return `${string}ies`;
-}
+// Delete expired kick counts from database
+function deleteKickCounterEntries(dbName, timeInMinutes, text) {
+	// Subtract the amount of time (timeInMinutes) from the current time
+	const timeSince = moment().subtract(timeInMinutes, 'minutes').unix();
 
-// Deleting expiring kick counts
-function deleteOldEntries2() {
-	const tenMinutesAgo = moment().subtract(10, 'minutes').unix();
+	// Select the amount of rows that are older than timeSince
+	const timeSinceCount = db_memberDecay.prepare(`SELECT COUNT(*) FROM ${dbName} WHERE timestamp <= ?`).get(timeSince)['COUNT(*)'];
 
-	// Select the amount of entries in memberDecay1 that are older than 10 minutes
-	const tenMinuteCount = db2.prepare('SELECT COUNT(*) FROM memberDecay1 WHERE timestamp <= ?').get(tenMinutesAgo)['COUNT(*)'];
+	// If the count of timeSinceCount is greater than 0, delete the entries
+	if (timeSinceCount > 0) {
+		console.log(chalk.cyan(`DATABASE: Running ${text} Cleanup Check...`));
 
-	// If the counter is greater than 0, delete the entries
-	if (tenMinuteCount > 0) {
-		console.log(chalk.cyan(`DATABASE: Running 10 Minute Kick Counter Cleanup Check...`));
+		db_memberDecay.prepare(`DELETE FROM ${dbName} WHERE timestamp <= ?`).run(timeSince);
 
-		db2.prepare('DELETE FROM memberDecay1 WHERE timestamp <= ?').run(tenMinutesAgo);
-
-		console.log(chalk.green(`DATABASE: 10 Minute Kick Counter Cleanup complete, deleted ${tenMinuteCount} ${checkEntryPlural(tenMinuteCount, 'entr')} from the database!`));
-	}
-}
-setInterval(deleteOldEntries2, 60 * 1000);
-
-function deleteOldEntries3() {
-	const oneDayAgo1 = moment().subtract(1440, 'minutes').unix();
-
-	// Select the amount of entries in memberDecay2 that are older than 1 day (part 1)
-	const oneHourCount = db2.prepare('SELECT COUNT(*) FROM memberDecay2 WHERE timestamp <= ?').get(oneDayAgo1)['COUNT(*)'];
-
-	// If the counter is greater than 0, delete the entries
-	if (oneHourCount > 0) {
-		console.log(chalk.cyan(`DATABASE: Running 1 Hour Kick Counter Cleanup Check...`));
-
-		db2.prepare('DELETE FROM memberDecay2 WHERE timestamp <= ?').run(oneDayAgo1);
-
-		console.log(chalk.green(`DATABASE: 1 Hour Kick Counter Cleanup complete, deleted ${oneHourCount} ${checkEntryPlural(oneHourCount, 'entr')} from the database!`));
+		console.log(chalk.green(`DATABASE: ${text} Cleanup Check complete, deleted ${timeSinceCount} ${checkEntryPlural(timeSinceCount, 'entr')} from ${dbName}`));
 	}
 }
-setInterval(deleteOldEntries3, 60 * 1000);
 
-function deleteOldEntries4() {
-	const oneDayAgo2 = moment().subtract(1440, 'minutes').unix();
+// Delete expired kick counts from database
+function deleteLFGPostEntries(dbName, timeInMinutes, text) {
+	// Subtract the amount of time (timeInMinutes) from the current time
+	const timeSince = moment().subtract(timeInMinutes, 'minutes').unix();
 
-	// Select the amount of entries in memberDecay3 that are older than 1 day (part 2)
-	const oneDay2Count = db2.prepare('SELECT COUNT(*) FROM memberDecay3 WHERE timestamp <= ?').get(oneDayAgo2)['COUNT(*)'];
+	// Select the amount of rows that are older than timeSince
+	const timeSinceCount = db_savedLFGPosts.prepare(`SELECT COUNT(*) FROM ${dbName} WHERE timestamp <= ?`).get(timeSince)['COUNT(*)'];
 
-	// If the counter is greater than 0, delete the entries
-	if (oneDay2Count > 0) {
-		console.log(chalk.cyan(`DATABASE: Running 28 Day Kick Counter Cleanup Check...`));
+	// If the count of timeSinceCount is greater than 0, delete the entries
+	if (timeSinceCount > 0) {
+		console.log(chalk.cyan(`DATABASE: Running ${text} Cleanup Check...`));
 
-		db2.prepare('DELETE FROM memberDecay3 WHERE timestamp <= ?').run(oneDayAgo2);
+		db_savedLFGPosts.prepare(`DELETE FROM ${dbName} WHERE timestamp <= ?`).run(timeSince);
 
-		console.log(chalk.green(`DATABASE: 28 Day Kick Counter Cleanup complete, deleted ${oneDay2Count} ${checkEntryPlural(oneDay2Count, 'entr')} from the database!`));
+		console.log(chalk.green(`DATABASE: ${text} Cleanup Check complete, deleted ${timeSinceCount} ${checkEntryPlural(timeSinceCount, 'entr')} from ${dbName}`));
 	}
 }
-setInterval(deleteOldEntries4, 60 * 1000);
 
-// Deleting expiring casual lfg messages
-function deleteOldEntries5() {
-	const twentyEightDaysAgo = moment().subtract(28, 'days').unix();
+function currentBotStats() {
+	// The idea is to run a command that spits out information to
+	// the console about current DB counts and such. Maybe in the
+	// future it'll update a message in the server for easier
+	// viewing.
+	const minutes = moment().minute();
 
-	// Select the amount of entries in casualLFG that are older than 10 minutes
-	const savedCommandCount = db3.prepare('SELECT COUNT(*) FROM casualLFG WHERE timestamp <= ?').get(twentyEightDaysAgo)['COUNT(*)'];
+	if (minutes % 30 == 0) {
+		const oneHourAgo = moment().subtract(1, 'hour').unix();
+		const twoHoursAgo = moment().subtract(2, 'hour').unix();
 
-	// If the counter is greater than 0, delete the entries
-	if (savedCommandCount > 0) {
-		console.log(chalk.cyan(`DATABASE: Running Saved Command Cleanup Check...`));
+		const savedCasualPostCount = db_savedLFGPosts.prepare(`SELECT COUNT(*) FROM casualLFG`).get()['COUNT(*)'];
+		const savedRankedPostCount = db_savedLFGPosts.prepare(`SELECT COUNT(*) FROM rankedLFG`).get()['COUNT(*)'];
+		const timeoutEntryCount1 = db_memberDecay.prepare(`SELECT COUNT(*) FROM memberDecay1`).get()['COUNT(*)'];
+		const timeoutEntryCount2 = db_memberDecay.prepare(`SELECT COUNT(*) FROM memberDecay2`).get()['COUNT(*)'];
+		const timeoutEntryCount3 = db_memberDecay.prepare(`SELECT COUNT(*) FROM memberDecay3`).get()['COUNT(*)'];
+		const vcOwnerCountTotal = db_vcOwnerList.prepare(`SELECT COUNT(*) FROM vcOwnerList`).get()['COUNT(*)'];
+		const vcOwnerCountOneHour = db_vcOwnerList.prepare(`SELECT COUNT(*) FROM vcOwnerList WHERE timestamp <= ${oneHourAgo}`).get()['COUNT(*)'];
+		const vcOwnerCountTwoHours = db_vcOwnerList.prepare(`SELECT COUNT(*) FROM vcOwnerList WHERE timestamp <= ${twoHoursAgo}`).get()['COUNT(*)'];
 
-		db3.prepare('DELETE FROM casualLFG WHERE timestamp <= ?').run(twentyEightDaysAgo);
+		const savedPostCountTable = new Table({
+			title: `Saved LFG Post Count`,
+			columns: [
+				{ name: 'casualSavedCount', title: 'Saved Casual LFG Posts' },
+				{ name: 'rankedSavedCount', title: 'Saved Ranked LFG Posts' },
+			],
+		});
 
-		console.log(chalk.green(`DATABASE: Saved Command Cleanup complete, deleted ${savedCommandCount} ${checkEntryPlural(savedCommandCount, 'entr')} from the database!`));
+		savedPostCountTable.addRows([
+			{
+				casualSavedCount: savedCasualPostCount,
+				rankedSavedCount: savedRankedPostCount,
+			},
+		]);
+
+		const timeoutCountTable = new Table({
+			title: `Timeout Entry Count`,
+			columns: [
+				{ name: 'timeoutCount1', title: '10m Timeout Entries' },
+				{ name: 'timeoutCount2', title: '1h Timeout Entries' },
+				{ name: 'timeoutCount3', title: '28d Timeout Entries' },
+			],
+		});
+
+		timeoutCountTable.addRows([
+			{
+				timeoutCount1: timeoutEntryCount1,
+				timeoutCount2: timeoutEntryCount2,
+				timeoutCount3: timeoutEntryCount3,
+			},
+		]);
+
+		const vcOwnerCountTable = new Table({
+			title: `Number of VC Owners`,
+			columns: [
+				{ name: 'vcOwnerCountTotal', title: 'Total VC Owners' },
+				{ name: 'vcOwnerCountOneHour', title: 'VC Owners [1+ Hours]' },
+				{ name: 'vcOwnerCountTwoHours', title: 'VC Owners [2+ Hours]' },
+			],
+		});
+
+		vcOwnerCountTable.addRows([
+			{
+				vcOwnerCountTotal: vcOwnerCountTotal,
+				vcOwnerCountOneHour: vcOwnerCountOneHour,
+				vcOwnerCountTwoHours: vcOwnerCountTwoHours,
+			},
+		]);
+
+		savedPostCountTable.printTable();
+		timeoutCountTable.printTable();
+		vcOwnerCountTable.printTable();
 	}
 }
-setInterval(deleteOldEntries5, 24 * 60 * 60 * 1000);
 
-// Deleting expiring ranked lfg messages
-function deleteOldEntries6() {
-	const sevenDaysAgo = moment().subtract(7, 'days').unix();
+// Bot Stats Timer
+// Runs once a minute, but only actually prints to the counter
+// on the 30th minute of the hour
+setInterval(currentBotStats, 60 * 1000);
 
-	// Select the amount of entries in casualLFG that are older than 10 minutes
-	const savedRankedCommandCount = db3.prepare('SELECT COUNT(*) FROM rankedLFG WHERE timestamp <= ?').get(sevenDaysAgo)['COUNT(*)'];
+// 10 Minute Kick Counter Timer
+// Ran every 10 minutes
+setInterval(deleteKickCounterEntries, 60 * 1000, 'memberDecay1', 10, '10 Minute Timeout Counter');
 
-	// If the counter is greater than 0, delete the entries
-	if (savedRankedCommandCount > 0) {
-		console.log(chalk.cyan(`DATABASE: Running Saved Command Cleanup Check...`));
+// 1 Hour Kick Counter Timer
+// Ran once a day
+setInterval(deleteKickCounterEntries, 60 * 1000, 'memberDecay2', 24 * 60, '1 Hour Timeout Counter');
 
-		db3.prepare('DELETE FROM rankedLFG WHERE timestamp <= ?').run(sevenDaysAgo);
+// 28 Day Kick Counter Timer
+// Ran once a day
+setInterval(deleteKickCounterEntries, 60 * 1000, 'memberDecay3', 24 * 60, '28 Day Timeout Counter');
 
-		console.log(
-			chalk.green(`DATABASE: Saved Command Cleanup complete, deleted ${savedRankedCommandCount} ${checkEntryPlural(savedRankedCommandCount, 'entr')} from the database!`),
-		);
-	}
-}
-setInterval(deleteOldEntries6, 24 * 60 * 60 * 1000);
+// Saved Casual LFG Post Cleanup Timer
+// Ran every 28 days
+setInterval(deleteLFGPostEntries, 3600 * 1000, 'casualLFG', 28 * 24 * 60, 'Casual LFG Post');
 
+// Saved Ranked LFG Post Cleanup Timer
+// Ran every 7 days
+setInterval(deleteLFGPostEntries, 3600 * 1000, 'rankedLFG', 7 * 24 * 60, 'Ranked LFG Post');
+
+// Export the client so other files can use it
 module.exports = { client };

@@ -1,195 +1,180 @@
 const chalk = require('chalk');
-const dotenv = require('dotenv');
+const moment = require('moment');
 const Database = require('better-sqlite3');
 
-dotenv.config();
+const db_vcOwnerList = new Database(`${__dirname}/../../databases/vcOwnerList.sqlite`);
 
-// Connect to the SQLite database
-const db = new Database(`${__dirname}/../../databases/vcOwnerList.sqlite`);
-
-// Grab the vc category whitelist
+const { logFormatter, checkVoiceChannel, movedLogFormatter } = require('../../functions/utilities.js');
 var categoryWhitelist = require('../../data/categoryWhitelist.json');
 
 module.exports = {
 	name: 'voiceStateUpdate',
 	once: false,
 	execute(oldState, newState) {
-		// oldState and newState variables
-		const guild = newState.guild;
-		const member = newState.member;
-
-		// Set timestamp for logging
-		const logTimestamp = Math.floor(Date.now() / 1000);
-
 		// User Join
 		if (oldState.channelId === null) {
-			// If the parent category of the VC is not in the list, ignore it
+			// If the parent category of the voice channel is not in the whitelist, ignore it
 			if (!categoryWhitelist.includes(newState.channel.parent.id)) return;
 
 			if (newState.channel.members.size === 1) {
-				// User joined Empty VC
-				// Log the join in the console for debugging
-				console.log(chalk.green(`JOIN: ${member.user.tag} Joined Empty VC "${newState.channel.name}"`));
+				// User joined an empty VC
+				console.log(chalk.green(`${chalk.bold('JOIN:')} ${newState.member.user.tag} joined empty voice channel "${newState.channel.name}"`));
 
-				// Log it in channel for reports
+				// Log it in the log channel
 				if (process.env.VC_JOIN !== undefined) {
-					const channel = guild.channels.cache.get(process.env.VC_JOIN);
-					channel.send(
-						`<t:${logTimestamp}:f> :microphone2: <:MRVN_Join:1118671133802246296> <@${member.user.id}> (**${member.user.tag}**, \`${member.user.id}\`) Joined Empty VC: <#${newState.channel.id}> (**${newState.channel.name}**, \`${newState.channel.id}\`)`,
-					);
+					const logChannel = newState.guild.channels.cache.get(process.env.VC_JOIN);
+
+					logChannel.send(logFormatter(newState, 'Joined'));
 				}
 
-				// Check if user already exists in DB
-				const findUser = 'SELECT id FROM vcOwnerList WHERE id = ?';
-				const findUserResult = db.prepare(findUser).get(member.user.id);
+				// dbTimestamp
+				const dbTimestamp = moment().unix();
 
-				if (!findUserResult) {
-					// User is not in DB, just insert
-					const addVCOwner = 'INSERT INTO vcOwnerList (id) VALUES (?)';
-					db.prepare(addVCOwner).run(member.user.id);
+				// Insert or replace the person in the vcOwnerList
+				db_vcOwnerList.prepare('INSERT OR REPLACE INTO vcOwnerList (id, timestamp) VALUES (?, ?)').run(newState.member.user.id, dbTimestamp);
 
-					console.log(chalk.blue(`DATABASE: Added ${member.user.tag} (${member.user.id}) to the database.`));
-				} else {
-					// User is in DB, remove then readd them
-					// May be redundant? Not sure if it's needed, look
-					// into it in the future if it becomes an issue
-					const removeVCOwner = 'DELETE FROM vcOwnerList WHERE id = ?';
-					db.prepare(removeVCOwner).run(member.user.id);
-
-					console.log(chalk.cyan(`DATABASE: Removed ${member.user.tag} (${member.user.id}) from the database.`));
-
-					const addVCOwner = 'INSERT INTO vcOwnerList (id) VALUES (?)';
-					db.prepare(addVCOwner).run(member.user.id);
-
-					console.log(chalk.blue(`DATABASE: Added ${member.user.tag} (${member.user.id}) to the database.`));
-				}
+				console.log(chalk.blue(`${chalk.bold('DATABASE:')} Added ${oldState.member.user.tag} to vcOwnerList`));
 			} else {
-				// User joined a non-empty VC
-				// Log the join in the console for debugging
-				console.log(chalk.green(`JOIN: ${member.user.tag} Joined Occupied VC "${newState.channel.name}"`));
+				// User join a non-empty VC
+				console.log(chalk.green(`${chalk.bold('JOIN:')} ${newState.member.user.tag} joined occupied voice channel "${newState.channel.name}"`));
 
-				// Log it in channel for reports
+				// Log it in the log channel
 				if (process.env.VC_JOIN !== undefined) {
-					const channel = guild.channels.cache.get(process.env.VC_JOIN);
-					channel.send(
-						`<t:${logTimestamp}:f> :microphone2: <:MRVN_Join:1118671133802246296> <@${member.user.id}> (**${member.user.tag}**, \`${member.user.id}\`) Joined Occupied VC: <#${newState.channel.id}> (**${newState.channel.name}**, \`${newState.channel.id}\`)`,
-					);
+					const logChannel = newState.guild.channels.cache.get(process.env.VC_JOIN);
+
+					logChannel.send(logFormatter(newState, 'Joined'));
 				}
 			}
 		} else if (newState.channelId === null) {
-			// User Leave
-			// If the parent category of the VC is not in the list, ignore it
+			// User left VC
+			// If the parent category of the voice channel is not in the whitelist, ignore it
 			if (!categoryWhitelist.includes(oldState.channel.parent.id)) return;
 
-			// Log the join in the console for debugging
-			console.log(chalk.red(`LEAVE: ${member.user.tag} Left VC "${oldState.channel.name}"`));
+			console.log(chalk.red(`${chalk.bold('LEAVE:')} ${oldState.member.user.tag} left voice channel "${oldState.channel.name}"`));
 
-			// Check if user already exists in DB
-			const findUser = 'SELECT id FROM vcOwnerList WHERE id = ?';
-			const findUserResult = db.prepare(findUser).get(member.user.id);
+			// Check to see if the user exists in vcOwnerList
+			const findUser = db_vcOwnerList.prepare('SELECT * FROM vcOwnerList WHERE id = ?').get(oldState.member.user.id);
 
-			if (findUserResult) {
-				// User is in DB, remove them
-				const deleteVCOwner = 'DELETE FROM vcOwnerList WHERE id = ?';
-				db.prepare(deleteVCOwner).run(member.user.id);
+			if (findUser) {
+				// User is in vcOwnerList, remove them
+				db_vcOwnerList.prepare('DELETE FROM vcOwnerList WHERE id = ?').run(oldState.member.user.id);
 
-				console.log(chalk.cyan(`DATABASE: Removed ${member.user.tag} (${member.user.id}) from the database.`));
+				console.log(chalk.blue(`${chalk.bold('DATABASE:')} Removed ${oldState.member.user.tag} from vcOwnerList`));
 
-				// If they are in the DB, set the channel limit back to 3
-				// If they aren't, then there's no point setting it back
-				// to 3 if they don't own the VC
-				if (oldState.channel != null && oldState.channel.parent.id != process.env.GEN_CATEGORY && oldState.channel.parent.id != process.env.EVENT_CATEGORY) {
+				// If they are in the DB, set the channel limit back
+				// to 3. If they aren't, do nothing, as they don't own the
+				// VC or are in a VC that should not be changed at all
+				if (checkVoiceChannel(oldState) == false && oldState.channel.userLimit != 3) {
 					oldState.channel.setUserLimit(3);
+
+					console.log(chalk.yellow(`${chalk.bold('VOICE:')} Set user limit of "${oldState.channel.name}" to 3`));
+				}
+
+				// Log it in the log channel
+				if (process.env.VC_LEAVE !== undefined) {
+					const logChannel = newState.guild.channels.cache.get(process.env.VC_LEAVE);
+
+					logChannel.send(logFormatter(oldState, 'Left'));
 				}
 			}
-
-			// Log it in channel for reports
-			if (process.env.VC_LEAVE !== undefined) {
-				const channel = guild.channels.cache.get(process.env.VC_LEAVE);
-				channel.send(
-					`<t:${logTimestamp}:f> :microphone2: <:MRVN_Leave:1118671155960762489> <@${member.user.id}> (**${member.user.tag}**, \`${member.user.id}\`) Left VC: <#${oldState.channel.id}> (**${oldState.channel.name}**, \`${oldState.channel.id}\`)`,
-				);
-			}
 		} else if (oldState.channelId != newState.channelId) {
-			// User Move
-			// If the parent category of the VC is not in the list, ignore it
-			if (!categoryWhitelist.includes(newState.channel.parent.id)) return;
+			// User moved
+			// If the parent category of the voice channel is
+			// not in the whitelist, ignore it
+			if (!categoryWhitelist.includes(oldState.channel.parent.id)) {
+				// Disconnect the user and force them to reconnect
+				// ...simply because I'm too lazy to figure out the
+				// logic needed to make this work properly (atm)
+				newState.member.voice.disconnect();
+
+				return;
+			}
+
+			// If the new VC is not in the whitelist, remove
+			// any VC owner entries for the user
+			if (!categoryWhitelist.includes(newState.channel.parent.id)) {
+				// User moved to a VC that is not in the
+				// category whitelist
+				console.log(chalk.yellow(`${chalk.bold('LEAVE:')} ${oldState.member.user.tag} left voice channel "${oldState.channel.name}"`));
+
+				const findUser = db_vcOwnerList.prepare('SELECT * FROM vcOwnerList WHERE id = ?').get(oldState.member.user.id);
+
+				if (findUser) {
+					db_vcOwnerList.prepare('DELETE FROM vcOwnerList WHERE id = ?').run(oldState.member.user.id);
+
+					console.log(chalk.blue(`${chalk.bold('DATABASE:')} Removed ${oldState.member.user.tag} from vcOwnerList`));
+				}
+
+				if (checkVoiceChannel(oldState) == false && oldState.channel.userLimit != 3) {
+					oldState.channel.setUserLimit(3);
+
+					console.log(chalk.yellow(`${chalk.bold('VOICE:')} Set user limit of "${oldState.channel.name}" to 3`));
+				}
+
+				// Log it in the log channel
+				if (process.env.VC_LEAVE !== undefined) {
+					const logChannel = newState.guild.channels.cache.get(process.env.VC_LEAVE);
+
+					logChannel.send(logFormatter(oldState, 'Left'));
+				}
+
+				return;
+			}
 
 			if (newState.channel.members.size === 1) {
 				// User moved to an empty VC
-				// Log the join in the console for debugging
-				console.log(chalk.yellow(`MOVE: ${member.user.tag} Moved to Empty VC "${newState.channel.name}"`));
+				console.log(chalk.yellow(`${chalk.bold('MOVE:')} ${newState.member.user.tag} moved from "${oldState.channel.name}" to "${newState.channel.name}"`));
 
-				// Log it in channel for reports
+				// Log it in the log channel
 				if (process.env.VC_MOVE !== undefined) {
-					const channel = guild.channels.cache.get(process.env.VC_MOVE);
-					channel.send(
-						`<t:${logTimestamp}:f> :microphone2: <:MRVN_Move:1118671145034596474> <@${member.user.id}> (**${member.user.tag}**, \`${member.user.id}\`) Moved to Empty VC: <#${newState.channel.id}> (**${newState.channel.name}**, \`${newState.channel.id}\`)`,
-					);
+					const logChannel = newState.guild.channels.cache.get(process.env.VC_MOVE);
+
+					logChannel.send(movedLogFormatter(oldState, newState));
 				}
 
-				// Check if the user is already in the DB
-				// If they are, remove and readd
-				// If they aren't, just add them
-				// Check if user already exists in DB
-				const findUser = 'SELECT id FROM vcOwnerList WHERE id = ?';
-				const findUserResult = db.prepare(findUser).get(member.user.id);
+				// dbTimestamp
+				const dbTimestamp = moment().unix();
 
-				if (!findUserResult) {
-					// User is not in DB, just insert
-					const addVCOwner = 'INSERT INTO vcOwnerList (id) VALUES (?)';
-					db.prepare(addVCOwner).run(member.user.id);
+				// Find out if the user owned the previous VC. If they did,
+				// set the limit of it back to 3 (just in case)
+				const findUser = db_vcOwnerList.prepare('SELECT * FROM vcOwnerList WHERE id = ?').get(oldState.member.user.id);
 
-					console.log(chalk.blue(`DATABASE: Added ${member.user.tag} (${member.user.id}) to the database.`));
-				} else {
-					// User is in DB, remove then readd them
-					// May be redundant? Not sure if it's needed, look
-					// into it in the future if it becomes an issue
-					const removeVCOwner = 'DELETE FROM vcOwnerList WHERE id = ?';
-					db.prepare(removeVCOwner).run(member.user.id);
-
-					console.log(chalk.cyan(`DATABASE: Removed ${member.user.tag} (${member.user.id}) from the database.`));
-
-					const addVCOwner = 'INSERT INTO vcOwnerList (id) VALUES (?)';
-					db.prepare(addVCOwner).run(member.user.id);
-
-					console.log(chalk.blue(`DATABASE: Added ${member.user.tag} (${member.user.id}) to the database.`));
-
-					// Also, set the previous VC channel limit back to 3
-					if (oldState.channel != null && oldState.channel.parent.id != process.env.GEN_CATEGORY && oldState.channel.parent.id != process.env.EVENT_CATEGORY) {
-						oldState.channel.setUserLimit(3);
-					}
+				if (findUser && checkVoiceChannel(oldState) == false && oldState.channel.userLimit != 3) {
+					// Set the vc limit back to 3
+					oldState.channel.setUserLimit(3);
 				}
+
+				// Insert or replace the person in the vcOwnerList
+				db_vcOwnerList.prepare('INSERT OR REPLACE INTO vcOwnerList (id, timestamp) VALUES (?, ?)').run(newState.member.user.id, dbTimestamp);
+
+				console.log(chalk.blue(`${chalk.bold('DATABASE:')} ${oldState.member.user.tag} moved to an empty VC; database entry inserted or updated`));
 			} else {
-				// User moved to occupied VC
-				// Log the join in the console for debugging
-				console.log(chalk.yellow(`MOVE: ${member.user.tag} Moved to Occupied VC "${newState.channel.name}"`));
+				// User moved to an occupied VC
+				console.log(chalk.yellow(`${chalk.bold('MOVE:')} ${newState.member.user.tag} moved from "${oldState.channel.name}" to "${newState.channel.name}"`));
 
-				// Log it in channel for reports
+				// Log it in the log channel
 				if (process.env.VC_MOVE !== undefined) {
-					const channel = guild.channels.cache.get(process.env.VC_MOVE);
-					channel.send(
-						`<t:${logTimestamp}:f> :microphone2: <:MRVN_Move:1118671145034596474> <@${member.user.id}> (**${member.user.tag}**, \`${member.user.id}\`) Moved to Occupied VC: <#${newState.channel.id}> (**${newState.channel.name}**, \`${newState.channel.id}\`)`,
-					);
+					const logChannel = newState.guild.channels.cache.get(process.env.VC_MOVE);
+
+					logChannel.send(movedLogFormatter(oldState, newState));
 				}
 
-				// If user exists in DB but moves to a VC they
-				// don't own, remove them
-				// Check if user already exists in DB
-				const findUser = 'SELECT id FROM vcOwnerList WHERE id = ?';
-				const findUserResult = db.prepare(findUser).get(member.user.id);
+				// Find out if the user owned the previous VC. If they did,
+				// set the limit of it back to 3 (just in case) and remove them from the vcOwnerList
+				const findUser = db_vcOwnerList.prepare('SELECT * FROM vcOwnerList WHERE id = ?').get(oldState.member.user.id);
 
-				if (findUserResult) {
-					// User is in DB, remove them
-					const deleteVCOwner = 'DELETE FROM vcOwnerList WHERE id = ?';
-					db.prepare(deleteVCOwner).run(member.user.id);
-
-					console.log(chalk.cyan(`DATABASE: Removed ${member.user.tag} (${member.user.id}) from the database.`));
-
-					// Also, set the previous VC channel limit back to 3
-					if (oldState.channel != null && oldState.channel.parent.id != process.env.GEN_CATEGORY && oldState.channel.parent.id != process.env.EVENT_CATEGORY) {
+				if (findUser) {
+					// Set the previous VC back to 3
+					if (checkVoiceChannel(oldState) == false && oldState.channel.userLimit != 3) {
+						// Set the vc limit back to 3
 						oldState.channel.setUserLimit(3);
+
+						console.log(chalk.yellow(`${chalk.bold('VOICE:')} Set user limit of "${oldState.channel.name}" to 3`));
 					}
+
+					db_vcOwnerList.prepare('DELETE FROM vcOwnerList WHERE id = ?').run(newState.member.user.id);
+
+					console.log(chalk.blue(`${chalk.bold('DATABASE:')} Removed ${oldState.member.user.tag} from vcOwnerList`));
 				}
 			}
 		}

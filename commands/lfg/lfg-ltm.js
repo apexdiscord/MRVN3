@@ -4,20 +4,8 @@ const { setVCLimit, checkBannedWords, checkVoiceChannel, saveCasualLFGPost, vcLi
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('lfg')
-		.setDescription('Create an LFG prompt for Battle Royale Trios and Duos.')
-		.addStringOption(option =>
-			option.setName('mode').setDescription('Select the mode you want to play.').setRequired(true).addChoices(
-				{
-					name: 'Duos',
-					value: 'Duos',
-				},
-				{
-					name: 'Trios',
-					value: 'Trios',
-				},
-			),
-		)
+		.setName('lfg-ltm')
+		.setDescription('Create an LFG prompt for LTMs.')
 		.addStringOption(option => option.setName('message').setDescription('Enter any information you want others to know.').setRequired(true))
 		.addStringOption(option =>
 			option.setName('save').setDescription('Choose whether to save your LFG message for future use using /rc.').setRequired(false).addChoices(
@@ -88,7 +76,7 @@ module.exports = {
 			return;
 		}
 
-		const mode = interaction.options.getString('mode');
+		const mode = 'LTM';
 		const description = interaction.options.getString('message');
 		const save = interaction.options.getString('save');
 		const playersNeeded = interaction.options.getString('players-needed');
@@ -111,7 +99,7 @@ module.exports = {
 
 		let playersNeededText = !playersNeeded ? `is looking for a team` : `is looking for ${playersNeeded} more`;
 
-		const lfgEmbed = new EmbedBuilder()
+		const lfgLTMEmbed = new EmbedBuilder()
 			.setAuthor({
 				name: `${interaction.member.displayName} ${playersNeededText}`,
 				iconURL: interaction.member.displayAvatarURL({ dynamic: true }),
@@ -125,21 +113,21 @@ module.exports = {
 			});
 
 		if (playstyle)
-			lfgEmbed.addFields({
+			lfgLTMEmbed.addFields({
 				name: '__Playstyle__',
 				value: `${playstyle}`,
 				inline: true,
 			});
 
 		if (mains)
-			lfgEmbed.addFields({
+			lfgLTMEmbed.addFields({
 				name: '__Main(s)__',
 				value: `${mains}`,
 				inline: true,
 			});
 
 		if (gamertag)
-			lfgEmbed.addFields({
+			lfgLTMEmbed.addFields({
 				name: '__Gamertag__',
 				value: `${gamertag}`,
 				inline: true,
@@ -161,7 +149,7 @@ module.exports = {
 
 		if (buttonRow.components.length == 0) {
 			await interaction.channel.send({
-				embeds: [lfgEmbed],
+				embeds: [lfgLTMEmbed],
 				files: [
 					{
 						attachment: `${__dirname}/../../images/nonRanked/${mode}.png`,
@@ -175,7 +163,7 @@ module.exports = {
 			});
 		} else {
 			await interaction.channel.send({
-				embeds: [lfgEmbed],
+				embeds: [lfgLTMEmbed],
 				components: [buttonRow],
 				files: [
 					{

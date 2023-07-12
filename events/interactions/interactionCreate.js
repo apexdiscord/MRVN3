@@ -1,31 +1,28 @@
+const chalk = require('chalk');
 const Database = require('better-sqlite3');
 const { InteractionType } = require('discord.js');
 
-// Connect to the SQLite database
-const db = new Database(`${__dirname}/../../databases/vcOwnerList.sqlite`);
+const db_vcOwnerList = new Database(`${__dirname}/../../databases/vcOwnerList.sqlite`);
 
 module.exports = {
 	name: 'interactionCreate',
 	once: false,
 	async execute(interaction, client) {
 		if (interaction.type === InteractionType.ApplicationCommand) {
-			// await interaction.deferReply({ ephemeral: true });
-
 			const command = client.commands.get(interaction.commandName);
 
 			if (!command) return;
 
-			const memberId = interaction.member.id;
-
-			const hasPermission = !command.requiresPermission || db.prepare('SELECT id FROM vcOwnerList WHERE id = ?').get(memberId);
+			const hasPermission = !command.requiresPermission || db_vcOwnerList.prepare(`SELECT * FROM vcOwnerList WHERE id = ?`).get(interaction.user.id);
 
 			if (hasPermission) {
+				// The user running the command has permission as either they are the owner of the voice channel or the command does not require permission to run
 				try {
-					await command.execute(interaction);
+					await command.execute(interaction, client);
 				} catch (error) {
-					console.error(error);
+					console.log(chalk.bold.red(`BOT: Error running /${command.data.name}: ${error}`));
 
-					await interaction.deferReply({ ephemeral: true });
+					// await interaction.deferReply({ ephemeral: true });
 
 					await interaction.editReply({
 						content: 'There was an error while executing this command!',
@@ -33,7 +30,7 @@ module.exports = {
 					});
 				}
 			} else {
-				// If a user is not in a voice channel, return an ephemeral message
+				// If the user is not in a voice channel, reply with an error. This should only happen on commands where the commands requires permission to run
 				if (!interaction.member.voice.channel) {
 					await interaction.deferReply({ ephemeral: true });
 

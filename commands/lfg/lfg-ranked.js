@@ -1,26 +1,46 @@
 const { ButtonStyle, EmbedBuilder, ButtonBuilder, ActionRowBuilder, SlashCommandBuilder } = require('discord.js');
 
-const { setVCLimit, checkBannedWords, checkVoiceChannel, saveCasualLFGPost, vcLinkButtonBuilder } = require('../../functions/utilities');
+const { setVCLimit, checkBannedWords, checkVoiceChannel, saveRankedLFGPost, vcLinkButtonBuilder } = require('../../functions/utilities.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('lfg')
-		.setDescription('Create an LFG prompt for Battle Royale Trios and Duos.')
-		.addStringOption(option =>
-			option.setName('mode').setDescription('Select the mode you want to play.').setRequired(true).addChoices(
-				{
-					name: 'Duos',
-					value: 'Duos',
-				},
-				{
-					name: 'Trios',
-					value: 'Trios',
-				},
-			),
-		)
+		.setName('lfg-ranked')
+		.setDescription('Create an LFG prompt for Ranked Matches.')
 		.addStringOption(option => option.setName('message').setDescription('Enter any information you want others to know.').setRequired(true))
 		.addStringOption(option =>
-			option.setName('save').setDescription('Choose whether to save your LFG message for future use using /rc.').setRequired(false).addChoices(
+			option
+				.setName('current-rank')
+				.setDescription('What rank are you currently?')
+				.setRequired(true)
+				.addChoices(
+					{ name: 'Rookie', value: 'Rookie' },
+					{ name: 'Bronze', value: 'Bronze' },
+					{ name: 'Silver', value: 'Silver' },
+					{ name: 'Gold', value: 'Gold' },
+					{ name: 'Platinum', value: 'Platinum' },
+					{ name: 'Diamond', value: 'Diamond' },
+					{ name: 'Master', value: 'Master' },
+					{ name: 'Apex Predator', value: 'Predator' },
+				),
+		)
+		.addStringOption(option =>
+			option
+				.setName('previous-rank')
+				.setDescription('What rank were you last season?')
+				.setRequired(false)
+				.addChoices(
+					{ name: 'Rookie', value: 'Rookie' },
+					{ name: 'Bronze', value: 'Bronze' },
+					{ name: 'Silver', value: 'Silver' },
+					{ name: 'Gold', value: 'Gold' },
+					{ name: 'Platinum', value: 'Platinum' },
+					{ name: 'Diamond', value: 'Diamond' },
+					{ name: 'Master', value: 'Master' },
+					{ name: 'Apex Predator', value: 'Apex Predator' },
+				),
+		)
+		.addStringOption(option =>
+			option.setName('save').setDescription('Choose whether to save your LFG message for future use using /rr.').setRequired(false).addChoices(
 				{
 					name: 'Yes',
 					value: 'Yes',
@@ -88,8 +108,18 @@ module.exports = {
 			return;
 		}
 
-		const mode = interaction.options.getString('mode');
+		const mode = 'Ranked';
 		const description = interaction.options.getString('message');
+
+		const currentRank = interaction.options.getString('current-rank');
+
+		const currentRankText = function () {
+			if (currentRank == 'Predator') return 'Apex Predator';
+
+			return currentRank;
+		};
+
+		const previousRank = interaction.options.getString('previous-rank');
 		const save = interaction.options.getString('save');
 		const playersNeeded = interaction.options.getString('players-needed');
 		const micRequired = interaction.options.getString('mic-required');
@@ -111,45 +141,59 @@ module.exports = {
 
 		let playersNeededText = !playersNeeded ? `is looking for a team` : `is looking for ${playersNeeded} more`;
 
-		const lfgEmbed = new EmbedBuilder()
+		const lfgRankedEmbed = new EmbedBuilder()
 			.setAuthor({
 				name: `${interaction.member.displayName} ${playersNeededText}`,
 				iconURL: interaction.member.displayAvatarURL({ dynamic: true }),
 			})
 			.setDescription(`<@${interaction.member.id}>'s Message: ${description}`)
-			.setThumbnail(`attachment://${mode}.png`)
+			.setThumbnail(`attachment://Ranked_${currentRank}.png`)
 			.setTimestamp()
 			.setFooter({
 				text: 'Read channel pins!',
 				iconURL: 'attachment://pin.png',
 			});
 
+		if (currentRank)
+			lfgRankedEmbed.addFields({
+				name: '__Current Rank__',
+				value: `${currentRankText()}`,
+				inline: true,
+			});
+
+		if (previousRank)
+			lfgRankedEmbed.addFields({
+				name: '__Previous Rank__',
+				value: `${previousRank}`,
+				inline: true,
+			});
+
 		if (playstyle)
-			lfgEmbed.addFields({
+			lfgRankedEmbed.addFields({
 				name: '__Playstyle__',
 				value: `${playstyle}`,
 				inline: true,
 			});
 
 		if (mains)
-			lfgEmbed.addFields({
+			lfgRankedEmbed.addFields({
 				name: '__Main(s)__',
 				value: `${mains}`,
 				inline: true,
 			});
 
 		if (gamertag)
-			lfgEmbed.addFields({
+			lfgRankedEmbed.addFields({
 				name: '__Gamertag__',
 				value: `${gamertag}`,
 				inline: true,
 			});
 
 		if (save == 'Yes') {
-			saveCasualLFGPost(interaction, mode, description, playersNeeded, micRequired, playstyle, mains, gamertag);
+			saveRankedLFGPost(interaction, mode, description, currentRank, previousRank, playersNeeded, micRequired, playstyle, mains, gamertag);
 
 			await interaction.editReply({
-				content: 'Your LFG message has been posted and saved, use the `/rc` command to post it again!',
+				content: 'Your LFG message has been posted and saved, use the `/rr` command to post it again!',
 				ephemeral: true,
 			});
 		} else {
@@ -161,11 +205,11 @@ module.exports = {
 
 		if (buttonRow.components.length == 0) {
 			await interaction.channel.send({
-				embeds: [lfgEmbed],
+				embeds: [lfgRankedEmbed],
 				files: [
 					{
-						attachment: `${__dirname}/../../images/nonRanked/${mode}.png`,
-						name: `${mode}.png`,
+						attachment: `${__dirname}/../../images/ranked/Ranked_${currentRank}.png`,
+						name: `Ranked_${currentRank}.png`,
 					},
 					{
 						attachment: `${__dirname}/../../images/other/pin.png`,
@@ -175,12 +219,12 @@ module.exports = {
 			});
 		} else {
 			await interaction.channel.send({
-				embeds: [lfgEmbed],
+				embeds: [lfgRankedEmbed],
 				components: [buttonRow],
 				files: [
 					{
-						attachment: `${__dirname}/../../images/nonRanked/${mode}.png`,
-						name: `${mode}.png`,
+						attachment: `${__dirname}/../../images/ranked/Ranked_${currentRank}.png`,
+						name: `Ranked_${currentRank}.png`,
 					},
 					{
 						attachment: `${__dirname}/../../images/other/pin.png`,

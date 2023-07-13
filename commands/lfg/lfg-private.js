@@ -178,9 +178,9 @@ module.exports = {
 			});
 
 		// Ping private match role on post
-		if (process.env.PRIVATEMATCH_PING !== undefined) {
-			await interaction.channel.send({ content: `<@&${process.env.PRIVATEMATCH_PING}>` });
-		}
+		// if (process.env.PRIVATEMATCH_PING !== undefined) {
+		// 	await interaction.channel.send({ content: `<@&${process.env.PRIVATEMATCH_PING}>` });
+		// }
 
 		await interaction.editReply({
 			embeds: [lfgPrivateEmbed],

@@ -128,7 +128,7 @@ module.exports = {
 				iconURL: interaction.member.displayAvatarURL({ dynamic: true }),
 			})
 			.setDescription(`${description}`)
-			.setThumbnail('attachment://base.png')
+			.setThumbnail('attachment://Base.png')
 			.setTimestamp()
 			.addFields(
 				{
@@ -178,14 +178,16 @@ module.exports = {
 			});
 
 		// Ping private match role on post
-		await interaction.channel.send({ content: `<@&${process.env.PRIVATEMATCH_PING}>` });
+		if (process.env.PRIVATEMATCH_PING !== undefined) {
+			await interaction.channel.send({ content: `<@&${process.env.PRIVATEMATCH_PING}>` });
+		}
 
 		await interaction.editReply({
 			embeds: [lfgPrivateEmbed],
 			files: [
 				{
-					attachment: `${__dirname}/../../images/nonRanked/base.png`,
-					name: 'base.png',
+					attachment: `${__dirname}/../../images/nonRanked/Base.png`,
+					name: 'Base.png',
 				},
 				{
 					attachment: `${__dirname}/../../images/other/pin.png`,

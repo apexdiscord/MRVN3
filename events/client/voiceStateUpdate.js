@@ -81,7 +81,7 @@ module.exports = {
 			// User moved
 			// If the parent category of the voice channel is
 			// not in the whitelist, ignore it
-			if (!categoryWhitelist.includes(oldState.channel.parent.id)) {
+			if (!categoryWhitelist.includes(oldState.channel.parent.id) && categoryWhitelist.includes(newState.channel.parent.id)) {
 				// Disconnect the user and force them to reconnect
 				// ...simply because I'm too lazy to figure out the
 				// logic needed to make this work properly (atm)

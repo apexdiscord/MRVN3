@@ -129,7 +129,7 @@ module.exports = {
 				iconURL: interaction.member.displayAvatarURL({ dynamic: true }),
 			})
 			.setDescription(`${description}`)
-			.setThumbnail('attachment://base.png')
+			.setThumbnail('attachment://Base.png')
 			.setTimestamp()
 			.addFields(
 				{
@@ -192,8 +192,8 @@ module.exports = {
 			embeds: [lfgTournamentEmbed],
 			files: [
 				{
-					attachment: `${__dirname}/../../images/nonRanked/base.png`,
-					name: 'base.png',
+					attachment: `${__dirname}/../../images/nonRanked/Base.png`,
+					name: 'Base.png',
 				},
 				{
 					attachment: `${__dirname}/../../images/other/pin.png`,

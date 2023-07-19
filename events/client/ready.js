@@ -52,6 +52,9 @@ module.exports = {
 		// Push the commands to Discord
 		(async () => {
 			try {
+				await rest.put(Routes.applicationCommands(client.user.id), { body: [] });
+				await rest.put(Routes.applicationGuildCommands(client.user.id, process.env.GUILD_ID), { body: [] });
+
 				if (process.env.DEBUG == 'false') {
 					// Production, register global slash commands
 					await rest.put(Routes.applicationCommands(client.user.id), { body: commands });

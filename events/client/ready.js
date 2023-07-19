@@ -22,9 +22,9 @@ module.exports = {
 		// Delete all entries from vcOwnerList and memberDecay
 		// tables on restart to prevent duplicate or ghost entries
 		db_vcOwnerList.prepare('DELETE FROM vcOwnerList').run();
-		db_memberDecay.prepare('DELETE FROM memberDecay1').run();
-		db_memberDecay.prepare('DELETE FROM memberDecay2').run();
-		db_memberDecay.prepare('DELETE FROM memberDecay3').run();
+		// db_memberDecay.prepare('DELETE FROM memberDecay1').run();
+		// db_memberDecay.prepare('DELETE FROM memberDecay2').run();
+		// db_memberDecay.prepare('DELETE FROM memberDecay3').run();
 
 		// Set up the command library
 		const commands = [];

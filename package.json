@@ -11,10 +11,10 @@
 	"dependencies": {
 		"@discordjs/rest": "1.7.1",
 		"@discordjs/voice": "0.16.0",
-		"better-sqlite3": "8.4.0",
+		"better-sqlite3": "8.5.0",
 		"chalk": "4.1.2",
 		"console-table-printer": "2.11.2",
-		"discord-api-types": "0.37.49",
+		"discord-api-types": "0.37.50",
 		"discord.js": "14.11.0",
 		"dotenv": "16.3.1",
 		"moment": "2.29.4",

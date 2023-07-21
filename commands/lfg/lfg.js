@@ -1,6 +1,6 @@
 const { ButtonStyle, EmbedBuilder, ButtonBuilder, ActionRowBuilder, SlashCommandBuilder } = require('discord.js');
 
-const { setVCLimit, checkBannedWords, checkVoiceChannel, saveCasualLFGPost, vcLinkButtonBuilder } = require('../../functions/utilities');
+const { setVCLimit, checkBannedWords, checkVoiceChannel, saveCasualLFGPost, vcLinkButtonBuilder, doesUserHaveSlowmode } = require('../../functions/utilities');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -87,6 +87,14 @@ module.exports = {
 
 			return;
 		}
+
+		// Check for a slowmode in the channel the interaction is created in.
+		// If there is, set that to the slowmode for the LFG post minute 30 seconds
+		// so that it is quicker to post an LFG post than to send a channel, but still
+		// have a slowmode to prevent people from spamming it
+		var slowmodeAmount = interaction.channel.rateLimitPerUser === 0 ? 90 : interaction.channel.rateLimitPerUser - 30;
+
+		if (doesUserHaveSlowmode(interaction, slowmodeAmount) == true) return;
 
 		const mode = interaction.options.getString('mode');
 		const description = interaction.options.getString('message');

@@ -37,6 +37,7 @@ client
 const db_vcOwnerList = new Database(`${__dirname}/databases/vcOwnerList.sqlite`);
 const db_memberDecay = new Database(`${__dirname}/databases/memberDecay.sqlite`);
 const db_savedLFGPosts = new Database(`${__dirname}/databases/savedLFGPosts.sqlite`);
+const db_memberSlowmode = new Database(`${__dirname}/databases/memberSlowmode.sqlite`);
 
 // Create the quieries to create table if they don't exist
 const createOwnerVCTable = `CREATE TABLE IF NOT EXISTS vcOwnerList (id TEXT, timestamp INTEGER, PRIMARY KEY (id));`;
@@ -71,8 +72,14 @@ const createRankedLFGPostsTable = `CREATE TABLE IF NOT EXISTS rankedLFG (
     timestamp INTEGER
 );`;
 
+const createSlowmodeTable = `CREATE TABLE IF NOT EXISTS memberSlowmode (
+    user_id TEXT PRIMARY KEY,
+    timestamp INTEGER
+);`;
+
 // Execute the queries to create the tables
 db_vcOwnerList.exec(createOwnerVCTable);
+db_memberSlowmode.exec(createSlowmodeTable);
 db_memberDecay.exec(createMemberDecayTable1);
 db_memberDecay.exec(createMemberDecayTable2);
 db_memberDecay.exec(createMemberDecayTable3);
@@ -112,6 +119,25 @@ function deleteLFGPostEntries(dbName, timeInMinutes, text) {
 		db_savedLFGPosts.prepare(`DELETE FROM ${dbName} WHERE timestamp <= ?`).run(timeSince);
 
 		console.log(chalk.green(`DATABASE: ${text} Cleanup Check complete, deleted ${timeSinceCount} ${checkEntryPlural(timeSinceCount, 'entr')} from ${dbName}`));
+	}
+}
+
+// Delete expired slowmode entries from the database
+// if the last update to `timestamp` is older than 6 hours
+function deleteSlowmodeEntries() {
+	// Subtract the amount of time (timeInMinutes) from the current time
+	const timeSince = moment().subtract(6, 'hours').unix();
+
+	// Select the amount of rows that are older than timeSince
+	const timeSinceCount = db_memberSlowmode.prepare(`SELECT COUNT(*) FROM memberSlowmode WHERE timestamp <= ?`).get(timeSince)['COUNT(*)'];
+
+	// If the count of timeSinceCount is greater than 0, delete the entries
+	if (timeSinceCount > 0) {
+		console.log(chalk.cyan(`DATABASE: Running Slowmode Cleanup Check...`));
+
+		db_memberSlowmode.prepare(`DELETE FROM memberSlowmode WHERE timestamp <= ?`).run(timeSince);
+
+		console.log(chalk.green(`DATABASE: Slowmode Cleanup Check complete, deleted ${timeSinceCount} ${checkEntryPlural(timeSinceCount, 'entr')} from memberSlowmode`));
 	}
 }
 
@@ -214,6 +240,10 @@ setInterval(deleteLFGPostEntries, 3600 * 1000, 'casualLFG', 28 * 24 * 60, 'Casua
 // Saved Ranked LFG Post Cleanup Timer
 // Ran every 7 days
 setInterval(deleteLFGPostEntries, 3600 * 1000, 'rankedLFG', 7 * 24 * 60, 'Ranked LFG Post');
+
+// Slowmode Cleanup Timer
+// Ran once an hour
+setInterval(deleteSlowmodeEntries, 3600 * 1000);
 
 // Export the client so other files can use it
 module.exports = { client };

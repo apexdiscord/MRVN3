@@ -88,14 +88,6 @@ module.exports = {
 			return;
 		}
 
-		// Check for a slowmode in the channel the interaction is created in.
-		// If there is, set that to the slowmode for the LFG post minute 30 seconds
-		// so that it is quicker to post an LFG post than to send a channel, but still
-		// have a slowmode to prevent people from spamming it
-		var slowmodeAmount = interaction.channel.rateLimitPerUser === 0 ? 90 : interaction.channel.rateLimitPerUser - 30;
-
-		if (doesUserHaveSlowmode(interaction, slowmodeAmount) == true) return;
-
 		const mode = interaction.options.getString('mode');
 		const description = interaction.options.getString('message');
 		const save = interaction.options.getString('save');
@@ -105,9 +97,20 @@ module.exports = {
 		const mains = interaction.options.getString('mains');
 		const gamertag = interaction.options.getString('gamertag');
 
+		// Check if any of the manual input fields contain banned words
 		if (checkBannedWords(description, interaction) == true) return;
 		if (checkBannedWords(mains, interaction) == true) return;
 		if (checkBannedWords(gamertag, interaction) == true) return;
+
+		// Check for a slowmode in the channel the interaction is created in.
+		// If there is, set that to the slowmode for the LFG post minute 30 seconds
+		// so that it is quicker to post an LFG post than to send a channel, but still
+		// have a slowmode to prevent people from spamming it
+		var slowmodeAmount = interaction.channel.rateLimitPerUser === 0 ? 90 : interaction.channel.rateLimitPerUser - 30;
+
+		// Check if the user has a slowmode. If true, return and don't execute
+		// If false, continue with the command and add a slowmode to the user
+		if (doesUserHaveSlowmode(interaction, slowmodeAmount) == true) return;
 
 		const buttonRow = new ActionRowBuilder();
 

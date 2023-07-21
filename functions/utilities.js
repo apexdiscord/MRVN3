@@ -281,6 +281,32 @@ function doesUserHaveSlowmode(interaction, time) {
 	}
 }
 
+function doesUserHaveSlowmodeCustom(interaction, time) {
+	// First, check to see if the user has an entry in the memberSlowmode database
+	const checkMemberSlowmode = db_memberSlowmode.prepare(`SELECT * FROM memberSlowmode WHERE user_id = ?`).get(interaction.user.id);
+
+	// If they do exist in the database, check to see if the current time is greater than the time time they last posted + the slowmode time
+	if (checkMemberSlowmode) {
+		if (checkMemberSlowmode.timestamp + time > moment().unix()) {
+			return true;
+		} else {
+			// If it isn't, update their entry in the database with the current time and allow the post to be posted
+			db_memberSlowmode.prepare(`UPDATE memberSlowmode SET timestamp = ? WHERE user_id = ?`).run(moment().unix(), interaction.user.id);
+
+			console.log(chalk.blue(`DATABASE: Updated ${interaction.user.tag}'s entry in memberSlowmode table`));
+
+			return false;
+		}
+	} else {
+		// If they don't exist in the database, add them and allow the post to be posted
+		db_memberSlowmode.prepare(`INSERT INTO memberSlowmode (user_id, timestamp) VALUES (?, ?)`).run(interaction.user.id, moment().unix());
+
+		console.log(chalk.blue(`DATABASE: Added ${interaction.user.tag} to memberSlowmode table`));
+
+		return false;
+	}
+}
+
 module.exports = {
 	setVCLimit,
 	logFormatter,
@@ -294,4 +320,5 @@ module.exports = {
 	vcLinkButtonBuilder,
 	doesUserHaveSlowmode,
 	checkBannedWordsCustom,
+	doesUserHaveSlowmodeCustom,
 };

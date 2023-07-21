@@ -1,6 +1,9 @@
+const Database = require('better-sqlite3');
 const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
 
-const { checkBannedWordsCustom, checkVoiceChannel } = require('../../functions/utilities.js');
+const { checkBannedWordsCustom, checkVoiceChannel, doesUserHaveSlowmodeCustom } = require('../../functions/utilities.js');
+
+const db_memberSlowmode = new Database(`${__dirname}/../../databases/memberSlowmode.sqlite`);
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -109,11 +112,33 @@ module.exports = {
 		const gameModeVarient = interaction.options.getString('game-mode-variant');
 		const matchCode = interaction.options.getString('match-code');
 
+		// Check if any of the manual input fields contain banned words
 		if (checkBannedWordsCustom(description, interaction, false) == true || checkBannedWordsCustom(matchCode, interaction, false) == true) {
 			await interaction.deferReply({ ephemeral: true });
 
 			await interaction.editReply({
 				content: 'Your LFG message contains a banned word. Please try again.',
+				ephemeral: true,
+			});
+
+			return;
+		}
+
+		// Check for a slowmode in the channel the interaction is created in.
+		// If there is, set that to the slowmode for the LFG post minute 30 seconds
+		// so that it is quicker to post an LFG post than to send a channel, but still
+		// have a slowmode to prevent people from spamming it
+		var slowmodeAmount = interaction.channel.rateLimitPerUser === 0 ? 90 : interaction.channel.rateLimitPerUser - 30;
+
+		// Check if the user has a slowmode. If true, return and don't execute
+		// If false, continue with the command and add a slowmode to the user
+		if (doesUserHaveSlowmodeCustom(interaction, slowmodeAmount) == true) {
+			const checkMemberSlowmode = db_memberSlowmode.prepare(`SELECT * FROM memberSlowmode WHERE user_id = ?`).get(interaction.user.id);
+
+			await interaction.deferReply({ ephemeral: true });
+
+			await interaction.editReply({
+				content: `You are posting too quickly. You will be able to post again <t:${checkMemberSlowmode.timestamp + slowmodeAmount}:R>.`,
 				ephemeral: true,
 			});
 

@@ -1,7 +1,7 @@
 const Database = require('better-sqlite3');
 const { ButtonStyle, EmbedBuilder, ButtonBuilder, ActionRowBuilder, SlashCommandBuilder } = require('discord.js');
 
-const { setVCLimit, checkVoiceChannel, vcLinkButtonBuilder } = require('../../functions/utilities.js');
+const { setVCLimit, checkVoiceChannel, vcLinkButtonBuilder, doesUserHaveSlowmode } = require('../../functions/utilities.js');
 const db_savedLFGPosts = new Database(`${__dirname}/../../databases/savedLFGPosts.sqlite`);
 
 module.exports = {
@@ -33,6 +33,16 @@ module.exports = {
 
 			return;
 		}
+
+		// Check for a slowmode in the channel the interaction is created in.
+		// If there is, set that to the slowmode for the LFG post minute 30 seconds
+		// so that it is quicker to post an LFG post than to send a channel, but still
+		// have a slowmode to prevent people from spamming it
+		var slowmodeAmount = interaction.channel.rateLimitPerUser === 0 ? 90 : interaction.channel.rateLimitPerUser - 30;
+
+		// Check if the user has a slowmode. If true, return and don't execute
+		// If false, continue with the command and add a slowmode to the user
+		if (doesUserHaveSlowmode(interaction, slowmodeAmount) == true) return;
 
 		await interaction.editReply({
 			content: 'Posted your saved LFG post below.',

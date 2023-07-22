@@ -165,13 +165,6 @@ module.exports = {
 				iconURL: 'attachment://pin.png',
 			});
 
-		if (currentRank)
-			lfgRankedEmbed.addFields({
-				name: '__Current Rank__',
-				value: `${currentRankText()}`,
-				inline: true,
-			});
-
 		if (previousRank)
 			lfgRankedEmbed.addFields({
 				name: '__Previous Rank__',

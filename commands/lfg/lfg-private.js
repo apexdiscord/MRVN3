@@ -1,11 +1,9 @@
+const chalk = require('chalk');
 const moment = require('moment');
 const db = require('../../functions/database.js');
-const Database = require('better-sqlite3');
 const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
 
-const { checkBannedWordsCustom, checkVoiceChannel, doesUserHaveSlowmodeCustom } = require('../../functions/utilities.js');
-
-const db_memberSlowmode = new Database(`${__dirname}/../../databases/memberSlowmode.sqlite`);
+const { checkBannedWordsCustom, checkVoiceChannel } = require('../../functions/utilities.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -126,26 +124,49 @@ module.exports = {
 			return;
 		}
 
-		// Check for a slowmode in the channel the interaction is created in.
-		// If there is, set that to the slowmode for the LFG post minute 30 seconds
-		// so that it is quicker to post an LFG post than to send a channel, but still
-		// have a slowmode to prevent people from spamming it
+		// Slowmode stuff
 		var slowmodeAmount = interaction.channel.rateLimitPerUser === 0 ? 90 : interaction.channel.rateLimitPerUser - 30;
-
-		// Check if the user has a slowmode. If true, return and don't execute
-		// If false, continue with the command and add a slowmode to the user
-		doesUserHaveSlowmodeCustom(interaction, slowmodeAmount);
 
 		let slowmodeQuery = 'SELECT * FROM userSlowmode WHERE userID = ?';
 
 		db.query(slowmodeQuery, [interaction.user.id], async (err, slowmodeRow) => {
+			// If slowmode row with user ID exists, then continue
 			if (slowmodeRow.length != 0) {
-				console.log(slowmodeRow[0].timestamp);
+				// If the time since is less than the slowmode should be active for, return an error
 				if (slowmodeRow[0].timestamp + slowmodeAmount > moment().unix()) {
-					console.log('check query');
+					await interaction.deferReply({ ephemeral: true });
+
+					await interaction.editReply({
+						content: `You are posting too quickly. You will be able to post again <t:${slowmodeRow[0].timestamp + slowmodeAmount}:R>.`,
+						ephemeral: true,
+					});
 
 					return;
+				} else {
+					// If it has been longer than the slowmode, simply update the timestamp in the DB
+					const updateSlowmode = `UPDATE userSlowmode SET timestamp = ? WHERE id = ?`;
+
+					db.query(updateSlowmode, [moment().unix(), slowmodeRow[0].id], (err, updateRow) => {
+						if (err) {
+							console.log(chalk.red(`OVERWATCH: ${err}`));
+							return false;
+						}
+					});
+
+					console.log(chalk.blue(`OVERWATCH: Updated ${interaction.user.tag}'s entry in userSlowmode table`));
 				}
+			} else {
+				// If they don't exist in the database, add them and allow the post to be posted
+				const insertSlowmode = `INSERT INTO userSlowmode (userID, timestamp) VALUES (?, ?)`;
+
+				db.query(insertSlowmode, [interaction.user.id, moment().unix()], (err, insertRow) => {
+					if (err) {
+						console.log(chalk.red(`OVERWATCH: ${err}`));
+						return false;
+					}
+				});
+
+				console.log(chalk.blue(`OVERWATCH: Added ${interaction.user.tag} to userSlowmode table`));
 			}
 
 			await interaction.deferReply({ ephemeral: false });

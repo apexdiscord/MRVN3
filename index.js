@@ -2,6 +2,7 @@ const chalk = require('chalk');
 const dotenv = require('dotenv');
 const moment = require('moment');
 const Database = require('better-sqlite3');
+const db = require('./functions/database.js');
 const { Table } = require('console-table-printer');
 const { Client, GatewayIntentBits } = require('discord.js');
 
@@ -37,7 +38,7 @@ client
 const db_vcOwnerList = new Database(`${__dirname}/databases/vcOwnerList.sqlite`);
 const db_memberDecay = new Database(`${__dirname}/databases/memberDecay.sqlite`);
 const db_savedLFGPosts = new Database(`${__dirname}/databases/savedLFGPosts.sqlite`);
-const db_memberSlowmode = new Database(`${__dirname}/databases/memberSlowmode.sqlite`);
+// const db_memberSlowmode = new Database(`${__dirname}/databases/memberSlowmode.sqlite`);
 
 // Create the quieries to create table if they don't exist
 const createOwnerVCTable = `CREATE TABLE IF NOT EXISTS vcOwnerList (id TEXT, timestamp INTEGER, PRIMARY KEY (id));`;
@@ -72,14 +73,14 @@ const createRankedLFGPostsTable = `CREATE TABLE IF NOT EXISTS rankedLFG (
     timestamp INTEGER
 );`;
 
-const createSlowmodeTable = `CREATE TABLE IF NOT EXISTS memberSlowmode (
-    user_id TEXT PRIMARY KEY,
-    timestamp INTEGER
-);`;
+// const createSlowmodeTable = `CREATE TABLE IF NOT EXISTS memberSlowmode (
+//     user_id TEXT PRIMARY KEY,
+//     timestamp INTEGER
+// );`;
 
 // Execute the queries to create the tables
 db_vcOwnerList.exec(createOwnerVCTable);
-db_memberSlowmode.exec(createSlowmodeTable);
+// db_memberSlowmode.exec(createSlowmodeTable);
 db_memberDecay.exec(createMemberDecayTable1);
 db_memberDecay.exec(createMemberDecayTable2);
 db_memberDecay.exec(createMemberDecayTable3);
@@ -129,16 +130,30 @@ function deleteSlowmodeEntries() {
 	const timeSince = moment().subtract(6, 'hours').unix();
 
 	// Select the amount of rows that are older than timeSince
-	const timeSinceCount = db_memberSlowmode.prepare(`SELECT COUNT(*) FROM memberSlowmode WHERE timestamp <= ?`).get(timeSince)['COUNT(*)'];
+	const timeSinceCount = `SELECT COUNT(*) FROM userSlowmode WHERE timestamp <= ?`;
 
-	// If the count of timeSinceCount is greater than 0, delete the entries
-	if (timeSinceCount > 0) {
-		console.log(chalk.cyan(`DATABASE: Running Slowmode Cleanup Check...`));
+	db.query(timeSinceCount, timeSince, (err, result) => {
+		if (err) {
+			console.log(chalk.bold.red(`OVERWATCH: Error: ${err}`));
+		}
 
-		db_memberSlowmode.prepare(`DELETE FROM memberSlowmode WHERE timestamp <= ?`).run(timeSince);
+		const rowCount = result[0]['count(*)'];
 
-		console.log(chalk.green(`DATABASE: Slowmode Cleanup Check complete, deleted ${timeSinceCount} ${checkEntryPlural(timeSinceCount, 'entr')} from memberSlowmode`));
-	}
+		// If the count of timeSinceCount is greater than 0, delete the entries
+		if (rowCount > 0) {
+			console.log(chalk.cyan(`OVERWATCH: Running Slowmode Cleanup Check...`));
+
+			const deleteOldSlowmodeEntries = `DELETE FROM userSlowmode WHERE timestamp <= ?`;
+
+			db.query(deleteOldSlowmodeEntries, timeSince, (err, result) => {
+				if (err) {
+					console.log(chalk.bold.red(`OVERWATCH: Error: ${err}`));
+				}
+			});
+
+			console.log(chalk.green(`OVERWATCH: Slowmode Cleanup Check complete, deleted ${rowCount} ${checkEntryPlural(rowCount, 'entr')} from userSlowmode`));
+		}
+	});
 }
 
 function currentBotStats() {

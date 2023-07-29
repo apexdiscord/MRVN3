@@ -4,9 +4,9 @@ const Database = require('better-sqlite3');
 const { ButtonStyle, EmbedBuilder, ButtonBuilder } = require('discord.js');
 
 const emotes = require('../data/emotes.json');
+const db = require('../functions/database.js');
 var bannedWords = require('../data/bannedWords.json');
 const db_savedLFGPosts = new Database(`${__dirname}/../databases/savedLFGPosts.sqlite`);
-const db_memberSlowmode = new Database(`${__dirname}/../databases/memberSlowmode.sqlite`);
 
 function setVCLimit(mode, channel) {
 	if (!channel.member.voice.channel) return;
@@ -250,61 +250,45 @@ function vcLinkButtonBuilder(interaction) {
 }
 
 function doesUserHaveSlowmode(interaction, time) {
-	// First, check to see if the user has an entry in the memberSlowmode database
-	const checkMemberSlowmode = db_memberSlowmode.prepare(`SELECT * FROM memberSlowmode WHERE user_id = ?`).get(interaction.user.id);
+	// First, check to see if the user has an entry in the userSlowmode database
+	let slowmodeQuery = 'SELECT * FROM userSlowmode WHERE userID = ?';
 
-	// If they do exist in the database, check to see if the current time is greater than the time time they last posted + the slowmode time
-	if (checkMemberSlowmode) {
-		if (checkMemberSlowmode.timestamp + time > moment().unix()) {
-			// If it is, send a message saying they have to wait to post again
-			interaction.editReply({
-				content: `You are posting too quickly. You will be able to post again <t:${checkMemberSlowmode.timestamp + time}:R>.`,
-				ephemeral: true,
+	db.query(slowmodeQuery, [interaction.user.id], (err, slowmodeRow) => {
+		// If they do exist in the database, check to see if the current time is greater than the time time they last posted + the slowmode time
+		if (slowmodeRow.length != 0) {
+			if (slowmodeRow[0].timestamp + time > moment().unix()) {
+				// If it is, send a message saying they have to wait to post again
+				interaction.editReply({
+					content: `You are posting too quickly. You will be able to post again <t:${slowmodeRow[0].timestamp + time}:R>.`,
+					ephemeral: true,
+				});
+			} else {
+				// If it isn't, update their entry in the database with the current time and allow the post to be posted
+				const updateSlowmode = `UPDATE userSlowmode SET timestamp = ? WHERE id = ?`;
+
+				db.query(updateSlowmode, [moment().unix(), slowmodeRow[0].id], (err, updateRow) => {
+					if (err) {
+						console.log(chalk.red(`OVERWATCH: ${err}`));
+						return false;
+					}
+				});
+
+				console.log(chalk.blue(`OVERWATCH: Updated ${interaction.user.tag}'s entry in userSlowmode table`));
+			}
+		} else {
+			// If they don't exist in the database, add them and allow the post to be posted
+			const insertSlowmode = `INSERT INTO userSlowmode (userID, timestamp) VALUES (?, ?)`;
+
+			db.query(insertSlowmode, [interaction.user.id, moment().unix()], (err, insertRow) => {
+				if (err) {
+					console.log(chalk.red(`OVERWATCH: ${err}`));
+					return false;
+				}
 			});
 
-			return true;
-		} else {
-			// If it isn't, update their entry in the database with the current time and allow the post to be posted
-			db_memberSlowmode.prepare(`UPDATE memberSlowmode SET timestamp = ? WHERE user_id = ?`).run(moment().unix(), interaction.user.id);
-
-			console.log(chalk.blue(`DATABASE: Updated ${interaction.user.tag}'s entry in memberSlowmode table`));
-
-			return false;
+			console.log(chalk.blue(`OVERWATCH: Added ${interaction.user.tag} to userSlowmode table`));
 		}
-	} else {
-		// If they don't exist in the database, add them and allow the post to be posted
-		db_memberSlowmode.prepare(`INSERT INTO memberSlowmode (user_id, timestamp) VALUES (?, ?)`).run(interaction.user.id, moment().unix());
-
-		console.log(chalk.blue(`DATABASE: Added ${interaction.user.tag} to memberSlowmode table`));
-
-		return false;
-	}
-}
-
-function doesUserHaveSlowmodeCustom(interaction, time) {
-	// First, check to see if the user has an entry in the memberSlowmode database
-	const checkMemberSlowmode = db_memberSlowmode.prepare(`SELECT * FROM memberSlowmode WHERE user_id = ?`).get(interaction.user.id);
-
-	// If they do exist in the database, check to see if the current time is greater than the time time they last posted + the slowmode time
-	if (checkMemberSlowmode) {
-		if (checkMemberSlowmode.timestamp + time > moment().unix()) {
-			return true;
-		} else {
-			// If it isn't, update their entry in the database with the current time and allow the post to be posted
-			db_memberSlowmode.prepare(`UPDATE memberSlowmode SET timestamp = ? WHERE user_id = ?`).run(moment().unix(), interaction.user.id);
-
-			console.log(chalk.blue(`DATABASE: Updated ${interaction.user.tag}'s entry in memberSlowmode table`));
-
-			return false;
-		}
-	} else {
-		// If they don't exist in the database, add them and allow the post to be posted
-		db_memberSlowmode.prepare(`INSERT INTO memberSlowmode (user_id, timestamp) VALUES (?, ?)`).run(interaction.user.id, moment().unix());
-
-		console.log(chalk.blue(`DATABASE: Added ${interaction.user.tag} to memberSlowmode table`));
-
-		return false;
-	}
+	});
 }
 
 module.exports = {
@@ -320,5 +304,4 @@ module.exports = {
 	vcLinkButtonBuilder,
 	doesUserHaveSlowmode,
 	checkBannedWordsCustom,
-	doesUserHaveSlowmodeCustom,
 };

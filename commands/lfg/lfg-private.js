@@ -1,3 +1,5 @@
+const moment = require('moment');
+const db = require('../../functions/database.js');
 const Database = require('better-sqlite3');
 const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
 
@@ -132,93 +134,95 @@ module.exports = {
 
 		// Check if the user has a slowmode. If true, return and don't execute
 		// If false, continue with the command and add a slowmode to the user
-		if (doesUserHaveSlowmodeCustom(interaction, slowmodeAmount) == true) {
-			const checkMemberSlowmode = db_memberSlowmode.prepare(`SELECT * FROM memberSlowmode WHERE user_id = ?`).get(interaction.user.id);
+		doesUserHaveSlowmodeCustom(interaction, slowmodeAmount);
 
-			await interaction.deferReply({ ephemeral: true });
+		let slowmodeQuery = 'SELECT * FROM userSlowmode WHERE userID = ?';
+
+		db.query(slowmodeQuery, [interaction.user.id], async (err, slowmodeRow) => {
+			if (slowmodeRow.length != 0) {
+				console.log(slowmodeRow[0].timestamp);
+				if (slowmodeRow[0].timestamp + slowmodeAmount > moment().unix()) {
+					console.log('check query');
+
+					return;
+				}
+			}
+
+			await interaction.deferReply({ ephemeral: false });
+
+			const lfgPrivateEmbed = new EmbedBuilder()
+				.setAuthor({
+					name: `${interaction.user.tag} is looking for teammates for a private match`,
+					iconURL: interaction.member.displayAvatarURL({ dynamic: true }),
+				})
+				.setDescription(`${description}`)
+				.setThumbnail('attachment://Base.png')
+				.setTimestamp()
+				.addFields(
+					{
+						name: '__Server Region__',
+						value: `${serverRegion}`,
+						inline: true,
+					},
+					{
+						name: '__Game Mode__',
+						value: `${gameMode}`,
+						inline: true,
+					},
+					{
+						name: '__Map__',
+						value: `${map}`,
+						inline: true,
+					},
+					{
+						name: '__Self-Assign Teams__',
+						value: `${selfAssignTeams}`,
+						inline: true,
+					},
+					{
+						name: '__Aim Assist Override__',
+						value: `${aimAssistOverride}`,
+						inline: true,
+					},
+					{
+						name: '__Anonymous Mode__',
+						value: `${anonymousMode}`,
+						inline: true,
+					},
+					{
+						name: '__Game Mode Variant__',
+						value: `${gameModeVarient}`,
+						inline: true,
+					},
+					{
+						name: '__Match Code__',
+						value: `${matchCode}`,
+						inline: true,
+					},
+				)
+				.setFooter({
+					text: 'Read channel pins!',
+					iconURL: 'attachment://pin.png',
+				});
+
+			// Ping private match role on post
+			// if (process.env.PRIVATEMATCH_PING !== undefined) {
+			// 	await interaction.channel.send({ content: `<@&${process.env.PRIVATEMATCH_PING}>` });
+			// }
 
 			await interaction.editReply({
-				content: `You are posting too quickly. You will be able to post again <t:${checkMemberSlowmode.timestamp + slowmodeAmount}:R>.`,
-				ephemeral: true,
+				embeds: [lfgPrivateEmbed],
+				files: [
+					{
+						attachment: `${__dirname}/../../images/nonRanked/Base.png`,
+						name: 'Base.png',
+					},
+					{
+						attachment: `${__dirname}/../../images/other/pin.png`,
+						name: 'pin.png',
+					},
+				],
 			});
-
-			return;
-		}
-
-		await interaction.deferReply({ ephemeral: false });
-
-		const lfgPrivateEmbed = new EmbedBuilder()
-			.setAuthor({
-				name: `${interaction.user.tag} is looking for teammates for a private match`,
-				iconURL: interaction.member.displayAvatarURL({ dynamic: true }),
-			})
-			.setDescription(`${description}`)
-			.setThumbnail('attachment://Base.png')
-			.setTimestamp()
-			.addFields(
-				{
-					name: '__Server Region__',
-					value: `${serverRegion}`,
-					inline: true,
-				},
-				{
-					name: '__Game Mode__',
-					value: `${gameMode}`,
-					inline: true,
-				},
-				{
-					name: '__Map__',
-					value: `${map}`,
-					inline: true,
-				},
-				{
-					name: '__Self-Assign Teams__',
-					value: `${selfAssignTeams}`,
-					inline: true,
-				},
-				{
-					name: '__Aim Assist Override__',
-					value: `${aimAssistOverride}`,
-					inline: true,
-				},
-				{
-					name: '__Anonymous Mode__',
-					value: `${anonymousMode}`,
-					inline: true,
-				},
-				{
-					name: '__Game Mode Variant__',
-					value: `${gameModeVarient}`,
-					inline: true,
-				},
-				{
-					name: '__Match Code__',
-					value: `${matchCode}`,
-					inline: true,
-				},
-			)
-			.setFooter({
-				text: 'Read channel pins!',
-				iconURL: 'attachment://pin.png',
-			});
-
-		// Ping private match role on post
-		// if (process.env.PRIVATEMATCH_PING !== undefined) {
-		// 	await interaction.channel.send({ content: `<@&${process.env.PRIVATEMATCH_PING}>` });
-		// }
-
-		await interaction.editReply({
-			embeds: [lfgPrivateEmbed],
-			files: [
-				{
-					attachment: `${__dirname}/../../images/nonRanked/Base.png`,
-					name: 'Base.png',
-				},
-				{
-					attachment: `${__dirname}/../../images/other/pin.png`,
-					name: 'pin.png',
-				},
-			],
 		});
 	},
 };

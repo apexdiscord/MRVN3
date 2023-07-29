@@ -1,3 +1,4 @@
+const chalk = require('chalk');
 var database = require('mysql2');
 const dotenv = require('dotenv');
 
@@ -23,9 +24,9 @@ function databaseConnection() {
 
 		db.getConnection(err => {
 			if (err) {
-				console.log(`Error connecting to database: ${err}`);
+				console.log(chalk.bold.red(`OVERWATCH: Error connecting to database: ${err}`));
 			} else {
-				console.log('Database connection complete. Overwatch operational.');
+				console.log(chalk.bold.blue('OVERWATCH: Database connection complete'));
 			}
 		});
 	}

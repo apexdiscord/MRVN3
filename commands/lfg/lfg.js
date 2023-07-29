@@ -1,5 +1,5 @@
 const moment = require('moment');
-const db = require('../../functions/database');
+const db = require('../../functions/database.js');
 const { ButtonStyle, EmbedBuilder, ButtonBuilder, ActionRowBuilder, SlashCommandBuilder } = require('discord.js');
 
 const { setVCLimit, checkBannedWords, checkVoiceChannel, saveCasualLFGPost, vcLinkButtonBuilder, doesUserHaveSlowmode } = require('../../functions/utilities');

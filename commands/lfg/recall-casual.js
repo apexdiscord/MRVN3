@@ -1,3 +1,5 @@
+const moment = require('moment');
+const db = require('../../functions/database.js');
 const Database = require('better-sqlite3');
 const { ButtonStyle, ButtonBuilder, ActionRowBuilder, SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
@@ -42,88 +44,98 @@ module.exports = {
 
 		// Check if the user has a slowmode. If true, return and don't execute
 		// If false, continue with the command and add a slowmode to the user
-		if (doesUserHaveSlowmode(interaction, slowmodeAmount) == true) return;
+		await doesUserHaveSlowmode(interaction, slowmodeAmount);
 
-		await interaction.editReply({
-			content: 'Posted your saved LFG post below.',
-			ephemeral: true,
+		let slowmodeQuery = 'SELECT * FROM userSlowmode WHERE userID = ?';
+
+		db.query(slowmodeQuery, [interaction.user.id], async (err, slowmodeRow) => {
+			if (slowmodeRow.length != 0) {
+				if (slowmodeRow[0].timestamp + slowmodeAmount > moment().unix()) {
+					return;
+				}
+			}
+
+			await interaction.editReply({
+				content: 'Posted your saved LFG post below.',
+				ephemeral: true,
+			});
+
+			const buttonRow = new ActionRowBuilder();
+
+			if (vcLinkButtonBuilder(interaction) != null) buttonRow.addComponents(vcLinkButtonBuilder(interaction));
+			if (savedPostData.micRequired == 'Yes')
+				buttonRow.addComponents(new ButtonBuilder().setCustomId('MicType').setLabel('Mic Required').setStyle(ButtonStyle.Danger).setDisabled(true));
+			if (savedPostData.micRequired == 'No')
+				buttonRow.addComponents(new ButtonBuilder().setCustomId('MicType').setLabel('Mic Optional').setStyle(ButtonStyle.Success).setDisabled(true));
+
+			setVCLimit(savedPostData.mode, interaction);
+
+			let playersNeededText = !savedPostData.playersNeeded ? `is looking for a team` : `is looking for ${savedPostData.playersNeeded} more`;
+
+			const savedPostEmbed = new EmbedBuilder()
+				.setAuthor({
+					name: `${interaction.user.username} ${playersNeededText}`,
+					iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
+				})
+				.setDescription(`<@${interaction.member.id}>'s Message: ${savedPostData.description}`)
+				.setThumbnail(`attachment://${savedPostData.mode}.png`)
+				.setTimestamp()
+				.setFooter({
+					text: 'Read channel pins!',
+					iconURL: 'attachment://pin.png',
+				});
+
+			if (savedPostData.playStyle)
+				savedPostEmbed.addFields({
+					name: '__Playstyle__',
+					value: `${savedPostData.playStyle}`,
+					inline: true,
+				});
+
+			if (savedPostData.main)
+				savedPostEmbed.addFields({
+					name: '__Main(s)__',
+					value: `${savedPostData.main}`,
+					inline: true,
+				});
+
+			if (savedPostData.gamerTag)
+				savedPostEmbed.addFields({
+					name: '__Gamertag__',
+					value: `${savedPostData.gamerTag}`,
+					inline: true,
+				});
+
+			if (buttonRow.components.length == 0) {
+				await interaction.channel.send({
+					embeds: [savedPostEmbed],
+					files: [
+						{
+							attachment: `${__dirname}/../../images/nonRanked/${savedPostData.mode}.png`,
+							name: `${savedPostData.mode}.png`,
+						},
+						{
+							attachment: `${__dirname}/../../images/other/pin.png`,
+							name: `pin.png`,
+						},
+					],
+				});
+			} else {
+				await interaction.channel.send({
+					embeds: [savedPostEmbed],
+					components: [buttonRow],
+					files: [
+						{
+							attachment: `${__dirname}/../../images/nonRanked/${savedPostData.mode}.png`,
+							name: `${savedPostData.mode}.png`,
+						},
+						{
+							attachment: `${__dirname}/../../images/other/pin.png`,
+							name: `pin.png`,
+						},
+					],
+				});
+			}
 		});
-
-		const buttonRow = new ActionRowBuilder();
-
-		if (vcLinkButtonBuilder(interaction) != null) buttonRow.addComponents(vcLinkButtonBuilder(interaction));
-		if (savedPostData.micRequired == 'Yes')
-			buttonRow.addComponents(new ButtonBuilder().setCustomId('MicType').setLabel('Mic Required').setStyle(ButtonStyle.Danger).setDisabled(true));
-		if (savedPostData.micRequired == 'No')
-			buttonRow.addComponents(new ButtonBuilder().setCustomId('MicType').setLabel('Mic Optional').setStyle(ButtonStyle.Success).setDisabled(true));
-
-		setVCLimit(savedPostData.mode, interaction);
-
-		let playersNeededText = !savedPostData.playersNeeded ? `is looking for a team` : `is looking for ${savedPostData.playersNeeded} more`;
-
-		const savedPostEmbed = new EmbedBuilder()
-			.setAuthor({
-				name: `${interaction.user.username} ${playersNeededText}`,
-				iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
-			})
-			.setDescription(`<@${interaction.member.id}>'s Message: ${savedPostData.description}`)
-			.setThumbnail(`attachment://${savedPostData.mode}.png`)
-			.setTimestamp()
-			.setFooter({
-				text: 'Read channel pins!',
-				iconURL: 'attachment://pin.png',
-			});
-
-		if (savedPostData.playStyle)
-			savedPostEmbed.addFields({
-				name: '__Playstyle__',
-				value: `${savedPostData.playStyle}`,
-				inline: true,
-			});
-
-		if (savedPostData.main)
-			savedPostEmbed.addFields({
-				name: '__Main(s)__',
-				value: `${savedPostData.main}`,
-				inline: true,
-			});
-
-		if (savedPostData.gamerTag)
-			savedPostEmbed.addFields({
-				name: '__Gamertag__',
-				value: `${savedPostData.gamerTag}`,
-				inline: true,
-			});
-
-		if (buttonRow.components.length == 0) {
-			await interaction.channel.send({
-				embeds: [savedPostEmbed],
-				files: [
-					{
-						attachment: `${__dirname}/../../images/nonRanked/${savedPostData.mode}.png`,
-						name: `${savedPostData.mode}.png`,
-					},
-					{
-						attachment: `${__dirname}/../../images/other/pin.png`,
-						name: `pin.png`,
-					},
-				],
-			});
-		} else {
-			await interaction.channel.send({
-				embeds: [savedPostEmbed],
-				components: [buttonRow],
-				files: [
-					{
-						attachment: `${__dirname}/../../images/nonRanked/${savedPostData.mode}.png`,
-						name: `${savedPostData.mode}.png`,
-					},
-					{
-						attachment: `${__dirname}/../../images/other/pin.png`,
-						name: `pin.png`,
-					},
-				],
-			});
-		}
 	},
 };

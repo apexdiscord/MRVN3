@@ -1,3 +1,5 @@
+const moment = require('moment');
+const db = require('../../functions/database.js');
 const { ButtonStyle, EmbedBuilder, ButtonBuilder, ActionRowBuilder, SlashCommandBuilder } = require('discord.js');
 
 const { setVCLimit, checkBannedWords, checkVoiceChannel, saveRankedLFGPost, vcLinkButtonBuilder, doesUserHaveSlowmode } = require('../../functions/utilities.js');
@@ -140,102 +142,112 @@ module.exports = {
 
 		// Check if the user has a slowmode. If true, return and don't execute
 		// If false, continue with the command and add a slowmode to the user
-		if (doesUserHaveSlowmode(interaction, slowmodeAmount) == true) return;
+		await doesUserHaveSlowmode(interaction, slowmodeAmount);
 
-		const buttonRow = new ActionRowBuilder();
+		let slowmodeQuery = 'SELECT * FROM userSlowmode WHERE userID = ?';
 
-		if (vcLinkButtonBuilder(interaction) != null) buttonRow.addComponents(vcLinkButtonBuilder(interaction));
-		if (micRequired == 'Yes') buttonRow.addComponents(new ButtonBuilder().setCustomId('MicType').setLabel('Mic Required').setStyle(ButtonStyle.Danger).setDisabled(true));
-		if (micRequired == 'No') buttonRow.addComponents(new ButtonBuilder().setCustomId('MicType').setLabel('Mic Optional').setStyle(ButtonStyle.Success).setDisabled(true));
+		db.query(slowmodeQuery, [interaction.user.id], async (err, slowmodeRow) => {
+			if (slowmodeRow.length != 0) {
+				if (slowmodeRow[0].timestamp + slowmodeAmount > moment().unix()) {
+					return;
+				}
+			}
 
-		setVCLimit(mode, interaction);
+			const buttonRow = new ActionRowBuilder();
 
-		let playersNeededText = !playersNeeded ? `is looking for a team` : `is looking for ${playersNeeded} more`;
+			if (vcLinkButtonBuilder(interaction) != null) buttonRow.addComponents(vcLinkButtonBuilder(interaction));
+			if (micRequired == 'Yes') buttonRow.addComponents(new ButtonBuilder().setCustomId('MicType').setLabel('Mic Required').setStyle(ButtonStyle.Danger).setDisabled(true));
+			if (micRequired == 'No') buttonRow.addComponents(new ButtonBuilder().setCustomId('MicType').setLabel('Mic Optional').setStyle(ButtonStyle.Success).setDisabled(true));
 
-		const lfgRankedEmbed = new EmbedBuilder()
-			.setAuthor({
-				name: `${interaction.member.displayName} ${playersNeededText}`,
-				iconURL: interaction.member.displayAvatarURL({ dynamic: true }),
-			})
-			.setDescription(`<@${interaction.member.id}>'s Message: ${description}`)
-			.setThumbnail(`attachment://Ranked_${currentRank}.png`)
-			.setTimestamp()
-			.setFooter({
-				text: 'Read channel pins!',
-				iconURL: 'attachment://pin.png',
-			});
+			setVCLimit(mode, interaction);
 
-		if (previousRank)
-			lfgRankedEmbed.addFields({
-				name: '__Previous Rank__',
-				value: `${previousRank}`,
-				inline: true,
-			});
+			let playersNeededText = !playersNeeded ? `is looking for a team` : `is looking for ${playersNeeded} more`;
 
-		if (playstyle)
-			lfgRankedEmbed.addFields({
-				name: '__Playstyle__',
-				value: `${playstyle}`,
-				inline: true,
-			});
+			const lfgRankedEmbed = new EmbedBuilder()
+				.setAuthor({
+					name: `${interaction.member.displayName} ${playersNeededText}`,
+					iconURL: interaction.member.displayAvatarURL({ dynamic: true }),
+				})
+				.setDescription(`<@${interaction.member.id}>'s Message: ${description}`)
+				.setThumbnail(`attachment://Ranked_${currentRank}.png`)
+				.setTimestamp()
+				.setFooter({
+					text: 'Read channel pins!',
+					iconURL: 'attachment://pin.png',
+				});
 
-		if (mains)
-			lfgRankedEmbed.addFields({
-				name: '__Main(s)__',
-				value: `${mains}`,
-				inline: true,
-			});
+			if (previousRank)
+				lfgRankedEmbed.addFields({
+					name: '__Previous Rank__',
+					value: `${previousRank}`,
+					inline: true,
+				});
 
-		if (gamertag)
-			lfgRankedEmbed.addFields({
-				name: '__Gamertag__',
-				value: `${gamertag}`,
-				inline: true,
-			});
+			if (playstyle)
+				lfgRankedEmbed.addFields({
+					name: '__Playstyle__',
+					value: `${playstyle}`,
+					inline: true,
+				});
 
-		if (save == 'Yes') {
-			saveRankedLFGPost(interaction, mode, description, currentRank, previousRank, playersNeeded, micRequired, playstyle, mains, gamertag);
+			if (mains)
+				lfgRankedEmbed.addFields({
+					name: '__Main(s)__',
+					value: `${mains}`,
+					inline: true,
+				});
 
-			await interaction.editReply({
-				content: 'Your LFG message has been posted and saved, use the `/rr` command to post it again!',
-				ephemeral: true,
-			});
-		} else {
-			await interaction.editReply({
-				content: 'Your LFG message has been posted!',
-				ephemeral: true,
-			});
-		}
+			if (gamertag)
+				lfgRankedEmbed.addFields({
+					name: '__Gamertag__',
+					value: `${gamertag}`,
+					inline: true,
+				});
 
-		if (buttonRow.components.length == 0) {
-			await interaction.channel.send({
-				embeds: [lfgRankedEmbed],
-				files: [
-					{
-						attachment: `${__dirname}/../../images/ranked/Ranked_${currentRank}.png`,
-						name: `Ranked_${currentRank}.png`,
-					},
-					{
-						attachment: `${__dirname}/../../images/other/pin.png`,
-						name: `pin.png`,
-					},
-				],
-			});
-		} else {
-			await interaction.channel.send({
-				embeds: [lfgRankedEmbed],
-				components: [buttonRow],
-				files: [
-					{
-						attachment: `${__dirname}/../../images/ranked/Ranked_${currentRank}.png`,
-						name: `Ranked_${currentRank}.png`,
-					},
-					{
-						attachment: `${__dirname}/../../images/other/pin.png`,
-						name: `pin.png`,
-					},
-				],
-			});
-		}
+			if (save == 'Yes') {
+				saveRankedLFGPost(interaction, mode, description, currentRank, previousRank, playersNeeded, micRequired, playstyle, mains, gamertag);
+
+				await interaction.editReply({
+					content: 'Your LFG message has been posted and saved, use the `/rr` command to post it again!',
+					ephemeral: true,
+				});
+			} else {
+				await interaction.editReply({
+					content: 'Your LFG message has been posted!',
+					ephemeral: true,
+				});
+			}
+
+			if (buttonRow.components.length == 0) {
+				await interaction.channel.send({
+					embeds: [lfgRankedEmbed],
+					files: [
+						{
+							attachment: `${__dirname}/../../images/ranked/Ranked_${currentRank}.png`,
+							name: `Ranked_${currentRank}.png`,
+						},
+						{
+							attachment: `${__dirname}/../../images/other/pin.png`,
+							name: `pin.png`,
+						},
+					],
+				});
+			} else {
+				await interaction.channel.send({
+					embeds: [lfgRankedEmbed],
+					components: [buttonRow],
+					files: [
+						{
+							attachment: `${__dirname}/../../images/ranked/Ranked_${currentRank}.png`,
+							name: `Ranked_${currentRank}.png`,
+						},
+						{
+							attachment: `${__dirname}/../../images/other/pin.png`,
+							name: `pin.png`,
+						},
+					],
+				});
+			}
+		});
 	},
 };

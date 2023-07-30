@@ -24,9 +24,9 @@ function databaseConnection() {
 
 		db.getConnection(err => {
 			if (err) {
-				console.log(chalk.bold.red(`OVERWATCH: Error connecting to database: ${err}`));
+				console.log(chalk.bold.red(`${chalk.bold(`OVERWATCH:`)} Error connecting to database: ${err}`));
 			} else {
-				console.log(chalk.bold.blue('OVERWATCH: Database connection complete'));
+				console.log(chalk.bold.blue('${chalk.bold(`OVERWATCH:`)} Database connection complete'));
 			}
 		});
 	}

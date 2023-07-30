@@ -148,12 +148,12 @@ module.exports = {
 
 					db.query(updateSlowmode, [moment().unix(), interaction.user.id], (err, updateRow) => {
 						if (err) {
-							console.log(chalk.red(`OVERWATCH: ${err}`));
+							console.log(chalk.red(`${chalk.bold(`OVERWATCH:`)} ${err}`));
 							return false;
 						}
 					});
 
-					console.log(chalk.blue(`OVERWATCH: Updated ${interaction.user.tag}'s entry in userPostSlowmode table`));
+					console.log(chalk.blue(`${chalk.bold(`OVERWATCH:`)} Updated ${interaction.user.tag}'s entry in userPostSlowmode table`));
 				}
 			} else {
 				// If they don't exist in the database, add them and allow the post to be posted
@@ -161,12 +161,12 @@ module.exports = {
 
 				db.query(insertSlowmode, [interaction.user.id, moment().unix()], (err, insertRow) => {
 					if (err) {
-						console.log(chalk.red(`OVERWATCH: ${err}`));
+						console.log(chalk.red(`${chalk.bold(`OVERWATCH:`)} ${err}`));
 						return false;
 					}
 				});
 
-				console.log(chalk.blue(`OVERWATCH: Added ${interaction.user.tag} to userPostSlowmode table`));
+				console.log(chalk.blue(`${chalk.bold(`OVERWATCH:`)} Added ${interaction.user.tag} to userPostSlowmode table`));
 			}
 
 			await interaction.deferReply({ ephemeral: false });

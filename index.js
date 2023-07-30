@@ -134,24 +134,26 @@ function deleteSlowmodeEntries() {
 
 	db.query(timeSinceCount, timeSince, (err, result) => {
 		if (err) {
-			console.log(chalk.bold.red(`OVERWATCH: Error: ${err}`));
+			console.log(chalk.bold.red(`${chalk.bold(`OVERWATCH:`)} Error: ${err}`));
 		}
 
 		const rowCount = result[0]['count(*)'];
 
 		// If the count of timeSinceCount is greater than 0, delete the entries
 		if (rowCount > 0) {
-			console.log(chalk.cyan(`OVERWATCH: Running Slowmode Cleanup Check...`));
+			console.log(chalk.cyan(`${chalk.bold(`OVERWATCH:`)} Running Slowmode Cleanup Check...`));
 
 			const deleteOldSlowmodeEntries = `DELETE FROM userPostSlowmode WHERE postTimestamp <= ?`;
 
 			db.query(deleteOldSlowmodeEntries, timeSince, (err, result) => {
 				if (err) {
-					console.log(chalk.bold.red(`OVERWATCH: Error: ${err}`));
+					console.log(chalk.bold.red(`${chalk.bold(`OVERWATCH:`)} Error: ${err}`));
 				}
 			});
 
-			console.log(chalk.green(`OVERWATCH: Slowmode Cleanup Check complete, deleted ${rowCount} ${checkEntryPlural(rowCount, 'entr')} from userPostSlowmode`));
+			console.log(
+				chalk.green(`${chalk.bold(`OVERWATCH:`)} Slowmode Cleanup Check complete, deleted ${rowCount} ${checkEntryPlural(rowCount, 'entr')} from userPostSlowmode`),
+			);
 		}
 	});
 }

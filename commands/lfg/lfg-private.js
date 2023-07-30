@@ -127,7 +127,7 @@ module.exports = {
 		// Slowmode stuff
 		var slowmodeAmount = interaction.channel.rateLimitPerUser === 0 ? 90 : interaction.channel.rateLimitPerUser - 30;
 
-		let slowmodeQuery = 'SELECT * FROM userSlowmode WHERE userID = ?';
+		let slowmodeQuery = 'SELECT timestamp FROM userSlowmode WHERE userID = ?';
 
 		db.query(slowmodeQuery, [interaction.user.id], async (err, slowmodeRow) => {
 			// If slowmode row with user ID exists, then continue

@@ -251,7 +251,7 @@ function vcLinkButtonBuilder(interaction) {
 
 function doesUserHaveSlowmode(interaction, time) {
 	// First, check to see if the user has an entry in the userSlowmode database
-	let slowmodeQuery = 'SELECT * FROM userSlowmode WHERE userID = ?';
+	let slowmodeQuery = 'SELECT id,timestamp FROM userSlowmode WHERE userID = ?';
 
 	db.query(slowmodeQuery, [interaction.user.id], (err, slowmodeRow) => {
 		// If they do exist in the database, check to see if the current time is greater than the time time they last posted + the slowmode time

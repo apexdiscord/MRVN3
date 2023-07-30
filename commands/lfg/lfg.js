@@ -114,7 +114,7 @@ module.exports = {
 		// If false, continue with the command and add a slowmode to the user
 		await doesUserHaveSlowmode(interaction, slowmodeAmount);
 
-		let slowmodeQuery = 'SELECT * FROM userSlowmode WHERE userID = ?';
+		let slowmodeQuery = 'SELECT timestamp FROM userSlowmode WHERE userID = ?';
 
 		db.query(slowmodeQuery, [interaction.user.id], async (err, slowmodeRow) => {
 			if (slowmodeRow.length != 0) {

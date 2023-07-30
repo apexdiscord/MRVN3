@@ -251,33 +251,33 @@ function vcLinkButtonBuilder(interaction) {
 
 function doesUserHaveSlowmode(interaction, time) {
 	// First, check to see if the user has an entry in the userSlowmode database
-	let slowmodeQuery = 'SELECT id,timestamp FROM userSlowmode WHERE userID = ?';
+	let slowmodeQuery = 'SELECT discordID,postTimestamp FROM userSlowmodeTheSecond WHERE discordID = ?';
 
 	db.query(slowmodeQuery, [interaction.user.id], (err, slowmodeRow) => {
 		// If they do exist in the database, check to see if the current time is greater than the time time they last posted + the slowmode time
 		if (slowmodeRow.length != 0) {
-			if (slowmodeRow[0].timestamp + time > moment().unix()) {
+			if (slowmodeRow[0].postTimestamp + time > moment().unix()) {
 				// If it is, send a message saying they have to wait to post again
 				interaction.editReply({
-					content: `You are posting too quickly. You will be able to post again <t:${slowmodeRow[0].timestamp + time}:R>.`,
+					content: `You are posting too quickly. You will be able to post again <t:${slowmodeRow[0].postTimestamp + time}:R>.`,
 					ephemeral: true,
 				});
 			} else {
 				// If it isn't, update their entry in the database with the current time and allow the post to be posted
-				const updateSlowmode = `UPDATE userSlowmode SET timestamp = ? WHERE id = ?`;
+				const updateSlowmode = `UPDATE userSlowmodeTheSecond SET postTimestamp = ? WHERE discordID = ?`;
 
-				db.query(updateSlowmode, [moment().unix(), slowmodeRow[0].id], (err, updateRow) => {
+				db.query(updateSlowmode, [moment().unix(), interaction.user.id], (err, updateRow) => {
 					if (err) {
 						console.log(chalk.red(`OVERWATCH: ${err}`));
 						return false;
 					}
 				});
 
-				console.log(chalk.blue(`OVERWATCH: Updated ${interaction.user.tag}'s entry in userSlowmode table`));
+				console.log(chalk.blue(`OVERWATCH: Updated ${interaction.user.tag}'s entry in userSlowmodeTheSecond table`));
 			}
 		} else {
 			// If they don't exist in the database, add them and allow the post to be posted
-			const insertSlowmode = `INSERT INTO userSlowmode (userID, timestamp) VALUES (?, ?)`;
+			const insertSlowmode = `INSERT INTO userSlowmodeTheSecond (discordID, postTimestamp) VALUES (?, ?)`;
 
 			db.query(insertSlowmode, [interaction.user.id, moment().unix()], (err, insertRow) => {
 				if (err) {
@@ -286,7 +286,7 @@ function doesUserHaveSlowmode(interaction, time) {
 				}
 			});
 
-			console.log(chalk.blue(`OVERWATCH: Added ${interaction.user.tag} to userSlowmode table`));
+			console.log(chalk.blue(`OVERWATCH: Added ${interaction.user.tag} to userSlowmodeTheSecond table`));
 		}
 	});
 }

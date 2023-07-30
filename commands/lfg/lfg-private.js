@@ -127,37 +127,37 @@ module.exports = {
 		// Slowmode stuff
 		var slowmodeAmount = interaction.channel.rateLimitPerUser === 0 ? 90 : interaction.channel.rateLimitPerUser - 30;
 
-		let slowmodeQuery = 'SELECT timestamp FROM userSlowmode WHERE userID = ?';
+		let slowmodeQuery = 'SELECT postTimestamp FROM userSlowmodeTheSecond WHERE discordID = ?';
 
 		db.query(slowmodeQuery, [interaction.user.id], async (err, slowmodeRow) => {
 			// If slowmode row with user ID exists, then continue
 			if (slowmodeRow.length != 0) {
 				// If the time since is less than the slowmode should be active for, return an error
-				if (slowmodeRow[0].timestamp + slowmodeAmount > moment().unix()) {
+				if (slowmodeRow[0].postTimestamp + slowmodeAmount > moment().unix()) {
 					await interaction.deferReply({ ephemeral: true });
 
 					await interaction.editReply({
-						content: `You are posting too quickly. You will be able to post again <t:${slowmodeRow[0].timestamp + slowmodeAmount}:R>.`,
+						content: `You are posting too quickly. You will be able to post again <t:${slowmodeRow[0].postTimestamp + slowmodeAmount}:R>.`,
 						ephemeral: true,
 					});
 
 					return;
 				} else {
 					// If it has been longer than the slowmode, simply update the timestamp in the DB
-					const updateSlowmode = `UPDATE userSlowmode SET timestamp = ? WHERE id = ?`;
+					const updateSlowmode = `UPDATE userSlowmodeTheSecond SET postTimestamp = ? WHERE discordID = ?`;
 
-					db.query(updateSlowmode, [moment().unix(), slowmodeRow[0].id], (err, updateRow) => {
+					db.query(updateSlowmode, [moment().unix(), interaction.user.id], (err, updateRow) => {
 						if (err) {
 							console.log(chalk.red(`OVERWATCH: ${err}`));
 							return false;
 						}
 					});
 
-					console.log(chalk.blue(`OVERWATCH: Updated ${interaction.user.tag}'s entry in userSlowmode table`));
+					console.log(chalk.blue(`OVERWATCH: Updated ${interaction.user.tag}'s entry in userSlowmodeTheSecond table`));
 				}
 			} else {
 				// If they don't exist in the database, add them and allow the post to be posted
-				const insertSlowmode = `INSERT INTO userSlowmode (userID, timestamp) VALUES (?, ?)`;
+				const insertSlowmode = `INSERT INTO userSlowmodeTheSecond (discordID, postTimestamp) VALUES (?, ?)`;
 
 				db.query(insertSlowmode, [interaction.user.id, moment().unix()], (err, insertRow) => {
 					if (err) {
@@ -166,7 +166,7 @@ module.exports = {
 					}
 				});
 
-				console.log(chalk.blue(`OVERWATCH: Added ${interaction.user.tag} to userSlowmode table`));
+				console.log(chalk.blue(`OVERWATCH: Added ${interaction.user.tag} to userSlowmodeTheSecond table`));
 			}
 
 			await interaction.deferReply({ ephemeral: false });

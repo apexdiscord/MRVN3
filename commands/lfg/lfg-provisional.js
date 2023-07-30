@@ -125,11 +125,11 @@ module.exports = {
 		// If false, continue with the command and add a slowmode to the user
 		await doesUserHaveSlowmode(interaction, slowmodeAmount);
 
-		let slowmodeQuery = 'SELECT timestamp FROM userSlowmode WHERE userID = ?';
+		let slowmodeQuery = 'SELECT postTimestamp FROM userSlowmodeTheSecond WHERE discordID = ?';
 
 		db.query(slowmodeQuery, [interaction.user.id], async (err, slowmodeRow) => {
 			if (slowmodeRow.length != 0) {
-				if (slowmodeRow[0].timestamp + slowmodeAmount > moment().unix()) {
+				if (slowmodeRow[0].postTimestamp + slowmodeAmount > moment().unix()) {
 					return;
 				}
 			}

@@ -250,8 +250,8 @@ function vcLinkButtonBuilder(interaction) {
 }
 
 function doesUserHaveSlowmode(interaction, time) {
-	// First, check to see if the user has an entry in the userSlowmode database
-	let slowmodeQuery = 'SELECT discordID,postTimestamp FROM userSlowmodeTheSecond WHERE discordID = ?';
+	// First, check to see if the user has an entry in the userPostSlowmode database
+	let slowmodeQuery = 'SELECT discordID,postTimestamp FROM userPostSlowmode WHERE discordID = ?';
 
 	db.query(slowmodeQuery, [interaction.user.id], (err, slowmodeRow) => {
 		// If they do exist in the database, check to see if the current time is greater than the time time they last posted + the slowmode time
@@ -264,7 +264,7 @@ function doesUserHaveSlowmode(interaction, time) {
 				});
 			} else {
 				// If it isn't, update their entry in the database with the current time and allow the post to be posted
-				const updateSlowmode = `UPDATE userSlowmodeTheSecond SET postTimestamp = ? WHERE discordID = ?`;
+				const updateSlowmode = `UPDATE userPostSlowmode SET postTimestamp = ? WHERE discordID = ?`;
 
 				db.query(updateSlowmode, [moment().unix(), interaction.user.id], (err, updateRow) => {
 					if (err) {
@@ -273,11 +273,11 @@ function doesUserHaveSlowmode(interaction, time) {
 					}
 				});
 
-				console.log(chalk.blue(`OVERWATCH: Updated ${interaction.user.tag}'s entry in userSlowmodeTheSecond table`));
+				console.log(chalk.blue(`OVERWATCH: Updated ${interaction.user.tag}'s entry in userPostSlowmode table`));
 			}
 		} else {
 			// If they don't exist in the database, add them and allow the post to be posted
-			const insertSlowmode = `INSERT INTO userSlowmodeTheSecond (discordID, postTimestamp) VALUES (?, ?)`;
+			const insertSlowmode = `INSERT INTO userPostSlowmode (discordID, postTimestamp) VALUES (?, ?)`;
 
 			db.query(insertSlowmode, [interaction.user.id, moment().unix()], (err, insertRow) => {
 				if (err) {
@@ -286,7 +286,7 @@ function doesUserHaveSlowmode(interaction, time) {
 				}
 			});
 
-			console.log(chalk.blue(`OVERWATCH: Added ${interaction.user.tag} to userSlowmodeTheSecond table`));
+			console.log(chalk.blue(`OVERWATCH: Added ${interaction.user.tag} to userPostSlowmode table`));
 		}
 	});
 }

@@ -130,7 +130,7 @@ function deleteSlowmodeEntries() {
 	const timeSince = moment().subtract(6, 'hours').unix();
 
 	// Select the amount of rows that are older than timeSince
-	const timeSinceCount = `SELECT COUNT(*) FROM userSlowmodeTheSecond WHERE postTimestamp <= ?`;
+	const timeSinceCount = `SELECT COUNT(*) FROM userPostSlowmode WHERE postTimestamp <= ?`;
 
 	db.query(timeSinceCount, timeSince, (err, result) => {
 		if (err) {
@@ -143,7 +143,7 @@ function deleteSlowmodeEntries() {
 		if (rowCount > 0) {
 			console.log(chalk.cyan(`OVERWATCH: Running Slowmode Cleanup Check...`));
 
-			const deleteOldSlowmodeEntries = `DELETE FROM userSlowmodeTheSecond WHERE postTimestamp <= ?`;
+			const deleteOldSlowmodeEntries = `DELETE FROM userPostSlowmode WHERE postTimestamp <= ?`;
 
 			db.query(deleteOldSlowmodeEntries, timeSince, (err, result) => {
 				if (err) {
@@ -151,7 +151,7 @@ function deleteSlowmodeEntries() {
 				}
 			});
 
-			console.log(chalk.green(`OVERWATCH: Slowmode Cleanup Check complete, deleted ${rowCount} ${checkEntryPlural(rowCount, 'entr')} from userSlowmodeTheSecond`));
+			console.log(chalk.green(`OVERWATCH: Slowmode Cleanup Check complete, deleted ${rowCount} ${checkEntryPlural(rowCount, 'entr')} from userPostSlowmode`));
 		}
 	});
 }

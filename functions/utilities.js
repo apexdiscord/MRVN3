@@ -6,7 +6,6 @@ const { ButtonStyle, EmbedBuilder, ButtonBuilder } = require('discord.js');
 const emotes = require('../data/emotes.json');
 const db = require('../functions/database.js');
 var bannedWords = require('../data/bannedWords.json');
-const db_savedLFGPosts = new Database(`${__dirname}/../databases/savedLFGPosts.sqlite`);
 
 function setVCLimit(mode, channel) {
 	if (!channel.member.voice.channel) return;
@@ -146,25 +145,35 @@ function movedLogFormatter(oldState, newState) {
 function saveCasualLFGPost(interaction, mode, description, playersNeeded, micRequired, playstyle, mains, gamertag) {
 	const timestamp = moment().unix();
 
-	const insertLFGPost = db_savedLFGPosts.prepare(
-		`INSERT OR REPLACE INTO casualLFG (user_id, mode, description, playersNeeded, micRequired, playStyle, main, gamerTag, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-	);
+	const insertLFGPost = `REPLACE INTO savedCasualLFGPosts (discordID, mode, message, playersNeeded, micRequired, playStyle, mainLegend, gamertag, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-	insertLFGPost.run(interaction.user.id, mode, description, playersNeeded, micRequired, playstyle, mains, gamertag, timestamp);
+	db.query(insertLFGPost, [interaction.user.id, mode, description, playersNeeded, micRequired, playstyle, mains, gamertag, timestamp], (err, updateRow) => {
+		if (err) {
+			console.log(chalk.red(`${chalk.bold(`OVERWATCH:`)} ${err}`));
+			return false;
+		}
+	});
 
-	console.log(chalk.blue(`DATABASE: Saved LFG post from ${interaction.user.tag} to casualLFG table`));
+	console.log(chalk.blue(`DATABASE: Saved LFG post from ${interaction.user.tag} to savedCasualLFGPosts table`));
 }
 
 function saveRankedLFGPost(interaction, mode, description, currentRank, previousRank, playersNeeded, micRequired, playstyle, mains, gamertag) {
 	const timestamp = moment().unix();
 
-	const insertLFGPost = db_savedLFGPosts.prepare(
-		`INSERT OR REPLACE INTO rankedLFG (user_id, mode, description, currentRank, previousRank, playersNeeded, micRequired, playStyle, main, gamerTag, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+	const insertLFGPost = `REPLACE INTO savedRankedLFGPosts (discordID, mode, message, currentRank, previousRank, playersNeeded, micRequired, playStyle, mainLegend, gamertag, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+	db.query(
+		insertLFGPost,
+		[interaction.user.id, mode, description, currentRank, previousRank, playersNeeded, micRequired, playstyle, mains, gamertag, timestamp],
+		(err, updateRow) => {
+			if (err) {
+				console.log(chalk.red(`${chalk.bold(`OVERWATCH:`)} ${err}`));
+				return false;
+			}
+		},
 	);
 
-	insertLFGPost.run(interaction.user.id, mode, description, currentRank, previousRank, playersNeeded, micRequired, playstyle, mains, gamertag, timestamp);
-
-	console.log(chalk.blue(`DATABASE: Saved LFG post from ${interaction.user.tag} to rankedLFG table`));
+	console.log(chalk.blue(`DATABASE: Saved LFG post from ${interaction.user.tag} to savedRankedLFGPosts table`));
 }
 
 async function timeoutController(length, lengthFull, memberKicked, interaction, entryOne, entryTwo, entryThree) {

@@ -84,8 +84,8 @@ db_vcOwnerList.exec(createOwnerVCTable);
 db_memberDecay.exec(createMemberDecayTable1);
 db_memberDecay.exec(createMemberDecayTable2);
 db_memberDecay.exec(createMemberDecayTable3);
-db_savedLFGPosts.exec(createCasualLFGPostsTable);
-db_savedLFGPosts.exec(createRankedLFGPostsTable);
+// db_savedLFGPosts.exec(createCasualLFGPostsTable);
+// db_savedLFGPosts.exec(createRankedLFGPostsTable);
 
 // Delete expired kick counts from database
 function deleteKickCounterEntries(dbName, timeInMinutes, text) {
@@ -111,16 +111,35 @@ function deleteLFGPostEntries(dbName, timeInMinutes, text) {
 	const timeSince = moment().subtract(timeInMinutes, 'minutes').unix();
 
 	// Select the amount of rows that are older than timeSince
-	const timeSinceCount = db_savedLFGPosts.prepare(`SELECT COUNT(*) FROM ${dbName} WHERE timestamp <= ?`).get(timeSince)['COUNT(*)'];
+	const timeSinceCount = `SELECT COUNT(*) FROM ${dbName} WHERE timestamp <= ?`;
 
-	// If the count of timeSinceCount is greater than 0, delete the entries
-	if (timeSinceCount > 0) {
-		console.log(chalk.cyan(`DATABASE: Running ${text} Cleanup Check...`));
+	db.query(timeSinceCount, timeSince, (err, result) => {
+		if (err) {
+			console.log(chalk.bold.red(`${chalk.bold(`OVERWATCH:`)} Error: ${err}`));
+		}
 
-		db_savedLFGPosts.prepare(`DELETE FROM ${dbName} WHERE timestamp <= ?`).run(timeSince);
+		// If the count of timeSinceCount is greater than 0, delete the entries
+		if (result[0]['count(*)'] > 0) {
+			console.log(chalk.cyan(`${chalk.bold('OVERWATCH:')} Running ${text} Cleanup Check...`));
 
-		console.log(chalk.green(`DATABASE: ${text} Cleanup Check complete, deleted ${timeSinceCount} ${checkEntryPlural(timeSinceCount, 'entr')} from ${dbName}`));
-	}
+			const deleteLFGPosts = `DELETE FROM ${dbName} WHERE timestamp <= ?`;
+
+			db.query(deleteLFGPosts, timeSince, (err, result) => {
+				if (err) {
+					console.log(chalk.bold.red(`${chalk.bold(`OVERWATCH:`)} Error: ${err}`));
+				}
+			});
+
+			console.log(
+				chalk.green(
+					`${chalk.bold(`OVERWATCH:`)} ${text} Cleanup Check complete, deleted ${result[0]['count(*)']} ${checkEntryPlural(
+						result[0]['count(*)'],
+						'entr',
+					)} from ${dbName}`,
+				),
+			);
+		}
+	});
 }
 
 // Delete expired slowmode entries from the database
@@ -169,8 +188,8 @@ function currentBotStats() {
 		const oneHourAgo = moment().subtract(1, 'hour').unix();
 		const twoHoursAgo = moment().subtract(2, 'hour').unix();
 
-		const savedCasualPostCount = db_savedLFGPosts.prepare(`SELECT COUNT(*) FROM casualLFG`).get()['COUNT(*)'];
-		const savedRankedPostCount = db_savedLFGPosts.prepare(`SELECT COUNT(*) FROM rankedLFG`).get()['COUNT(*)'];
+		// const savedCasualPostCount = db_savedLFGPosts.prepare(`SELECT COUNT(*) FROM casualLFG`).get()['COUNT(*)'];
+		// const savedRankedPostCount = db_savedLFGPosts.prepare(`SELECT COUNT(*) FROM rankedLFG`).get()['COUNT(*)'];
 		const timeoutEntryCount1 = db_memberDecay.prepare(`SELECT COUNT(*) FROM memberDecay1`).get()['COUNT(*)'];
 		const timeoutEntryCount2 = db_memberDecay.prepare(`SELECT COUNT(*) FROM memberDecay2`).get()['COUNT(*)'];
 		const timeoutEntryCount3 = db_memberDecay.prepare(`SELECT COUNT(*) FROM memberDecay3`).get()['COUNT(*)'];
@@ -178,20 +197,20 @@ function currentBotStats() {
 		const vcOwnerCountOneHour = db_vcOwnerList.prepare(`SELECT COUNT(*) FROM vcOwnerList WHERE timestamp <= ${oneHourAgo}`).get()['COUNT(*)'];
 		const vcOwnerCountTwoHours = db_vcOwnerList.prepare(`SELECT COUNT(*) FROM vcOwnerList WHERE timestamp <= ${twoHoursAgo}`).get()['COUNT(*)'];
 
-		const savedPostCountTable = new Table({
-			title: `Saved LFG Post Count`,
-			columns: [
-				{ name: 'casualSavedCount', title: 'Saved Casual LFG Posts' },
-				{ name: 'rankedSavedCount', title: 'Saved Ranked LFG Posts' },
-			],
-		});
+		// const savedPostCountTable = new Table({
+		// 	title: `Saved LFG Post Count`,
+		// 	columns: [
+		// 		{ name: 'casualSavedCount', title: 'Saved Casual LFG Posts' },
+		// 		{ name: 'rankedSavedCount', title: 'Saved Ranked LFG Posts' },
+		// 	],
+		// });
 
-		savedPostCountTable.addRows([
-			{
-				casualSavedCount: savedCasualPostCount,
-				rankedSavedCount: savedRankedPostCount,
-			},
-		]);
+		// savedPostCountTable.addRows([
+		// 	{
+		// 		casualSavedCount: savedCasualPostCount,
+		// 		rankedSavedCount: savedRankedPostCount,
+		// 	},
+		// ]);
 
 		const timeoutCountTable = new Table({
 			title: `Timeout Entry Count`,
@@ -227,7 +246,7 @@ function currentBotStats() {
 			},
 		]);
 
-		savedPostCountTable.printTable();
+		// savedPostCountTable.printTable();
 		timeoutCountTable.printTable();
 		vcOwnerCountTable.printTable();
 	}
@@ -252,11 +271,11 @@ setInterval(deleteKickCounterEntries, 60 * 1000, 'memberDecay3', 24 * 60, '28 Da
 
 // Saved Casual LFG Post Cleanup Timer
 // Ran every 28 days
-setInterval(deleteLFGPostEntries, 3600 * 1000, 'casualLFG', 28 * 24 * 60, 'Casual LFG Post');
+setInterval(deleteLFGPostEntries, 3600 * 1000, 'savedCasualLFGPosts', 28 * 24 * 60, 'Casual LFG Post');
 
 // Saved Ranked LFG Post Cleanup Timer
 // Ran every 7 days
-setInterval(deleteLFGPostEntries, 3600 * 1000, 'rankedLFG', 7 * 24 * 60, 'Ranked LFG Post');
+setInterval(deleteLFGPostEntries, 3600 * 1000, 'savedRankedLFGPosts', 7 * 24 * 60, 'Ranked LFG Post');
 
 // Slowmode Cleanup Timer
 // Ran once an hour

@@ -4,7 +4,6 @@ const Database = require('better-sqlite3');
 const { ButtonStyle, ButtonBuilder, ActionRowBuilder, SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 const { setVCLimit, checkVoiceChannel, vcLinkButtonBuilder, doesUserHaveSlowmode } = require('../../functions/utilities.js');
-const db_savedLFGPosts = new Database(`${__dirname}/../../databases/savedLFGPosts.sqlite`);
 
 module.exports = {
 	data: new SlashCommandBuilder().setName('rc').setDescription('Recall your saved casual LFG post. These posts are deleted after they have been saved for 28 days.'),
@@ -24,118 +23,120 @@ module.exports = {
 		}
 
 		// Retrieve the saved LFG data from the database
-		const savedPostData = db_savedLFGPosts.prepare(`SELECT * FROM casualLFG WHERE user_id = ?`).get(interaction.user.id);
+		const savedPostData = `SELECT * FROM savedCasualLFGPosts WHERE discordID = ?`;
 
-		// If there is no saved post, return an error
-		if (!savedPostData) {
-			await interaction.editReply({
-				content: 'You have not saved an LFG post. Use an LFG command and select `Yes` for the "save" option to save a post!',
-				ephemeral: true,
-			});
+		db.query(savedPostData, [interaction.user.id], async (err, savedDataRow) => {
+			// If there is no saved post, return an error
+			if (savedDataRow.length === 0) {
+				await interaction.editReply({
+					content: 'You have not saved an LFG post. Use an LFG command and select `Yes` for the "save" option to save a post!',
+					ephemeral: true,
+				});
 
-			return;
-		}
+				return;
+			}
 
-		// Check for a slowmode in the channel the interaction is created in.
-		// If there is, set that to the slowmode for the LFG post minute 30 seconds
-		// so that it is quicker to post an LFG post than to send a channel, but still
-		// have a slowmode to prevent people from spamming it
-		var slowmodeAmount = interaction.channel.rateLimitPerUser === 0 ? 90 : interaction.channel.rateLimitPerUser - 30;
+			// Check for a slowmode in the channel the interaction is created in.
+			// If there is, set that to the slowmode for the LFG post minute 30 seconds
+			// so that it is quicker to post an LFG post than to send a channel, but still
+			// have a slowmode to prevent people from spamming it
+			var slowmodeAmount = interaction.channel.rateLimitPerUser === 0 ? 90 : interaction.channel.rateLimitPerUser - 30;
 
-		// Check if the user has a slowmode. If true, return and don't execute
-		// If false, continue with the command and add a slowmode to the user
-		await doesUserHaveSlowmode(interaction, slowmodeAmount);
+			// Check if the user has a slowmode. If true, return and don't execute
+			// If false, continue with the command and add a slowmode to the user
+			await doesUserHaveSlowmode(interaction, slowmodeAmount);
 
-		let slowmodeQuery = 'SELECT postTimestamp FROM userPostSlowmode WHERE discordID = ?';
+			let slowmodeQuery = 'SELECT postTimestamp FROM userPostSlowmode WHERE discordID = ?';
 
-		db.query(slowmodeQuery, [interaction.user.id], async (err, slowmodeRow) => {
-			if (slowmodeRow.length != 0) {
-				if (slowmodeRow[0].postTimestamp + slowmodeAmount > moment().unix()) {
-					return;
+			db.query(slowmodeQuery, [interaction.user.id], async (err, slowmodeRow) => {
+				if (slowmodeRow.length != 0) {
+					if (slowmodeRow[0].postTimestamp + slowmodeAmount > moment().unix()) {
+						return;
+					}
 				}
-			}
 
-			await interaction.editReply({
-				content: 'Posted your saved LFG post below.',
-				ephemeral: true,
+				await interaction.editReply({
+					content: 'Posted your saved LFG post below.',
+					ephemeral: true,
+				});
+
+				const buttonRow = new ActionRowBuilder();
+
+				if (vcLinkButtonBuilder(interaction) != null) buttonRow.addComponents(vcLinkButtonBuilder(interaction));
+				if (savedDataRow[0].micRequired == 'Yes')
+					buttonRow.addComponents(new ButtonBuilder().setCustomId('MicType').setLabel('Mic Required').setStyle(ButtonStyle.Danger).setDisabled(true));
+				if (savedDataRow[0].micRequired == 'No')
+					buttonRow.addComponents(new ButtonBuilder().setCustomId('MicType').setLabel('Mic Optional').setStyle(ButtonStyle.Success).setDisabled(true));
+
+				setVCLimit(savedDataRow[0].mode, interaction);
+
+				let playersNeededText = !savedDataRow[0].playersNeeded ? `is looking for a team` : `is looking for ${savedDataRow[0].playersNeeded} more`;
+
+				const savedPostEmbed = new EmbedBuilder()
+					.setAuthor({
+						name: `${interaction.user.username} ${playersNeededText}`,
+						iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
+					})
+					.setDescription(`<@${interaction.member.id}>'s Message: ${savedDataRow[0].message}`)
+					.setThumbnail(`attachment://${savedDataRow[0].mode}.png`)
+					.setTimestamp()
+					.setFooter({
+						text: 'Read channel pins!',
+						iconURL: 'attachment://pin.png',
+					});
+
+				if (savedDataRow[0].playStyle)
+					savedPostEmbed.addFields({
+						name: '__Playstyle__',
+						value: `${savedDataRow[0].playStyle}`,
+						inline: true,
+					});
+
+				if (savedDataRow[0].mainLegend)
+					savedPostEmbed.addFields({
+						name: '__Main(s)__',
+						value: `${savedDataRow[0].mainLegend}`,
+						inline: true,
+					});
+
+				if (savedDataRow[0].gamertag)
+					savedPostEmbed.addFields({
+						name: '__Gamertag__',
+						value: `${savedDataRow[0].gamertag}`,
+						inline: true,
+					});
+
+				if (buttonRow.components.length == 0) {
+					await interaction.channel.send({
+						embeds: [savedPostEmbed],
+						files: [
+							{
+								attachment: `${__dirname}/../../images/nonRanked/${savedDataRow[0].mode}.png`,
+								name: `${savedDataRow[0].mode}.png`,
+							},
+							{
+								attachment: `${__dirname}/../../images/other/pin.png`,
+								name: `pin.png`,
+							},
+						],
+					});
+				} else {
+					await interaction.channel.send({
+						embeds: [savedPostEmbed],
+						components: [buttonRow],
+						files: [
+							{
+								attachment: `${__dirname}/../../images/nonRanked/${savedDataRow[0].mode}.png`,
+								name: `${savedDataRow[0].mode}.png`,
+							},
+							{
+								attachment: `${__dirname}/../../images/other/pin.png`,
+								name: `pin.png`,
+							},
+						],
+					});
+				}
 			});
-
-			const buttonRow = new ActionRowBuilder();
-
-			if (vcLinkButtonBuilder(interaction) != null) buttonRow.addComponents(vcLinkButtonBuilder(interaction));
-			if (savedPostData.micRequired == 'Yes')
-				buttonRow.addComponents(new ButtonBuilder().setCustomId('MicType').setLabel('Mic Required').setStyle(ButtonStyle.Danger).setDisabled(true));
-			if (savedPostData.micRequired == 'No')
-				buttonRow.addComponents(new ButtonBuilder().setCustomId('MicType').setLabel('Mic Optional').setStyle(ButtonStyle.Success).setDisabled(true));
-
-			setVCLimit(savedPostData.mode, interaction);
-
-			let playersNeededText = !savedPostData.playersNeeded ? `is looking for a team` : `is looking for ${savedPostData.playersNeeded} more`;
-
-			const savedPostEmbed = new EmbedBuilder()
-				.setAuthor({
-					name: `${interaction.user.username} ${playersNeededText}`,
-					iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
-				})
-				.setDescription(`<@${interaction.member.id}>'s Message: ${savedPostData.description}`)
-				.setThumbnail(`attachment://${savedPostData.mode}.png`)
-				.setTimestamp()
-				.setFooter({
-					text: 'Read channel pins!',
-					iconURL: 'attachment://pin.png',
-				});
-
-			if (savedPostData.playStyle)
-				savedPostEmbed.addFields({
-					name: '__Playstyle__',
-					value: `${savedPostData.playStyle}`,
-					inline: true,
-				});
-
-			if (savedPostData.main)
-				savedPostEmbed.addFields({
-					name: '__Main(s)__',
-					value: `${savedPostData.main}`,
-					inline: true,
-				});
-
-			if (savedPostData.gamerTag)
-				savedPostEmbed.addFields({
-					name: '__Gamertag__',
-					value: `${savedPostData.gamerTag}`,
-					inline: true,
-				});
-
-			if (buttonRow.components.length == 0) {
-				await interaction.channel.send({
-					embeds: [savedPostEmbed],
-					files: [
-						{
-							attachment: `${__dirname}/../../images/nonRanked/${savedPostData.mode}.png`,
-							name: `${savedPostData.mode}.png`,
-						},
-						{
-							attachment: `${__dirname}/../../images/other/pin.png`,
-							name: `pin.png`,
-						},
-					],
-				});
-			} else {
-				await interaction.channel.send({
-					embeds: [savedPostEmbed],
-					components: [buttonRow],
-					files: [
-						{
-							attachment: `${__dirname}/../../images/nonRanked/${savedPostData.mode}.png`,
-							name: `${savedPostData.mode}.png`,
-						},
-						{
-							attachment: `${__dirname}/../../images/other/pin.png`,
-							name: `pin.png`,
-						},
-					],
-				});
-			}
 		});
 	},
 };

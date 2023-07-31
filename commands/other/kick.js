@@ -52,7 +52,7 @@ module.exports = {
 			const entryCount3 = db_memberDecay.prepare(`SELECT COUNT(*) FROM memberDecay3 WHERE id = ?`).get(userToKickID)['COUNT(*)'];
 
 			const entryCountTable = new Table({
-				title: `Kick Count for ${memberToKick.user.tag} (${memberToKick.user.id})`,
+				title: `Kick Count for ${memberToKick.user.username} (${memberToKick.user.id})`,
 				columns: [
 					{ name: 'entryCount1', title: '10m Timeout Count', color: 'blue' },
 					{ name: 'entryCount2', title: '1h Timeout Count', color: 'yellow' },

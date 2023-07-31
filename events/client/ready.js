@@ -14,7 +14,7 @@ module.exports = {
 	name: 'ready',
 	once: true,
 	async execute(client) {
-		console.log(chalk.bold.green(`BOT: Logged in as ${client.user.tag}`));
+		console.log(chalk.bold.green(`BOT: Logged in as ${client.user.username}`));
 
 		// Set bot status to "Watching your games."
 		client.user.setActivity('your games.', { type: ActivityType.Watching });

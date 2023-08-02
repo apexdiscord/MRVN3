@@ -18,7 +18,7 @@ module.exports = {
 
 			if (newState.channel.members.size === 1) {
 				// User joined an empty VC
-				console.log(chalk.green(`${chalk.bold('JOIN:')} ${newState.member.user.tag} joined empty voice channel "${newState.channel.name}"`));
+				console.log(chalk.green(`${chalk.bold('JOIN:')} ${newState.member.user.username} joined empty voice channel "${newState.channel.name}"`));
 
 				// Log it in the log channel
 				if (process.env.VC_JOIN !== undefined) {
@@ -33,10 +33,10 @@ module.exports = {
 				// Insert or replace the person in the vcOwnerList
 				db_vcOwnerList.prepare('INSERT OR REPLACE INTO vcOwnerList (id, timestamp) VALUES (?, ?)').run(newState.member.user.id, dbTimestamp);
 
-				console.log(chalk.blue(`${chalk.bold('DATABASE:')} Added ${oldState.member.user.tag} to vcOwnerList`));
+				console.log(chalk.blue(`${chalk.bold('DATABASE:')} Added ${oldState.member.user.username} to vcOwnerList`));
 			} else {
 				// User join a non-empty VC
-				console.log(chalk.green(`${chalk.bold('JOIN:')} ${newState.member.user.tag} joined occupied voice channel "${newState.channel.name}"`));
+				console.log(chalk.green(`${chalk.bold('JOIN:')} ${newState.member.user.username} joined occupied voice channel "${newState.channel.name}"`));
 
 				// Log it in the log channel
 				if (process.env.VC_JOIN !== undefined) {
@@ -50,7 +50,7 @@ module.exports = {
 			// If the parent category of the voice channel is not in the whitelist, ignore it
 			if (!categoryWhitelist.includes(oldState.channel.parent.id)) return;
 
-			console.log(chalk.red(`${chalk.bold('LEAVE:')} ${oldState.member.user.tag} left voice channel "${oldState.channel.name}"`));
+			console.log(chalk.red(`${chalk.bold('LEAVE:')} ${oldState.member.user.username} left voice channel "${oldState.channel.name}"`));
 
 			// Check to see if the user exists in vcOwnerList
 			const findUser = db_vcOwnerList.prepare('SELECT * FROM vcOwnerList WHERE id = ?').get(oldState.member.user.id);
@@ -59,7 +59,7 @@ module.exports = {
 				// User is in vcOwnerList, remove them
 				db_vcOwnerList.prepare('DELETE FROM vcOwnerList WHERE id = ?').run(oldState.member.user.id);
 
-				console.log(chalk.blue(`${chalk.bold('DATABASE:')} Removed ${oldState.member.user.tag} from vcOwnerList`));
+				console.log(chalk.blue(`${chalk.bold('DATABASE:')} Removed ${oldState.member.user.username} from vcOwnerList`));
 
 				// If they are in the DB, set the channel limit back
 				// to 3. If they aren't, do nothing, as they don't own the
@@ -95,14 +95,14 @@ module.exports = {
 			if (!categoryWhitelist.includes(newState.channel.parent.id)) {
 				// User moved to a VC that is not in the
 				// category whitelist
-				console.log(chalk.yellow(`${chalk.bold('LEAVE:')} ${oldState.member.user.tag} left voice channel "${oldState.channel.name}"`));
+				console.log(chalk.yellow(`${chalk.bold('LEAVE:')} ${oldState.member.user.username} left voice channel "${oldState.channel.name}"`));
 
 				const findUser = db_vcOwnerList.prepare('SELECT * FROM vcOwnerList WHERE id = ?').get(oldState.member.user.id);
 
 				if (findUser) {
 					db_vcOwnerList.prepare('DELETE FROM vcOwnerList WHERE id = ?').run(oldState.member.user.id);
 
-					console.log(chalk.blue(`${chalk.bold('DATABASE:')} Removed ${oldState.member.user.tag} from vcOwnerList`));
+					console.log(chalk.blue(`${chalk.bold('DATABASE:')} Removed ${oldState.member.user.username} from vcOwnerList`));
 				}
 
 				if (checkVoiceChannel(oldState) == false && oldState.channel.userLimit != 3) {
@@ -123,7 +123,7 @@ module.exports = {
 
 			if (newState.channel.members.size === 1) {
 				// User moved to an empty VC
-				console.log(chalk.yellow(`${chalk.bold('MOVE:')} ${newState.member.user.tag} moved from "${oldState.channel.name}" to "${newState.channel.name}"`));
+				console.log(chalk.yellow(`${chalk.bold('MOVE:')} ${newState.member.user.username} moved from "${oldState.channel.name}" to "${newState.channel.name}"`));
 
 				// Log it in the log channel
 				if (process.env.VC_MOVE !== undefined) {
@@ -147,10 +147,10 @@ module.exports = {
 				// Insert or replace the person in the vcOwnerList
 				db_vcOwnerList.prepare('INSERT OR REPLACE INTO vcOwnerList (id, timestamp) VALUES (?, ?)').run(newState.member.user.id, dbTimestamp);
 
-				console.log(chalk.blue(`${chalk.bold('DATABASE:')} ${oldState.member.user.tag} moved to an empty VC; database entry inserted or updated`));
+				console.log(chalk.blue(`${chalk.bold('DATABASE:')} ${oldState.member.user.username} moved to an empty VC; database entry inserted or updated`));
 			} else {
 				// User moved to an occupied VC
-				console.log(chalk.yellow(`${chalk.bold('MOVE:')} ${newState.member.user.tag} moved from "${oldState.channel.name}" to "${newState.channel.name}"`));
+				console.log(chalk.yellow(`${chalk.bold('MOVE:')} ${newState.member.user.username} moved from "${oldState.channel.name}" to "${newState.channel.name}"`));
 
 				// Log it in the log channel
 				if (process.env.VC_MOVE !== undefined) {
@@ -174,7 +174,7 @@ module.exports = {
 
 					db_vcOwnerList.prepare('DELETE FROM vcOwnerList WHERE id = ?').run(newState.member.user.id);
 
-					console.log(chalk.blue(`${chalk.bold('DATABASE:')} Removed ${oldState.member.user.tag} from vcOwnerList`));
+					console.log(chalk.blue(`${chalk.bold('DATABASE:')} Removed ${oldState.member.user.username} from vcOwnerList`));
 				}
 			}
 		}

@@ -30,7 +30,7 @@ function setVCLimit(mode, channel) {
 function logFormatter(state, text) {
 	var logTimestamp = moment().unix();
 
-	return `<t:${logTimestamp}:f> :microphone2: ${emotes[text]} <@${state.member.user.id}> (**${state.member.user.tag}**, \`${state.member.user.id}\`) ${text} <#${state.channel.id}> (**${state.channel.name}**, \`${state.channel.id}\`)`;
+	return `<t:${logTimestamp}:f> :microphone2: ${emotes[text]} <@${state.member.user.id}> (**${state.member.user.username}**, \`${state.member.user.id}\`) ${text} <#${state.channel.id}> (**${state.channel.name}**, \`${state.channel.id}\`)`;
 }
 
 function checkBannedWords(message, interaction) {
@@ -52,7 +52,7 @@ function checkBannedWords(message, interaction) {
 			const alertEmbed = new EmbedBuilder().setTitle('LFG Command - Blocked Banned Word').addFields([
 				{
 					name: `User`,
-					value: `<@${interaction.user.id}>\n${interaction.user.tag}\n\`${interaction.user.id}\``,
+					value: `<@${interaction.user.id}>\n${interaction.user.username}\n\`${interaction.user.id}\``,
 					inline: true,
 				},
 				{
@@ -95,7 +95,7 @@ function checkBannedWordsCustom(message, interaction) {
 			const alertEmbed = new EmbedBuilder().setTitle('LFG Command - Blocked Banned Word').addFields([
 				{
 					name: `User`,
-					value: `<@${interaction.user.id}>\n${interaction.user.tag}\n\`${interaction.user.id}\``,
+					value: `<@${interaction.user.id}>\n${interaction.user.username}\n\`${interaction.user.id}\``,
 					inline: true,
 				},
 				{
@@ -139,7 +139,7 @@ function checkVoiceChannel(voice) {
 function movedLogFormatter(oldState, newState) {
 	var logTimestamp = moment().unix();
 
-	return `<t:${logTimestamp}:f> :microphone2: ${emotes['Moved']} <@${newState.member.user.id}> (**${newState.member.user.tag}**, \`${newState.member.user.id}\`) Moved From <#${oldState.channel.id}> (**${oldState.channel.name}**, \`${oldState.channel.id}\`) to <#${newState.channel.id}> (**${newState.channel.name}**, \`${newState.channel.id}\`)`;
+	return `<t:${logTimestamp}:f> :microphone2: ${emotes['Moved']} <@${newState.member.user.id}> (**${newState.member.user.username}**, \`${newState.member.user.id}\`) Moved From <#${oldState.channel.id}> (**${oldState.channel.name}**, \`${oldState.channel.id}\`) to <#${newState.channel.id}> (**${newState.channel.name}**, \`${newState.channel.id}\`)`;
 }
 
 function saveCasualLFGPost(interaction, mode, description, playersNeeded, micRequired, playstyle, mains, gamertag) {
@@ -154,7 +154,7 @@ function saveCasualLFGPost(interaction, mode, description, playersNeeded, micReq
 		}
 	});
 
-	console.log(chalk.blue(`DATABASE: Saved LFG post from ${interaction.user.tag} to savedCasualLFGPosts table`));
+	console.log(chalk.blue(`DATABASE: Saved LFG post from ${interaction.user.username} to savedCasualLFGPosts table`));
 }
 
 function saveRankedLFGPost(interaction, mode, description, currentRank, previousRank, playersNeeded, micRequired, playstyle, mains, gamertag) {
@@ -173,32 +173,32 @@ function saveRankedLFGPost(interaction, mode, description, currentRank, previous
 		},
 	);
 
-	console.log(chalk.blue(`DATABASE: Saved LFG post from ${interaction.user.tag} to savedRankedLFGPosts table`));
+	console.log(chalk.blue(`DATABASE: Saved LFG post from ${interaction.user.username} to savedRankedLFGPosts table`));
 }
 
 async function timeoutController(length, lengthFull, memberKicked, interaction, entryOne, entryTwo, entryThree) {
 	const unmuteTimestamp = Math.floor(new Date(Date.now() + lengthFull) / 1000);
 
 	if (length == 2419199_000) {
-		var textTitle = `${memberKicked.user.tag} was issued a 28 day timeout!`;
+		var textTitle = `${memberKicked.user.username} was issued a 28 day timeout!`;
 		var textInfo = `Thier timeout will expire <t:${unmuteTimestamp}:R>, <t:${unmuteTimestamp}:d> at <t:${unmuteTimestamp}:t>`;
 		var embedColor = 'CA2128';
 
 		memberKicked.timeout(length, 'User was timed out for 28 days due to being kicked from an LFG channel 9 or more times in the past 24 hours.').catch(console.error);
 	} else if (length == 3600_000) {
-		var textTitle = `${memberKicked.user.tag} was issued a 1 hour timeout!`;
+		var textTitle = `${memberKicked.user.username} was issued a 1 hour timeout!`;
 		var textInfo = `Their timeout will expire <t:${unmuteTimestamp}:R>, at <t:${unmuteTimestamp}:t>`;
 		var embedColor = 'E9BE1A';
 
 		memberKicked.timeout(length, 'User was timed out for 1 hour due to being kicked from an LFG channel 6 or more times in the past 24 hours.').catch(console.error);
 	} else if (length == 600_000) {
-		var textTitle = `${memberKicked.user.tag} was issued a 10 minute timeout!`;
+		var textTitle = `${memberKicked.user.username} was issued a 10 minute timeout!`;
 		var textInfo = `Their timeout will expire <t:${unmuteTimestamp}:R>, at <t:${unmuteTimestamp}:t>`;
 		var embedColor = '1A6EC8';
 
 		memberKicked.timeout(length, 'User was timed out for 10 minutes due to being kicked from an LFG channel 3 or more times in the past hour.').catch(console.error);
 	} else {
-		var textTitle = `${memberKicked.user.tag} was kicked from a voice channel!`;
+		var textTitle = `${memberKicked.user.username} was kicked from a voice channel!`;
 		var textInfo = 'They were kicked, but were not issued a timeout.';
 		var embedColor = '1A6EC8';
 	}
@@ -282,7 +282,7 @@ function doesUserHaveSlowmode(interaction, time) {
 					}
 				});
 
-				console.log(chalk.blue(`${chalk.bold(`OVERWATCH:`)} Updated ${interaction.user.tag}'s entry in userPostSlowmode table`));
+				console.log(chalk.blue(`${chalk.bold(`OVERWATCH:`)} Updated ${interaction.user.username}'s entry in userPostSlowmode table`));
 			}
 		} else {
 			// If they don't exist in the database, add them and allow the post to be posted
@@ -295,7 +295,7 @@ function doesUserHaveSlowmode(interaction, time) {
 				}
 			});
 
-			console.log(chalk.blue(`${chalk.bold(`OVERWATCH:`)} Added ${interaction.user.tag} to userPostSlowmode table`));
+			console.log(chalk.blue(`${chalk.bold(`OVERWATCH:`)} Added ${interaction.user.username} to userPostSlowmode table`));
 		}
 	});
 }

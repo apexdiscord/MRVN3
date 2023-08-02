@@ -154,7 +154,7 @@ module.exports = {
 						}
 					});
 
-					console.log(chalk.blue(`${chalk.bold(`OVERWATCH:`)} Updated ${interaction.user.tag}'s entry in userPostSlowmode table`));
+					console.log(chalk.blue(`${chalk.bold(`OVERWATCH:`)} Updated ${interaction.user.username}'s entry in userPostSlowmode table`));
 				}
 			} else {
 				// If they don't exist in the database, add them and allow the post to be posted
@@ -167,14 +167,14 @@ module.exports = {
 					}
 				});
 
-				console.log(chalk.blue(`${chalk.bold(`OVERWATCH:`)} Added ${interaction.user.tag} to userPostSlowmode table`));
+				console.log(chalk.blue(`${chalk.bold(`OVERWATCH:`)} Added ${interaction.user.username} to userPostSlowmode table`));
 			}
 
 			await interaction.deferReply({ ephemeral: false });
 
 			const lfgTournamentEmbed = new EmbedBuilder()
 				.setAuthor({
-					name: `${interaction.user.tag} is looking for teammates for a tournament`,
+					name: `${interaction.user.username} is looking for teammates for a tournament`,
 					iconURL: interaction.member.displayAvatarURL({ dynamic: true }),
 				})
 				.setDescription(`${description}`)

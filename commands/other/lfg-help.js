@@ -25,7 +25,7 @@ module.exports = {
 					inline: true,
 				},
 				{
-					name: `Custom Matches`,
+					name: `Other LFG`,
 					value: '</lfg-private:1118231336394694660>\n</lfg-tournament:1118231336394694663>',
 					inline: true,
 				},

@@ -267,7 +267,7 @@ setInterval(deleteKickCounterEntries, 60 * 1000, 'memberDecay2', 24 * 60, '1 Hou
 
 // 28 Day Kick Counter Timer
 // Ran once a day
-setInterval(deleteKickCounterEntries, 60 * 1000, 'memberDecay3', 24 * 60 * 5, '28 Day Timeout Counter');
+setInterval(deleteKickCounterEntries, 60 * 1000, 'memberDecay3', 24 * 60 * 3, '28 Day Timeout Counter');
 
 // Saved Casual LFG Post Cleanup Timer
 // Ran every 28 days

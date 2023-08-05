@@ -52,6 +52,13 @@ module.exports = {
 
 			console.log(chalk.red(`${chalk.bold('LEAVE:')} ${oldState.member.user.username} left voice channel "${oldState.channel.name}"`));
 
+			// Log it in the log channel
+			if (process.env.VC_LEAVE !== undefined) {
+				const logChannel = newState.guild.channels.cache.get(process.env.VC_LEAVE);
+
+				logChannel.send(logFormatter(oldState, 'Left'));
+			}
+
 			// Check to see if the user exists in vcOwnerList
 			const findUser = db_vcOwnerList.prepare('SELECT * FROM vcOwnerList WHERE id = ?').get(oldState.member.user.id);
 
@@ -68,13 +75,6 @@ module.exports = {
 					oldState.channel.setUserLimit(3);
 
 					console.log(chalk.yellow(`${chalk.bold('VOICE:')} Set user limit of "${oldState.channel.name}" to 3`));
-				}
-
-				// Log it in the log channel
-				if (process.env.VC_LEAVE !== undefined) {
-					const logChannel = newState.guild.channels.cache.get(process.env.VC_LEAVE);
-
-					logChannel.send(logFormatter(oldState, 'Left'));
 				}
 			}
 		} else if (oldState.channelId != newState.channelId) {

@@ -34,6 +34,20 @@ client
 		console.log(chalk.bold.red(`BOT: Login Error: ${err}`));
 	});
 
+const process = require('node:process');
+
+process.on('unhandledRejection', async (reason,promise) => {
+	console.log('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+process.on('uncaughtException', (err) => {
+	console.log('Unhandled Exception:', err);
+});
+
+process.on('uncaughtExceptionMonitor', (err, origin) => {
+	console.log('Uncaught Exception Monitor', err, origin);
+});
+
 // Create and load database files
 const db_vcOwnerList = new Database(`${__dirname}/databases/vcOwnerList.sqlite`);
 const db_memberDecay = new Database(`${__dirname}/databases/memberDecay.sqlite`);

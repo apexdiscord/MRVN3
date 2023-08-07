@@ -24,15 +24,6 @@ const client = new Client({
 	allowedMentions: { parse: ['roles'], repliedUser: true },
 });
 
-// Log the bot in to Discord and load the event handlers
-client
-	.login(process.env.TOKEN)
-	.then(() => {
-		loadEvents(client);
-	})
-	.catch(err => {
-		console.log(chalk.bold.red(`BOT: Login Error: ${err}`));
-	});
 
 const process = require('node:process');
 
@@ -47,6 +38,16 @@ process.on('uncaughtException', (err) => {
 process.on('uncaughtExceptionMonitor', (err, origin) => {
 	console.log('Uncaught Exception Monitor', err, origin);
 });
+
+// Log the bot in to Discord and load the event handlers
+client
+	.login(process.env.TOKEN)
+	.then(() => {
+		loadEvents(client);
+	})
+	.catch(err => {
+		console.log(chalk.bold.red(`BOT: Login Error: ${err}`));
+	});
 
 // Create and load database files
 const db_vcOwnerList = new Database(`${__dirname}/databases/vcOwnerList.sqlite`);

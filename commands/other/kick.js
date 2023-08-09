@@ -88,6 +88,7 @@ module.exports = {
 				content: `Successfully removed <@${userToKick.id}> from the voice channel.${kickModMailText}`,
 				ephemeral: true,
 			});
+			userToKick.send("You were kicked by another member from their voice channel. Repeated kicks will result in timeouts.")
 		} catch (error) {
 			console.log(error);
 

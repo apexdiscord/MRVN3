@@ -173,7 +173,7 @@ module.exports = {
 
 			const lfgPrivateEmbed = new EmbedBuilder()
 				.setAuthor({
-					name: `${interaction.user.username} is looking for teammates for a private match`,
+					name: `${interaction.user.username} is looking for players for a private match`,
 					iconURL: interaction.member.displayAvatarURL({ dynamic: true }),
 				})
 				.setDescription(`${description}`)

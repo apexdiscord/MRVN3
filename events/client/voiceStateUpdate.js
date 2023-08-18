@@ -95,7 +95,7 @@ module.exports = {
 			if (!categoryWhitelist.includes(newState.channel.parent.id)) {
 				// User moved to a VC that is not in the
 				// category whitelist
-				console.log(chalk.yellow(`${chalk.bold('LEAVE:')} ${oldState.member.user.username} left voice channel "${oldState.channel.name}"`));
+				console.log(chalk.red(`${chalk.bold('LEAVE:')} ${oldState.member.user.username} left voice channel "${oldState.channel.name}"`));
 
 				const findUser = db_vcOwnerList.prepare('SELECT * FROM vcOwnerList WHERE id = ?').get(oldState.member.user.id);
 

@@ -24,6 +24,21 @@ const client = new Client({
 	allowedMentions: { parse: ['roles'], repliedUser: true },
 });
 
+
+const process = require('node:process');
+
+process.on('unhandledRejection', async (reason,promise) => {
+	console.log('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+process.on('uncaughtException', (err) => {
+	console.log('Unhandled Exception:', err);
+});
+
+process.on('uncaughtExceptionMonitor', (err, origin) => {
+	console.log('Uncaught Exception Monitor', err, origin);
+});
+
 // Log the bot in to Discord and load the event handlers
 client
 	.login(process.env.TOKEN)

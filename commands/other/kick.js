@@ -1,3 +1,4 @@
+const chalk = require('chalk');
 const moment = require('moment');
 const Database = require('better-sqlite3');
 const { SlashCommandBuilder } = require('discord.js');
@@ -88,7 +89,15 @@ module.exports = {
 				content: `Successfully removed <@${userToKick.id}> from the voice channel.${kickModMailText}`,
 				ephemeral: true,
 			});
-			userToKick.send("You were kicked by another member from their voice channel. Repeated kicks will result in timeouts.")
+
+			// Send a DM to the user when they are kicked
+			userToKick
+				.send(
+					'You were kick from a voice channel by another user. Repeated kicks may lead to a timeout.\n\n*The user who kicked you is not a mod. Please refer to https://discord.com/channels/541484311354933258/542256155125219339/1118325007999827968 for information.*',
+				)
+				.catch(error => {
+					console.log(chalk.yellow(`${chalk.bold(`BOT:`)} Could not DM user.`));
+				});
 		} catch (error) {
 			console.log(error);
 

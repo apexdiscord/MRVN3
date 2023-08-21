@@ -57,7 +57,7 @@ module.exports = {
 								return interaction.editReply({ content: 'There was a database error while fetching trackers.', embeds: [] });
 							}
 		
-							const initialTrackerIDs = data.user.trackers.map(tracker => tracker.id);
+							const initialTrackerIDs = data.active.trackers.map(tracker => tracker.id);
 		
 							await interaction.editReply({
 								content: `Linked player \`${data.user.username}\` to discord account \`${interaction.user.tag}\`. Use \`/me\` to view your linked account.\n\nEquip the following trackers in-game within the next 15 minutes:\n1. **${randomTrackers[0].trackerName}** (Tracker ID: ${randomTrackers[0].trackerID})\n2. **${randomTrackers[1].trackerName}** (Tracker ID: ${randomTrackers[1].trackerID})\n3. **${randomTrackers[2].trackerName}** (Tracker ID: ${randomTrackers[2].trackerID})`,
@@ -88,7 +88,7 @@ module.exports = {
 									}
 		
 									const updatedData = await axios.get(`https://api.jumpmaster.xyz/user/Stats?platform=${platform}&player=${encodeURIComponent(username)}&key=1yWK5uNz3Xo2O8lY2YlW4o4bCu4jXgPt`);
-									const equippedTrackerIDs = updatedData.data.user.trackers.map(tracker => tracker.id);
+									const equippedTrackerIDs = updatedData.data.active.trackers.map(tracker => tracker.id);
 		
 									const matchingTrackers = randomTrackers.every(randomTracker => {
 										return equippedTrackerIDs.includes(randomTracker.trackerID);

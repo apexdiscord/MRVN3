@@ -28,11 +28,11 @@ module.exports = {
 		const platform = interaction.options.getString('platform');
 		const username = interaction.options.getString('username');
 
-		//const loadingEmbed = new EmbedBuilder().setDescription(`${Misc.Loading} Loading data for selected account...`).setColor(embedColor);
-		//await interaction.editReply({ embeds: [loadingEmbed] });
+		const loadingEmbed = new EmbedBuilder().setDescription(`Loading data for selected account...`);
+		await interaction.reply({ embeds: [loadingEmbed] });
 
 		try {
-			const response = await axios.get(`https://api.jumpmaster.xyz/user/Stats?platform=${platform}&player=${encodeURIComponent(username)}&key=1yWK5uNz3Xo2O8lY2YlW4o4bCu4jXgPt`);
+			const response = await axios.get(`https://api.jumpmaster.xyz/user/Stats?platform=${platform}&player=${encodeURIComponent(username)}&key=${process.env.SPYGLASS}`);
 			const data = response.data;
 		
 			const playerID = data.user.id;
@@ -87,7 +87,7 @@ module.exports = {
 										return;
 									}
 		
-									const updatedData = await axios.get(`https://api.jumpmaster.xyz/user/Stats?platform=${platform}&player=${encodeURIComponent(username)}&key=1yWK5uNz3Xo2O8lY2YlW4o4bCu4jXgPt`);
+									const updatedData = await axios.get(`https://api.jumpmaster.xyz/user/Stats?platform=${platform}&player=${encodeURIComponent(username)}&key=${process.env.SPYGLASS}`);
 									const equippedTrackerIDs = updatedData.data.active.trackers.map(tracker => tracker.id);
 		
 									const matchingTrackers = randomTrackers.every(randomTracker => {

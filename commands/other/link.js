@@ -96,13 +96,13 @@ module.exports = {
 										});
 
 										await interaction.editReply({
-											content: `Linked player \`${data.user.username}\` to discord account \`${interaction.user.tag}\`. Use \`/me\` to view your linked account.\n\nEquip the following trackers in-game within the next 15 minutes:\n1. **${randomTrackers[0].trackerName}** (Tracker ID: ${randomTrackers[0].trackerID})\n2. **${randomTrackers[1].trackerName}** (Tracker ID: ${randomTrackers[1].trackerID})\n3. **${randomTrackers[2].trackerName}** (Tracker ID: ${randomTrackers[2].trackerID})`,
+											content: `Linked player \`${data.user.username}\` to discord account \`${interaction.user.tag}\`. Use \`/me\` to view your linked account.`,
 											embeds: [],
 										});
 
 									} else {
 										console.log('Tracker matching failed after 15 minutes.');
-										interaction.channel.send('The link was not successful. Ypu may try again.');
+										interaction.channel.send('The link was not successful. You may try again.');
 									}
 								});
 							}, 900000); // 15 minutes in ms

@@ -51,18 +51,13 @@ module.exports = {
 						if (err) return console.log(err);
 		
 						const allTrackersQuery = 'SELECT * FROM game_trackers ORDER BY RAND() LIMIT 3';
+						interaction.editReply({ content: `Equip the following trackers in-game within the next 15 minutes:\n1. **${allTrackersQuery[0].trackerName}** (Tracker ID: ${allTrackersQuery[0].trackerID})\n2. **${allTrackersQuery[1].trackerName}** (Tracker ID: ${allTrackersQuery[1].trackerID})\n3. **${allTrackersQuery[2].trackerName}** (Tracker ID: ${allTrackersQuery[2].trackerID})`, embeds: [] });
+
 						db.query(allTrackersQuery, async (err, randomTrackers) => {
 							if (err) {
 								console.log(err);
 								return interaction.editReply({ content: 'There was a database error while fetching trackers.', embeds: [] });
 							}
-		
-							const initialTrackerIDs = data.active.trackers.map(tracker => tracker.id);
-		
-							await interaction.editReply({
-								content: `Linked player \`${data.user.username}\` to discord account \`${interaction.user.tag}\`. Use \`/me\` to view your linked account.\n\nEquip the following trackers in-game within the next 15 minutes:\n1. **${randomTrackers[0].trackerName}** (Tracker ID: ${randomTrackers[0].trackerID})\n2. **${randomTrackers[1].trackerName}** (Tracker ID: ${randomTrackers[1].trackerID})\n3. **${randomTrackers[2].trackerName}** (Tracker ID: ${randomTrackers[2].trackerID})`,
-								embeds: [],
-							});
 		
 							setTimeout(async () => {
 								const linkDataQuery = 'SELECT * FROM temp_linking WHERE discordID = ?';
@@ -99,9 +94,15 @@ module.exports = {
 										db.query(userLinkQuery, [discordID, playerID, platform], (err, row) => {
 											if (err) return console.log(err);
 										});
+
+										await interaction.editReply({
+											content: `Linked player \`${data.user.username}\` to discord account \`${interaction.user.tag}\`. Use \`/me\` to view your linked account.\n\nEquip the following trackers in-game within the next 15 minutes:\n1. **${randomTrackers[0].trackerName}** (Tracker ID: ${randomTrackers[0].trackerID})\n2. **${randomTrackers[1].trackerName}** (Tracker ID: ${randomTrackers[1].trackerID})\n3. **${randomTrackers[2].trackerName}** (Tracker ID: ${randomTrackers[2].trackerID})`,
+											embeds: [],
+										});
+
 									} else {
 										console.log('Tracker matching failed after 15 minutes.');
-										interaction.channel.send('The link was not successful. Please equip the provided trackers within the next 15 minutes.');
+										interaction.channel.send('The link was not successful. Ypu may try again.');
 									}
 								});
 							}, 900000); // 15 minutes in ms

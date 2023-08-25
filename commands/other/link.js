@@ -1,5 +1,4 @@
 const axios = require('axios');
-// const db = require('../../utilities/database.js');
 const db = require('../../functions/database.js');
 const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
 
@@ -8,9 +7,9 @@ module.exports = {
 		.setName('link')
 		.setDescription('Link an existing Apex account to your Discord account.')
 		.addStringOption(option =>
-			option.setName('platform').setDescription('The platform you play on').setRequired(true).addChoices(
+			option.setName('platform').setDescription('The platform of the account you want to link.').setRequired(true).addChoices(
 				{
-					name: 'PC (Steam/Origin)',
+					name: 'PC (Steam/EA App)',
 					value: 'PC',
 				},
 				{
@@ -23,14 +22,29 @@ module.exports = {
 				},
 			),
 		)
-		.addStringOption(option => option.setName('username').setDescription("Your in-game username. If this doesn't work, try a previous username").setRequired(true)),
+		.addStringOption(option => option.setName('username').setDescription("Your in-game username. If this doesn't work, try a previous username.").setRequired(true)),
 
 	async execute(interaction) {
+		await interaction.deferReply({ ephemeral: true });
+
 		const platform = interaction.options.getString('platform');
 		const username = interaction.options.getString('username');
 
-		const loadingEmbed = new EmbedBuilder().setDescription(`Loading data for selected account...`);
-		await interaction.reply({ embeds: [loadingEmbed] });
+		const currentTime = Math.round(new Date().getTime() / 1000);
+		const expiryTime = currentTime + 900;
+
+		function randomNoRepeats(array) {
+			var copy = array.slice(0);
+			return function () {
+				if (copy.length < 1) {
+					copy = array.slice(0);
+				}
+				var index = Math.floor(Math.random() * copy.length);
+				var item = copy[index];
+				copy.splice(index, 1);
+				return item;
+			};
+		}
 
 		try {
 			const response = await axios.get(`https://api.jumpmaster.xyz/user/MRVN_Link?platform=${platform}&player=${encodeURIComponent(username)}&key=${process.env.SPYGLASS}`);
@@ -39,87 +53,21 @@ module.exports = {
 			const playerID = data.user.id;
 			const discordID = interaction.user.id;
 
-			const linkQuery = 'SELECT * FROM temp_linking WHERE discordID = ?';
-			db.query(linkQuery, [discordID], async (err, row) => {
-				if (err) {
-					console.log(err);
-					return interaction.editReply({ content: 'There was a database error.', embeds: [] });
-				}
+			const legends = ['Bloodhound', 'Gibraltar', 'Lifeline', 'Pathfinder', 'Wraith', 'Bangalore'];
+			const randomLegend = Math.floor(Math.random() * legends.length);
+			const trackers = require(`../../data/legendTrackers/${legends[randomLegend]}.json`);
+			const trackerData = require(`../../data/legendTrackers/${legends[randomLegend]}_Reference.json`);
 
-				if (row.length === 0) {
-					const insertTempLink = `INSERT INTO temp_linking (discordID, playerID, platform, expiry) VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL 15 MINUTE))`;
-					db.query(insertTempLink, [discordID, playerID, platform], async (err, row) => {
-						if (err) return console.log(err);
+			console.log(randomLegend, legends[randomLegend]);
 
-						const allTrackersQuery = 'SELECT * FROM game_trackers ORDER BY RAND() LIMIT 3';
+			var chooser = randomNoRepeats(trackerData);
 
-						db.query(allTrackersQuery, async (err, randomTrackers) => {
-							if (err) {
-								console.log(err);
-								return interaction.editReply({ content: 'There was a database error while fetching trackers.', embeds: [] });
-							}
+			const insertTempLink = `INSERT INTO temp_linking (discordID, playerID, platform, legend, trackerOneID, trackerTwoID, trackerThreeID, expiry) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
 
-							interaction.editReply({
-								content: `Equip the following trackers in-game within the next 15 minutes:\n1. **${randomTrackers[0].id}** (Tracker ID: ${randomTrackers[0].id})\n2. **${randomTrackers[1].id}** (Tracker ID: ${randomTrackers[1].id})\n3. **${randomTrackers[2].id}** (Tracker ID: ${randomTrackers[2].id})`,
-								embeds: [],
-							});
+			db.query(insertTempLink, [discordID, playerID, platform, legends[randomLegend], chooser(), chooser(), chooser(), expiryTime], async (err, row) => {
+				if (err) return console.log(err);
 
-							setTimeout(async () => {
-								const linkDataQuery = 'SELECT * FROM temp_linking WHERE discordID = ?';
-								db.query(linkDataQuery, [discordID], async (err, tempLinkData) => {
-									if (err) {
-										console.log(err);
-										return;
-									}
-
-									if (tempLinkData.length === 0) {
-										// Temp link data expired or doesn't exist
-										console.log('Temp link data not found.');
-										return;
-									}
-
-									const expiry = tempLinkData[0].expiry;
-									const currentTime = new Date();
-
-									if (currentTime > expiry) {
-										// 15-minute window expired
-										console.log('15-minute window expired.');
-										return;
-									}
-
-									const updatedData = await axios.get(
-										`https://api.jumpmaster.xyz/user/MRVN_Link?platform=${platform}&player=${encodeURIComponent(username)}&key=${process.env.SPYGLASS}`,
-									);
-									const equippedTrackerIDs = updatedData.data.active.trackers.map(tracker => tracker.id);
-
-									const matchingTrackers = randomTrackers.every(randomTracker => {
-										return equippedTrackerIDs.includes(randomTracker.trackerID);
-									});
-
-									if (matchingTrackers) {
-										const userLinkQuery = 'INSERT INTO specter (discordID, playerID, platform) VALUES (?, ?, ?)';
-										db.query(userLinkQuery, [discordID, playerID, platform], (err, row) => {
-											if (err) return console.log(err);
-										});
-
-										await interaction.editReply({
-											content: `Linked player \`${data.user.username}\` to discord account \`${interaction.user.tag}\`. Use \`/me\` to view your linked account.`,
-											embeds: [],
-										});
-									} else {
-										console.log('Tracker matching failed after 15 minutes.');
-										interaction.channel.send('The link was not successful. You may try again.');
-									}
-								});
-							}, 900000); // 15 minutes in ms
-						});
-					});
-				} else {
-					return interaction.editReply({
-						content: 'You already have a linked account. Use `/me` to see your linked account or `/unlink` to unlink your account.',
-						embeds: [],
-					});
-				}
+				console.log('inserted user and tracker data into temp_linking');
 			});
 		} catch (error) {
 			if (error.response) {

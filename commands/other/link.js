@@ -1,5 +1,6 @@
 const axios = require('axios');
-const db = require('../../utilities/database.js');
+// const db = require('../../utilities/database.js');
+const db = require('../../functions/database.js');
 const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
@@ -32,33 +33,37 @@ module.exports = {
 		await interaction.reply({ embeds: [loadingEmbed] });
 
 		try {
-			const response = await axios.get(`https://api.jumpmaster.xyz/user/Stats?platform=${platform}&player=${encodeURIComponent(username)}&key=${process.env.SPYGLASS}`);
+			const response = await axios.get(`https://api.jumpmaster.xyz/user/MRVN_Link?platform=${platform}&player=${encodeURIComponent(username)}&key=${process.env.SPYGLASS}`);
 			const data = response.data;
-		
+
 			const playerID = data.user.id;
 			const discordID = interaction.user.id;
-		
+
 			const linkQuery = 'SELECT * FROM temp_linking WHERE discordID = ?';
 			db.query(linkQuery, [discordID], async (err, row) => {
 				if (err) {
 					console.log(err);
 					return interaction.editReply({ content: 'There was a database error.', embeds: [] });
 				}
-		
+
 				if (row.length === 0) {
 					const insertTempLink = `INSERT INTO temp_linking (discordID, playerID, platform, expiry) VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL 15 MINUTE))`;
 					db.query(insertTempLink, [discordID, playerID, platform], async (err, row) => {
 						if (err) return console.log(err);
-		
+
 						const allTrackersQuery = 'SELECT * FROM game_trackers ORDER BY RAND() LIMIT 3';
-						interaction.editReply({ content: `Equip the following trackers in-game within the next 15 minutes:\n1. **${allTrackersQuery[0].trackerName}** (Tracker ID: ${allTrackersQuery[0].trackerID})\n2. **${allTrackersQuery[1].trackerName}** (Tracker ID: ${allTrackersQuery[1].trackerID})\n3. **${allTrackersQuery[2].trackerName}** (Tracker ID: ${allTrackersQuery[2].trackerID})`, embeds: [] });
 
 						db.query(allTrackersQuery, async (err, randomTrackers) => {
 							if (err) {
 								console.log(err);
 								return interaction.editReply({ content: 'There was a database error while fetching trackers.', embeds: [] });
 							}
-		
+
+							interaction.editReply({
+								content: `Equip the following trackers in-game within the next 15 minutes:\n1. **${randomTrackers[0].id}** (Tracker ID: ${randomTrackers[0].id})\n2. **${randomTrackers[1].id}** (Tracker ID: ${randomTrackers[1].id})\n3. **${randomTrackers[2].id}** (Tracker ID: ${randomTrackers[2].id})`,
+								embeds: [],
+							});
+
 							setTimeout(async () => {
 								const linkDataQuery = 'SELECT * FROM temp_linking WHERE discordID = ?';
 								db.query(linkDataQuery, [discordID], async (err, tempLinkData) => {
@@ -66,29 +71,31 @@ module.exports = {
 										console.log(err);
 										return;
 									}
-		
+
 									if (tempLinkData.length === 0) {
 										// Temp link data expired or doesn't exist
 										console.log('Temp link data not found.');
 										return;
 									}
-		
+
 									const expiry = tempLinkData[0].expiry;
 									const currentTime = new Date();
-		
+
 									if (currentTime > expiry) {
 										// 15-minute window expired
 										console.log('15-minute window expired.');
 										return;
 									}
-		
-									const updatedData = await axios.get(`https://api.jumpmaster.xyz/user/Stats?platform=${platform}&player=${encodeURIComponent(username)}&key=${process.env.SPYGLASS}`);
+
+									const updatedData = await axios.get(
+										`https://api.jumpmaster.xyz/user/MRVN_Link?platform=${platform}&player=${encodeURIComponent(username)}&key=${process.env.SPYGLASS}`,
+									);
 									const equippedTrackerIDs = updatedData.data.active.trackers.map(tracker => tracker.id);
-		
+
 									const matchingTrackers = randomTrackers.every(randomTracker => {
 										return equippedTrackerIDs.includes(randomTracker.trackerID);
 									});
-		
+
 									if (matchingTrackers) {
 										const userLinkQuery = 'INSERT INTO specter (discordID, playerID, platform) VALUES (?, ?, ?)';
 										db.query(userLinkQuery, [discordID, playerID, platform], (err, row) => {
@@ -99,7 +106,6 @@ module.exports = {
 											content: `Linked player \`${data.user.username}\` to discord account \`${interaction.user.tag}\`. Use \`/me\` to view your linked account.`,
 											embeds: [],
 										});
-
 									} else {
 										console.log('Tracker matching failed after 15 minutes.');
 										interaction.channel.send('The link was not successful. You may try again.');
@@ -108,13 +114,13 @@ module.exports = {
 							}, 900000); // 15 minutes in ms
 						});
 					});
-                } else {
-                    return interaction.editReply({
-                        content: 'You already have a linked account. Use `/me` to see your linked account or `/unlink` to unlink your account.',
-                        embeds: [],
-                    });
-                }
-            });
+				} else {
+					return interaction.editReply({
+						content: 'You already have a linked account. Use `/me` to see your linked account or `/unlink` to unlink your account.',
+						embeds: [],
+					});
+				}
+			});
 		} catch (error) {
 			if (error.response) {
 				console.log(error.response.data);

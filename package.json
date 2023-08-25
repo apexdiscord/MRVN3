@@ -9,10 +9,11 @@
 	"author": "zod",
 	"license": "ISC",
 	"engines": {
-		"node": "18.12.0"
+		"node": "18.12.1"
 	},
 	"dependencies": {
 		"@discordjs/rest": "2.0.0",
+		"axios": "^1.4.0",
 		"better-sqlite3": "8.5.0",
 		"chalk": "4.1.2",
 		"console-table-printer": "2.11.2",

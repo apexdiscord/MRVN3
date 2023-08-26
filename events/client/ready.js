@@ -1,5 +1,6 @@
 const fs = require('fs');
 const chalk = require('chalk');
+const moment = require('moment');
 const Database = require('better-sqlite3');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v10');
@@ -16,8 +17,19 @@ module.exports = {
 	async execute(client) {
 		console.log(chalk.bold.green(`BOT: Logged in as ${client.user.username}`));
 
-		// Set bot status to "Watching your games."
-		client.user.setActivity('your games.', { type: ActivityType.Watching });
+		function updatePresence() {
+			// Use moment to calculate the number of days since March 18th 2014
+			const daysSince = moment().diff(moment('2014-03-18'), 'days');
+
+			// Set bot status to "X Days since Last Directive"
+			client.user.setActivity(`${daysSince.toLocaleString()} Days since Last Directive`, { type: ActivityType.Custom });
+
+			console.log(chalk.green(`${'BOT:'} Updated bot presence`));
+		}
+
+		updatePresence();
+
+		setInterval(updatePresence, 1000 * 60 * 60 * 12);
 
 		// Delete all entries from vcOwnerList and memberDecay
 		// tables on restart to prevent duplicate or ghost entries

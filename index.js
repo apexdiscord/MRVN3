@@ -128,7 +128,7 @@ function deleteExpiredAccountLinks(dbName, timeInMinutes, text) {
 	db.query(`SELECT COUNT(*) AS count FROM ${dbName} WHERE expiry < ?`, [timeSince], async (err, row) => {
 		if (err) console.log(err);
 
-		if (row[0]['count'] >= 1) {
+		if (parseInt(row[0]['count']) >= 1) {
 			console.log(chalk.cyan(`${chalk.bold('OVERWATCH:')} Running ${text} Cleanup Check...`));
 
 			// Select the amount of rows that are older than timeSince
@@ -293,7 +293,7 @@ function currentBotStats() {
 }
 
 // Bot Stats Timer
-// Runs once a minute, but only actually prints to the counter
+// Runs once a minute, but only actually prints to the console
 // on the 30th minute of the hour
 setInterval(currentBotStats, 60 * 1000);
 
@@ -303,7 +303,7 @@ setInterval(deleteKickCounterEntries, 60 * 1000, 'memberDecay1', 10, '10 Minute 
 
 // Link Account Cleanup Timer
 // Ran every 5 minutes
-setInterval(deleteExpiredAccountLinks, 1000, 'temp_linking', 15, 'Linked Account');
+setInterval(deleteExpiredAccountLinks, 60 * 1000, 'temp_linking', 15, 'Linked Account');
 
 // 1 Hour Kick Counter Timer
 // Ran once a day

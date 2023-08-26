@@ -24,14 +24,13 @@ const client = new Client({
 	allowedMentions: { parse: ['roles'], repliedUser: true },
 });
 
-
 const process = require('node:process');
 
-process.on('unhandledRejection', async (reason,promise) => {
+process.on('unhandledRejection', async (reason, promise) => {
 	console.log('Unhandled Rejection at:', promise, 'reason:', reason);
 });
 
-process.on('uncaughtException', (err) => {
+process.on('uncaughtException', err => {
 	console.log('Unhandled Exception:', err);
 });
 
@@ -118,6 +117,32 @@ function deleteKickCounterEntries(dbName, timeInMinutes, text) {
 
 		console.log(chalk.green(`DATABASE: ${text} Cleanup Check complete, deleted ${timeSinceCount} ${checkEntryPlural(timeSinceCount, 'entr')} from ${dbName}`));
 	}
+}
+
+// Delete expired link accounts (accounts that were not linked)
+function deleteExpiredAccountLinks(dbName, timeInMinutes, text) {
+	// Subtract the amount of time (timeInMinutes) from the current time
+	const timeSince = moment().subtract(timeInMinutes, 'minutes').unix();
+
+	// Select the amount of rows that are older than timeSince
+	db.query(`SELECT COUNT(*) AS count FROM ${dbName} WHERE expiry < ?`, [timeSince], async (err, row) => {
+		if (err) console.log(err);
+
+		if (row[0]['count'] >= 1) {
+			console.log(chalk.cyan(`${chalk.bold('OVERWATCH:')} Running ${text} Cleanup Check...`));
+
+			// Select the amount of rows that are older than timeSince
+			db.query(`DELETE FROM ${dbName} WHERE expiry < ?`, [timeSince], async (err, row) => {
+				if (err) return console.log(err);
+
+				console.log(
+					chalk.green(
+						`${chalk.bold('OVERWATCH:')} ${text} Cleanup Check complete, deleted ${row.affectedRows} ${checkEntryPlural(row.affectedRows, 'entr')} from ${dbName}`,
+					),
+				);
+			});
+		}
+	});
 }
 
 // Delete expired kick counts from database
@@ -275,6 +300,10 @@ setInterval(currentBotStats, 60 * 1000);
 // 10 Minute Kick Counter Timer
 // Ran every 10 minutes
 setInterval(deleteKickCounterEntries, 60 * 1000, 'memberDecay1', 10, '10 Minute Timeout Counter');
+
+// Link Account Cleanup Timer
+// Ran every 5 minutes
+setInterval(deleteExpiredAccountLinks, 1000, 'temp_linking', 2, 'Linked Account');
 
 // 1 Hour Kick Counter Timer
 // Ran once a day

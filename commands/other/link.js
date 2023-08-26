@@ -1,5 +1,5 @@
 const axios = require('axios');
-const db = require('../../functions/database.js');
+const Database = require('../../functions/database.js');
 const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
@@ -31,7 +31,6 @@ module.exports = {
 		const username = interaction.options.getString('username');
 
 		const currentTime = Math.round(new Date().getTime() / 1000);
-		const expiryTime = currentTime + 900;
 
 		function randomNoRepeats(array) {
 			var copy = array.slice(0);
@@ -53,7 +52,7 @@ module.exports = {
 			const playerID = data.user.id;
 			const discordID = interaction.user.id;
 
-			db.query('SELECT COUNT(*) AS count FROM temp_linking WHERE discordID = ?', [discordID], async (err, row) => {
+			Database.query('SELECT COUNT(*) AS count FROM temp_linking WHERE discordID = ?', [discordID], async (err, row) => {
 				if (err) console.log(err);
 
 				if (row[0]['count'] == 1) {
@@ -61,11 +60,11 @@ module.exports = {
 
 					const getTrackers = 'SELECT legend, trackerOneID, trackerTwoID, trackerThreeID, expiry FROM temp_linking WHERE discordID = ?';
 
-					db.query(getTrackers, [discordID], async (err, row) => {
+					Database.query(getTrackers, [discordID], async (err, row) => {
 						if (err) console.log(err);
 
 						const legends = ['Bloodhound', 'Gibraltar', 'Lifeline', 'Pathfinder', 'Wraith', 'Bangalore'];
-						const trackers = require(`../../data/legendTrackers/${legends[randomLegend]}.json`);
+						const trackers = require(`../../data/legendTrackers/${row[0]['legend']}.json`);
 
 						const legend = row[0]['legend'];
 						const trackerOneID = row[0]['trackerOneID'];
@@ -73,14 +72,18 @@ module.exports = {
 						const trackerThreeID = row[0]['trackerThreeID'];
 
 						interaction.editReply(
-							`you already have an account link in progress. pls add the following trackers to your banner as ${legend} in the following order:\n1. ${trackers[trackerOneID].Name}\n2. ${trackers[trackerTwoID].Name}\n3. ${trackers[trackerThreeID].Name}\n\nif u dont want this account linked, please wait for the link to expire <t:${row[0]['expirey']}:R>`,
+							`you already have an account link in progress. pls add the following trackers to your banner as ${legend} in the following order:\n1. ${
+								trackers[trackerOneID].Name
+							}\n2. ${trackers[trackerTwoID].Name}\n3. ${
+								trackers[trackerThreeID].Name
+							}\n\nif u dont want this account linked, please wait for the link to expire <t:${parseInt(row[0]['expiry']) + 900}:R>`,
 						);
 					});
 
 					return;
 				}
 
-				db.query('SELECT COUNT(*) AS count FROM specter WHERE discordID = ?', [discordID], async (err, row) => {
+				Database.query('SELECT COUNT(*) AS count FROM specter WHERE discordID = ?', [discordID], async (err, row) => {
 					if (err) console.log(err);
 
 					if (row[0]['count'] == 1) {
@@ -104,14 +107,14 @@ module.exports = {
 
 					const insertTempLink = `INSERT INTO temp_linking (discordID, playerID, platform, legend, trackerOneID, trackerTwoID, trackerThreeID, expiry) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
 
-					db.query(insertTempLink, [discordID, playerID, platform, legends[randomLegend], chooser(), chooser(), chooser(), expiryTime], async (err, row) => {
+					Database.query(insertTempLink, [discordID, playerID, platform, legends[randomLegend], chooser(), chooser(), chooser(), currentTime], async (err, row) => {
 						if (err) return console.log(err);
 
 						console.log('inserted user and tracker data into temp_linking');
 
 						const getTrackers = 'SELECT legend, trackerOneID, trackerTwoID, trackerThreeID FROM temp_linking WHERE discordID = ?';
 
-						db.query(getTrackers, [discordID], async (err, row) => {
+						Database.query(getTrackers, [discordID], async (err, row) => {
 							if (err) console.log(err);
 
 							const legend = row[0]['legend'];

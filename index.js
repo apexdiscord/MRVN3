@@ -303,7 +303,7 @@ setInterval(deleteKickCounterEntries, 60 * 1000, 'memberDecay1', 10, '10 Minute 
 
 // Link Account Cleanup Timer
 // Ran every 5 minutes
-setInterval(deleteExpiredAccountLinks, 1000, 'temp_linking', 2, 'Linked Account');
+setInterval(deleteExpiredAccountLinks, 1000, 'temp_linking', 15, 'Linked Account');
 
 // 1 Hour Kick Counter Timer
 // Ran once a day

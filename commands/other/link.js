@@ -76,7 +76,9 @@ module.exports = {
 								trackers[trackerOneID].Name
 							}\n2. ${trackers[trackerTwoID].Name}\n3. ${
 								trackers[trackerThreeID].Name
-							}\n\nif u dont want this account linked, please wait for the link to expire <t:${parseInt(row[0]['expiry']) + 900}:R>`,
+							}\nthen run the \`/verify\` command to verify your account\n\nif u dont want this account linked, please wait for the link to expire <t:${
+								parseInt(row[0]['expiry']) + 900
+							}:R>`,
 						);
 					});
 
@@ -123,7 +125,7 @@ module.exports = {
 							const trackerThreeID = row[0]['trackerThreeID'];
 
 							interaction.editReply(
-								`hey! pls add the following trackers to your banner as ${legend} in the following order:\n1. ${trackers[trackerOneID].Name}\n2. ${trackers[trackerTwoID].Name}\n3. ${trackers[trackerThreeID].Name}`,
+								`hey! pls add the following trackers to your banner as ${legend} in the following order:\n1. ${trackers[trackerOneID].Name}\n2. ${trackers[trackerTwoID].Name}\n3. ${trackers[trackerThreeID].Name}\nthen run the \`/verify\` command to verify your account`,
 							);
 						});
 					});

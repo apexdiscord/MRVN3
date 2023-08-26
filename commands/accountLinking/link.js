@@ -55,7 +55,7 @@ module.exports = {
 			Database.query('SELECT COUNT(*) AS count FROM temp_linking WHERE discordID = ?', [discordID], async (err, row) => {
 				if (err) console.log(err);
 
-				if (row[0]['count'] <= 1) {
+				if (row[0]['count'] >= 1) {
 					console.log('cannot continue, temp link already exists');
 
 					const getTrackers = 'SELECT legend, trackerOneID, trackerTwoID, trackerThreeID, expiry FROM temp_linking WHERE discordID = ?';
@@ -88,7 +88,7 @@ module.exports = {
 				Database.query('SELECT COUNT(*) AS count FROM specter WHERE discordID = ?', [discordID], async (err, row) => {
 					if (err) console.log(err);
 
-					if (row[0]['count'] <= 1) {
+					if (row[0]['count'] >= 1) {
 						console.log('cannot continue, temp link already exists');
 
 						interaction.editReply(

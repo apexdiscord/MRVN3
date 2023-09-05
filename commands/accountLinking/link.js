@@ -1,6 +1,7 @@
 const axios = require('axios');
+const chalk = require('chalk');
 const Database = require('../../functions/database.js');
-const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
+const { EmbedBuilder, SlashCommandBuilder, Embed } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -56,14 +57,13 @@ module.exports = {
 				if (err) console.log(err);
 
 				if (row[0]['count'] >= 1) {
-					console.log('cannot continue, temp link already exists');
+					console.log(chalk.yellow(`${chalk.bold('ACCOUNT LINKING:')} Could not link account there is already an account link in progress with this Discord ID`));
 
 					const getTrackers = 'SELECT legend, trackerOneID, trackerTwoID, trackerThreeID, expiry FROM temp_linking WHERE discordID = ?';
 
 					Database.query(getTrackers, [discordID], async (err, row) => {
 						if (err) console.log(err);
 
-						const legends = ['Bloodhound', 'Gibraltar', 'Lifeline', 'Pathfinder', 'Wraith', 'Bangalore'];
 						const trackers = require(`../../data/legendTrackers/${row[0]['legend']}.json`);
 
 						const legend = row[0]['legend'];
@@ -71,15 +71,57 @@ module.exports = {
 						const trackerTwoID = row[0]['trackerTwoID'];
 						const trackerThreeID = row[0]['trackerThreeID'];
 
-						interaction.editReply(
-							`you already have an account link in progress. pls add the following trackers to your banner as ${legend} in the following order:\n1. ${
-								trackers[trackerOneID].Name
-							}\n2. ${trackers[trackerTwoID].Name}\n3. ${
-								trackers[trackerThreeID].Name
-							}\nthen run the \`/verify\` command to verify your account\n\nif u dont want this account linked, please wait for the link to expire <t:${
-								parseInt(row[0]['expiry']) + 900
-							}:R>`,
-						);
+						// interaction.editReply(
+						// 	`you already have an account link in progress. pls add the following trackers to your banner as ${legend} in the following order:\n1. ${
+						// 		trackers[trackerOneID].Name
+						// 	}\n2. ${trackers[trackerTwoID].Name}\n3. ${
+						// 		trackers[trackerThreeID].Name
+						// 	}\nthen run the \`/verify\` command to verify your account\n\nif u dont want this account linked, please wait for the link to expire <t:${
+						// 		parseInt(row[0]['expiry']) + 900
+						// 	}:R>`,
+						// );
+
+						const alreadyLinkedEmbed = new EmbedBuilder()
+							.setTitle('Account Link In Progress...')
+							.setDescription('You already have an account link in progress.\nPlease equip the following items in game:')
+							.addFields([
+								{
+									name: '\u200b',
+									value: '\u200b',
+									inline: true,
+								},
+								{
+									name: 'Legend',
+									value: `${legend}`,
+									inline: true,
+								},
+								{
+									name: '\u200b',
+									value: '\u200b',
+									inline: true,
+								},
+								{
+									name: 'Tracker 1',
+									value: `${trackers[trackerOneID].Name}`,
+									inline: true,
+								},
+								{
+									name: 'Tracker 2',
+									value: `${trackers[trackerTwoID].Name}`,
+									inline: true,
+								},
+								{
+									name: 'Tracker 3',
+									value: `${trackers[trackerThreeID].Name}`,
+									inline: true,
+								},
+								{
+									name: '\u200b',
+									value: 'Equip these trackers, then run the `/verify` command\nto verify your account.',
+								},
+							]);
+
+						interaction.editReply({ content: '', embeds: [alreadyLinkedEmbed] });
 					});
 
 					return;
@@ -89,10 +131,10 @@ module.exports = {
 					if (err) console.log(err);
 
 					if (row[0]['count'] >= 1) {
-						console.log('cannot continue, temp link already exists');
+						console.log(chalk.yellow(`${chalk.bold('ACCOUNT LINKING:')} Could not link account as this account is already linked`));
 
 						interaction.editReply(
-							'u cannot continue as u already have an account linked. your stats will automatically show up in lfg posts. u can type `/unlink` to unlink ur account.',
+							'You already have an Apex account linked to your Discord account.\nYour stats will automatically be posted alongside LFG posts.\nIf you want to unlink your account, type `/unlink`.',
 						);
 
 						return;

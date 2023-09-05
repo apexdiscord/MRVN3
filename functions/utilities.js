@@ -42,7 +42,8 @@ function checkBannedWords(message, interaction) {
 		console.log(chalk.red(`USER WARNING: ${interaction.member.displayName} tried to use a banned word in their LFG message`));
 
 		interaction.editReply({
-			content: 'Your LFG message contains a banned word. Please try again.',
+			content:
+				'Your LFG message contains a banned word. Please try again.\n\n*Note: You do not need to include a link in your LFG post. A link will automatically be generated.*',
 			ephemeral: true,
 		});
 

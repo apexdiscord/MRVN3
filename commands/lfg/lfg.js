@@ -126,6 +126,7 @@ module.exports = {
 			const buttonRow = new ActionRowBuilder();
 
 			if (vcLinkButtonBuilder(interaction) != null) buttonRow.addComponents(vcLinkButtonBuilder(interaction));
+			if (vcLinkButtonBuilder(interaction) != null) var vcLink = `<#${interaction.member.voice.channel.id}>`;
 			if (micRequired == 'Yes') buttonRow.addComponents(new ButtonBuilder().setCustomId('MicType').setLabel('Mic Required').setStyle(ButtonStyle.Danger).setDisabled(true));
 			if (micRequired == 'No') buttonRow.addComponents(new ButtonBuilder().setCustomId('MicType').setLabel('Mic Optional').setStyle(ButtonStyle.Success).setDisabled(true));
 
@@ -197,6 +198,7 @@ module.exports = {
 				});
 			} else {
 				await interaction.channel.send({
+					content: `${vcLink}`,
 					embeds: [lfgEmbed],
 					components: [buttonRow],
 					files: [

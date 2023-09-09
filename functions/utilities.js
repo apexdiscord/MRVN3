@@ -253,7 +253,7 @@ function vcLinkButtonBuilder(interaction) {
 	if (!interaction.member.voice.channel) return null;
 
 	return new ButtonBuilder()
-		.setLabel(`Join "${interaction.member.voice.channel.name}"`)
+		.setLabel(`Join`)
 		.setStyle(ButtonStyle.Link)
 		.setEmoji('🔊')
 		.setURL(`https://discord.com/channels/${interaction.guild.id}/${interaction.member.voice.channel.id}`);

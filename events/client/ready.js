@@ -15,7 +15,7 @@ module.exports = {
 	name: 'ready',
 	once: true,
 	async execute(client) {
-		console.log(chalk.bold.green(`BOT: Logged in as ${client.user.username}`));
+		console.log(chalk.green(`${chalk.bold('[BOT]')} Logged in as ${client.user.username}`));
 
 		function updatePresence() {
 			// Use moment to calculate the number of days since March 18th 2014
@@ -24,7 +24,7 @@ module.exports = {
 			// Set bot status to "X Days since Last Directive"
 			client.user.setActivity(`${daysSince.toLocaleString()} Days since Last Directive`, { type: ActivityType.Custom });
 
-			console.log(chalk.green(`${'BOT:'} Updated bot presence`));
+			console.log(chalk.green(`${chalk.bold('[BOT]')} Updated bot presence`));
 		}
 
 		updatePresence();
@@ -71,15 +71,15 @@ module.exports = {
 					// Production, register global slash commands
 					await rest.put(Routes.applicationCommands(client.user.id), { body: commands });
 
-					console.log(chalk.bold.green('BOT: Deployed global slash commands'));
+					console.log(chalk.green(`${chalk.bold('[BOT]')} Deployed global slash commands`));
 				} else {
 					// Development, register guild slash commands
 					await rest.put(Routes.applicationGuildCommands(client.user.id, process.env.GUILD_ID), { body: commands });
 
-					console.log(chalk.bold.yellow('BOT: Deployed guild slash commands for development environment'));
+					console.log(chalk.yellow(`${chalk.bold('[BOT]')} Deployed guild slash commands for development environment`));
 				}
 			} catch (error) {
-				if (error) console.log(chalk.bold.red(`BOT: ${error}`));
+				if (error) console.log(chalk.red(`${chalk.bold('[BOT]')} ${error}`));
 			}
 		})();
 	},

@@ -1,10 +1,8 @@
 const moment = require('moment');
 const Database = require('better-sqlite3');
 const { SlashCommandBuilder } = require('discord.js');
-const { Table } = require('console-table-printer');
 
-const { timeoutController } = require('../../functions/utilities.js');
-const db_memberDecay = new Database(`${__dirname}/../../databases/memberDecay.sqlite`);
+const db_roleTracker = new Database(`${__dirname}/../../databases/roleTracker.sqlite`);
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -53,11 +51,11 @@ module.exports = {
 			
 			if (typeof selectedTime === 'number') {
 				const expiryTime = timestamp + selectedTime
-				db_memberDecay.prepare(`INSERT OR REPLACE INTO roleExpiryTracker (expiryTime, roleToAdd, userID) VALUES (?, ?, ?)`).run(expiryTime, roleToAdd, userID);
-				targetMember.roles.add(roleToAdd);
+				db_roleTracker.prepare(`INSERT OR REPLACE INTO roleExpiryTracker (expiryTime, roleToAdd, userID) VALUES (?, ?, ?)`).run(expiryTime, roleToAdd, userID);
+				interaction.member.roles.add(roleToAdd);
 
 			} else if (!isNaN(selectedTime)) {
-				targetMember.roles.add(roleToAdd);
+				interaction.member.roles.add(roleToAdd);
 				  }
 			
 			else {
@@ -65,7 +63,7 @@ module.exports = {
 				  }
 
 			await interaction.editReply({
-				content: `Successfully add the role <@${roleToAdd}> to you for thee selected time period!`,
+				content: `Successfully added the role <@&${roleToAdd}> on you for the selected time period!`,
 				ephemeral: true,
 			});
 		} catch (error) {

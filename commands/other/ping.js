@@ -6,7 +6,7 @@ const db_roleTracker = new Database(`${__dirname}/../../databases/roleTracker.sq
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('add-ping-role')
+		.setName('ping-role-add')
 		.setDescription('Add a ranked ping role to get notified when someone posts looking for that rank.')
 		.addStringOption(option =>
 			option.setName('rank').setDescription('Choose the rank you want to be pinged for.').setRequired(true).addChoices(
@@ -42,6 +42,7 @@ module.exports = {
 
 		const roleToAdd = interaction.options.getString('rank');
 
+		// Convert the time value to integer for processing logic on temporary vs permanent
 		const selectedTime = parseInt(interaction.options.getString('time'));
 
 		const userID = interaction.user.id;
@@ -49,9 +50,15 @@ module.exports = {
 		try {
 			const timestamp = moment().unix();
 			
+			// Logic to check if the time selected is permanent or temporary
 			if (typeof selectedTime === 'number') {
+
+				// For storing expiry time to check against the current time periodically
 				const expiryTime = timestamp + selectedTime
+
+				// Add to db for tracking if the role is temporary
 				db_roleTracker.prepare(`INSERT OR REPLACE INTO roleExpiryTracker (expiryTime, roleToAdd, userID) VALUES (?, ?, ?)`).run(expiryTime, roleToAdd, userID);
+
 				interaction.member.roles.add(roleToAdd);
 
 			} else if (!isNaN(selectedTime)) {

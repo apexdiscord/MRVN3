@@ -67,6 +67,7 @@ module.exports = {
 					buttonRow.addComponents(new ButtonBuilder().setCustomId('MicType').setLabel('Mic Required').setStyle(ButtonStyle.Danger).setDisabled(true));
 				if (savedDataRow[0].micRequired == 'No')
 					buttonRow.addComponents(new ButtonBuilder().setCustomId('MicType').setLabel('Mic Optional').setStyle(ButtonStyle.Success).setDisabled(true));
+				var vcLink = vcLinkButtonBuilder(interaction) != null ? `<#${interaction.member.voice.channel.id}>` : '';
 
 				setVCLimit(savedDataRow[0].mode, interaction);
 
@@ -108,6 +109,7 @@ module.exports = {
 
 				if (buttonRow.components.length == 0) {
 					await interaction.channel.send({
+						content: `${vcLink}`,
 						embeds: [savedPostEmbed],
 						files: [
 							{
@@ -122,6 +124,7 @@ module.exports = {
 					});
 				} else {
 					await interaction.channel.send({
+						content: `${vcLink}`,
 						embeds: [savedPostEmbed],
 						components: [buttonRow],
 						files: [

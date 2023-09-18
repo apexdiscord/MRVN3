@@ -53,6 +53,7 @@ const db_vcOwnerList = new Database(`${__dirname}/databases/vcOwnerList.sqlite`)
 const db_memberDecay = new Database(`${__dirname}/databases/memberDecay.sqlite`);
 // const db_savedLFGPosts = new Database(`${__dirname}/databases/savedLFGPosts.sqlite`);
 // const db_memberSlowmode = new Database(`${__dirname}/databases/memberSlowmode.sqlite`);
+const db_roleTracker = new Database(`${__dirname}/databases/roleTracker.sqlite`);
 
 // Create the quieries to create table if they don't exist
 const createOwnerVCTable = `CREATE TABLE IF NOT EXISTS vcOwnerList (id TEXT, timestamp INTEGER, PRIMARY KEY (id));`;
@@ -60,6 +61,8 @@ const createOwnerVCTable = `CREATE TABLE IF NOT EXISTS vcOwnerList (id TEXT, tim
 const createMemberDecayTable1 = `CREATE TABLE IF NOT EXISTS memberDecay1 (id TEXT, timestamp INTEGER, PRIMARY KEY (id, timestamp));`;
 const createMemberDecayTable2 = `CREATE TABLE IF NOT EXISTS memberDecay2 (id TEXT, timestamp INTEGER, PRIMARY KEY (id, timestamp));`;
 const createMemberDecayTable3 = `CREATE TABLE IF NOT EXISTS memberDecay3 (id TEXT, timestamp INTEGER, PRIMARY KEY (id, timestamp));`;
+
+const createRoleExpiryTracker = `CREATE TABLE IF NOT EXISTS roleExpiryTracker (roleToAdd INTEGER, expiryTime INTEGER, userID INTEGER, PRIMARY KEY (roleToAdd, userID));`;
 
 // const createCasualLFGPostsTable = `CREATE TABLE IF NOT EXISTS casualLFG (
 //     user_id TEXT PRIMARY KEY,
@@ -100,6 +103,7 @@ db_memberDecay.exec(createMemberDecayTable2);
 db_memberDecay.exec(createMemberDecayTable3);
 // db_savedLFGPosts.exec(createCasualLFGPostsTable);
 // db_savedLFGPosts.exec(createRankedLFGPostsTable);
+db_roleTracker.exec(createRoleExpiryTracker);
 
 // Delete expired kick counts from database
 function deleteKickCounterEntries(dbName, timeInMinutes, text) {
@@ -217,6 +221,32 @@ function deleteSlowmodeEntries() {
 	});
 }
 
+// Delete expired role entries from database and remove role
+function deleteExpiredRoleEntries(dbName, timeInMinutes, text) {
+	// Subtract the amount of time (timeInMinutes) from the current time
+	const timeSince = moment().subtract(timeInMinutes, 'minutes').unix();
+
+	// Select the amount of rows that are older than timeSince
+	const timeSinceCount = db_roleTracker.prepare(`SELECT COUNT(*) FROM ${dbName} WHERE timestamp <= ?`).get(timeSince)['COUNT(*)'];
+
+	// Select the role to be removed
+	const roleToRemove = db_roleTracker.prepare(`SELECT COUNT(*) FROM ${dbName} WHERE roleToAdd <= ?`).get(timeSince)['COUNT(*)']; 
+
+	// Select the user's id
+	const userer = db_roleTracker.prepare(`SELECT COUNT(*) FROM ${dbName} WHERE userID <= ?`).get(timeSince)['COUNT(*)'];
+
+	// If the count of timeSinceCount is greater than 0, delete the entries
+	if (timeSinceCount > 0) {
+		console.log(chalk.cyan(`DATABASE: Running ${text} Cleanup Check...`));
+
+		userer.roles.remove(roleToRemove);
+
+		db_roleTracker.prepare(`DELETE FROM ${dbName} WHERE timestamp <= ?`).run(timeSince);
+
+		console.log(chalk.green(`DATABASE: ${text} Cleanup Check complete, deleted ${timeSinceCount} ${checkEntryPlural(timeSinceCount, 'entr')} from ${dbName}`));
+	}
+}
+
 function currentBotStats() {
 	// The idea is to run a command that spits out information to
 	// the console about current DB counts and such. Maybe in the
@@ -324,6 +354,10 @@ setInterval(deleteLFGPostEntries, 3600 * 1000, 'savedRankedLFGPosts', 7 * 24 * 6
 // Slowmode Cleanup Timer
 // Ran once an hour
 setInterval(deleteSlowmodeEntries, 3600 * 1000);
+
+// 1 Minute Role Expiry Timer
+// Ran every minute
+setInterval(deleteExpiredRoleEntries, 60 * 1000, 'roleExpiryTracker', 1, 'Role Expiry Counter');
 
 // Export the client so other files can use it
 module.exports = { client };

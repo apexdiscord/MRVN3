@@ -1,5 +1,5 @@
+const { SlashCommandBuilder } = require('discord.js');
 const Database = require('../../functions/database.js');
-const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder().setName('unlink').setDescription('Unlink your linked Apex account.'),

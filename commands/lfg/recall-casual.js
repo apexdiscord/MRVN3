@@ -1,6 +1,5 @@
 const moment = require('moment');
 const db = require('../../functions/database.js');
-const Database = require('better-sqlite3');
 const { ButtonStyle, ButtonBuilder, ActionRowBuilder, SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 const { setVCLimit, checkVoiceChannel, vcLinkButtonBuilder, doesUserHaveSlowmode } = require('../../functions/utilities.js');

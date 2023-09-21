@@ -14,7 +14,7 @@ function setVCLimit(mode, channel) {
 		if (channel.member.voice.channel.userLimit != 2) {
 			channel.member.voice.channel.setUserLimit(2);
 
-			return console.log(chalk.yellow(`${chalk.bold('VOICE:')} Set user limit of "${channel.member.voice.channel.name}" to 2`));
+			return console.log(chalk.yellow(`${chalk.bold('[VOICE]')} Set user limit of "${channel.member.voice.channel.name}" to 2`));
 		}
 
 		return;
@@ -22,7 +22,7 @@ function setVCLimit(mode, channel) {
 		if (channel.member.voice.channel.userLimit != 3) {
 			channel.member.voice.channel.setUserLimit(3);
 
-			return console.log(chalk.yellow(`${chalk.bold('VOICE:')} Set user limit of "${channel.member.voice.channel.name}" to 3`));
+			return console.log(chalk.yellow(`${chalk.bold('[VOICE]')} Set user limit of "${channel.member.voice.channel.name}" to 3`));
 		}
 	}
 }
@@ -39,10 +39,11 @@ function checkBannedWords(message, interaction) {
 	const findBannedWords = bannedWords.find(i => message.toLowerCase().includes(i));
 
 	if (findBannedWords) {
-		console.log(chalk.red(`USER WARNING: ${interaction.member.displayName} tried to use a banned word in their LFG message`));
+		console.log(chalk.red(`${chalk.bold('[USER WARNING]')} ${interaction.user.username} tried to use a banned word in their LFG message`));
 
 		interaction.editReply({
-			content: 'Your LFG message contains a banned word. Please try again.',
+			content:
+				'Your LFG message contains a banned word. Please try again.\n\n*Note: You do not need to include a link in your LFG post. A link will automatically be generated.*',
 			ephemeral: true,
 		});
 
@@ -87,7 +88,7 @@ function checkBannedWordsCustom(message, interaction) {
 	const findBannedWords = bannedWords.find(i => message.toLowerCase().includes(i));
 
 	if (findBannedWords) {
-		console.log(chalk.red(`USER WARNING: ${interaction.member.displayName} tried to use a banned word in their LFG message`));
+		console.log(chalk.red(`${chalk.bold('[USER WARNING]')} ${interaction.member.displayName} tried to use a banned word in their LFG message`));
 
 		if (process.env.LFG_ALERTS !== undefined) {
 			const lfgAlertChannel = interaction.guild.channels.cache.get(process.env.LFG_ALERTS);
@@ -149,12 +150,12 @@ function saveCasualLFGPost(interaction, mode, description, playersNeeded, micReq
 
 	db.query(insertLFGPost, [interaction.user.id, mode, description, playersNeeded, micRequired, playstyle, mains, gamertag, timestamp], (err, updateRow) => {
 		if (err) {
-			console.log(chalk.red(`${chalk.bold(`OVERWATCH:`)} ${err}`));
+			console.log(chalk.red(`${chalk.bold(`[OVERWATCH]`)} ${err}`));
 			return false;
 		}
 	});
 
-	console.log(chalk.blue(`DATABASE: Saved LFG post from ${interaction.user.username} to savedCasualLFGPosts table`));
+	console.log(chalk.blue(`${chalk.bold('[OVERWATCH]')} Saved LFG post from ${interaction.user.username} to savedCasualLFGPosts table`));
 }
 
 function saveRankedLFGPost(interaction, mode, description, currentRank, previousRank, playersNeeded, micRequired, playstyle, mains, gamertag) {
@@ -167,13 +168,13 @@ function saveRankedLFGPost(interaction, mode, description, currentRank, previous
 		[interaction.user.id, mode, description, currentRank, previousRank, playersNeeded, micRequired, playstyle, mains, gamertag, timestamp],
 		(err, updateRow) => {
 			if (err) {
-				console.log(chalk.red(`${chalk.bold(`OVERWATCH:`)} ${err}`));
+				console.log(chalk.red(`${chalk.bold(`[OVERWATCH]`)} ${err}`));
 				return false;
 			}
 		},
 	);
 
-	console.log(chalk.blue(`DATABASE: Saved LFG post from ${interaction.user.username} to savedRankedLFGPosts table`));
+	console.log(chalk.blue(`${chalk.bold(`[OVERWATCH]`)} Saved LFG post from ${interaction.user.username} to savedRankedLFGPosts table`));
 }
 
 async function timeoutController(length, lengthFull, memberKicked, interaction, entryOne, entryTwo, entryThree) {
@@ -252,7 +253,7 @@ function vcLinkButtonBuilder(interaction) {
 	if (!interaction.member.voice.channel) return null;
 
 	return new ButtonBuilder()
-		.setLabel(`Join "${interaction.member.voice.channel.name}"`)
+		.setLabel(`Join`)
 		.setStyle(ButtonStyle.Link)
 		.setEmoji('🔊')
 		.setURL(`https://discord.com/channels/${interaction.guild.id}/${interaction.member.voice.channel.id}`);
@@ -277,12 +278,12 @@ function doesUserHaveSlowmode(interaction, time) {
 
 				db.query(updateSlowmode, [moment().unix(), interaction.user.id], (err, updateRow) => {
 					if (err) {
-						console.log(chalk.red(`${chalk.bold(`OVERWATCH:`)} ${err}`));
+						console.log(chalk.red(`${chalk.bold(`[OVERWATCH]`)} ${err}`));
 						return false;
 					}
 				});
 
-				console.log(chalk.blue(`${chalk.bold(`OVERWATCH:`)} Updated ${interaction.user.username}'s entry in userPostSlowmode table`));
+				console.log(chalk.blue(`${chalk.bold(`[OVERWATCH]`)} Updated ${interaction.user.username}'s entry in userPostSlowmode table`));
 			}
 		} else {
 			// If they don't exist in the database, add them and allow the post to be posted
@@ -290,12 +291,12 @@ function doesUserHaveSlowmode(interaction, time) {
 
 			db.query(insertSlowmode, [interaction.user.id, moment().unix()], (err, insertRow) => {
 				if (err) {
-					console.log(chalk.red(`${chalk.bold(`OVERWATCH:`)} ${err}`));
+					console.log(chalk.red(`${chalk.bold(`[OVERWATCH]`)} ${err}`));
 					return false;
 				}
 			});
 
-			console.log(chalk.blue(`${chalk.bold(`OVERWATCH:`)} Added ${interaction.user.username} to userPostSlowmode table`));
+			console.log(chalk.blue(`${chalk.bold(`[OVERWATCH]`)} Added ${interaction.user.username} to userPostSlowmode table`));
 		}
 	});
 }

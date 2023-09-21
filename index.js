@@ -24,19 +24,18 @@ const client = new Client({
 	allowedMentions: { parse: ['roles'], repliedUser: true },
 });
 
-
 const process = require('node:process');
 
-process.on('unhandledRejection', async (reason,promise) => {
-	console.log('Unhandled Rejection at:', promise, 'reason:', reason);
+process.on('unhandledRejection', async (reason, promise) => {
+	console.log(chalk.red(`${chalk.bold('[BOT]')} Unhandled Rejection at: ${promise}, reason:, ${reason}`));
 });
 
-process.on('uncaughtException', (err) => {
-	console.log('Unhandled Exception:', err);
+process.on('uncaughtException', err => {
+	console.log(chalk.red(`${chalk.bold('[BOT]')} Unhandled Exception: ${err}`));
 });
 
 process.on('uncaughtExceptionMonitor', (err, origin) => {
-	console.log('Uncaught Exception Monitor', err, origin);
+	console.log(chalk.red(`${chalk.bold('[BOT]')} Uncaught Exception Monitor: ${err}, ${origin}`));
 });
 
 // Log the bot in to Discord and load the event handlers
@@ -46,7 +45,7 @@ client
 		loadEvents(client);
 	})
 	.catch(err => {
-		console.log(chalk.bold.red(`BOT: Login Error: ${err}`));
+		console.log(chalk.red(`${chalk.bold('[BOT]')} Login Error: ${err}`));
 	});
 
 // Create and load database files
@@ -112,12 +111,40 @@ function deleteKickCounterEntries(dbName, timeInMinutes, text) {
 
 	// If the count of timeSinceCount is greater than 0, delete the entries
 	if (timeSinceCount > 0) {
-		console.log(chalk.cyan(`DATABASE: Running ${text} Cleanup Check...`));
+		console.log(chalk.cyan(`${chalk.bold('[DATABASE]')} Running ${text} Cleanup Check...`));
 
 		db_memberDecay.prepare(`DELETE FROM ${dbName} WHERE timestamp <= ?`).run(timeSince);
 
-		console.log(chalk.green(`DATABASE: ${text} Cleanup Check complete, deleted ${timeSinceCount} ${checkEntryPlural(timeSinceCount, 'entr')} from ${dbName}`));
+		console.log(
+			chalk.green(`${chalk.bold('[DATABASE]')} ${text} Cleanup Check complete, deleted ${timeSinceCount} ${checkEntryPlural(timeSinceCount, 'entr')} from ${dbName}`),
+		);
 	}
+}
+
+// Delete expired link accounts (accounts that were not linked)
+function deleteExpiredAccountLinks(dbName, timeInMinutes, text) {
+	// Subtract the amount of time (timeInMinutes) from the current time
+	const timeSince = moment().subtract(timeInMinutes, 'minutes').unix();
+
+	// Select the amount of rows that are older than timeSince
+	db.query(`SELECT COUNT(*) AS count FROM ${dbName} WHERE expiry < ?`, [timeSince], async (err, row) => {
+		if (err) console.log(err);
+
+		if (parseInt(row[0]['count']) >= 1) {
+			console.log(chalk.cyan(`${chalk.bold('[OVERWATCH]')} Running ${text} Cleanup Check...`));
+
+			// Select the amount of rows that are older than timeSince
+			db.query(`DELETE FROM ${dbName} WHERE expiry < ?`, [timeSince], async (err, row) => {
+				if (err) return console.log(err);
+
+				console.log(
+					chalk.green(
+						`${chalk.bold('[OVERWATCH]')} ${text} Cleanup Check complete, deleted ${row.affectedRows} ${checkEntryPlural(row.affectedRows, 'entr')} from ${dbName}`,
+					),
+				);
+			});
+		}
+	});
 }
 
 // Delete expired kick counts from database
@@ -130,24 +157,24 @@ function deleteLFGPostEntries(dbName, timeInMinutes, text) {
 
 	db.query(timeSinceCount, timeSince, (err, result) => {
 		if (err) {
-			console.log(chalk.bold.red(`${chalk.bold(`OVERWATCH:`)} Error: ${err}`));
+			console.log(chalk.bold.red(`${chalk.bold('[OVERWATCH]')} Error: ${err}`));
 		}
 
 		// If the count of timeSinceCount is greater than 0, delete the entries
 		if (result[0]['count(*)'] > 0) {
-			console.log(chalk.cyan(`${chalk.bold('OVERWATCH:')} Running ${text} Cleanup Check...`));
+			console.log(chalk.cyan(`${chalk.bold('[OVERWATCH]')} Running ${text} Cleanup Check...`));
 
 			const deleteLFGPosts = `DELETE FROM ${dbName} WHERE timestamp <= ?`;
 
 			db.query(deleteLFGPosts, timeSince, (err, result) => {
 				if (err) {
-					console.log(chalk.bold.red(`${chalk.bold(`OVERWATCH:`)} Error: ${err}`));
+					console.log(chalk.bold.red(`${chalk.bold('[OVERWATCH]')} Error: ${err}`));
 				}
 			});
 
 			console.log(
 				chalk.green(
-					`${chalk.bold(`OVERWATCH:`)} ${text} Cleanup Check complete, deleted ${result[0]['count(*)']} ${checkEntryPlural(
+					`${chalk.bold('[OVERWATCH]')} ${text} Cleanup Check complete, deleted ${result[0]['count(*)']} ${checkEntryPlural(
 						result[0]['count(*)'],
 						'entr',
 					)} from ${dbName}`,
@@ -168,25 +195,25 @@ function deleteSlowmodeEntries() {
 
 	db.query(timeSinceCount, timeSince, (err, result) => {
 		if (err) {
-			console.log(chalk.bold.red(`${chalk.bold(`OVERWATCH:`)} Error: ${err}`));
+			console.log(chalk.bold.red(`${chalk.bold('[OVERWATCH]')} Error: ${err}`));
 		}
 
 		const rowCount = result[0]['count(*)'];
 
 		// If the count of timeSinceCount is greater than 0, delete the entries
 		if (rowCount > 0) {
-			console.log(chalk.cyan(`${chalk.bold(`OVERWATCH:`)} Running Slowmode Cleanup Check...`));
+			console.log(chalk.cyan(`${chalk.bold('[OVERWATCH]')} Running Slowmode Cleanup Check...`));
 
 			const deleteOldSlowmodeEntries = `DELETE FROM userPostSlowmode WHERE postTimestamp <= ?`;
 
 			db.query(deleteOldSlowmodeEntries, timeSince, (err, result) => {
 				if (err) {
-					console.log(chalk.bold.red(`${chalk.bold(`OVERWATCH:`)} Error: ${err}`));
+					console.log(chalk.bold.red(`${chalk.bold('[OVERWATCH]')} Error: ${err}`));
 				}
 			});
 
 			console.log(
-				chalk.green(`${chalk.bold(`OVERWATCH:`)} Slowmode Cleanup Check complete, deleted ${rowCount} ${checkEntryPlural(rowCount, 'entr')} from userPostSlowmode`),
+				chalk.green(`${chalk.bold('[OVERWATCH]')} Slowmode Cleanup Check complete, deleted ${rowCount} ${checkEntryPlural(rowCount, 'entr')} from userPostSlowmode`),
 			);
 		}
 	});
@@ -268,13 +295,17 @@ function currentBotStats() {
 }
 
 // Bot Stats Timer
-// Runs once a minute, but only actually prints to the counter
+// Runs once a minute, but only actually prints to the console
 // on the 30th minute of the hour
 setInterval(currentBotStats, 60 * 1000);
 
 // 10 Minute Kick Counter Timer
 // Ran every 10 minutes
 setInterval(deleteKickCounterEntries, 60 * 1000, 'memberDecay1', 10, '10 Minute Timeout Counter');
+
+// Link Account Cleanup Timer
+// Ran every 5 minutes
+setInterval(deleteExpiredAccountLinks, 60 * 1000, 'temp_linking', 15, 'Linked Account');
 
 // 1 Hour Kick Counter Timer
 // Ran once a day

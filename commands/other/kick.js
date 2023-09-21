@@ -1,8 +1,8 @@
 const chalk = require('chalk');
 const moment = require('moment');
 const Database = require('better-sqlite3');
-const { SlashCommandBuilder } = require('discord.js');
 const { Table } = require('console-table-printer');
+const { SlashCommandBuilder } = require('discord.js');
 
 const { timeoutController } = require('../../functions/utilities.js');
 const db_memberDecay = new Database(`${__dirname}/../../databases/memberDecay.sqlite`);

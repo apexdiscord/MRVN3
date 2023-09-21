@@ -123,94 +123,105 @@ module.exports = {
 				}
 			}
 
-			const buttonRow = new ActionRowBuilder();
+			// Check if the user has stats in the DB
+			const linkedUserRow = `SELECT * FROM specter WHERE discordID = ?`;
 
-			if (vcLinkButtonBuilder(interaction) != null) buttonRow.addComponents(vcLinkButtonBuilder(interaction));
-			if (micRequired == 'Yes') buttonRow.addComponents(new ButtonBuilder().setCustomId('MicType').setLabel('Mic Required').setStyle(ButtonStyle.Danger).setDisabled(true));
-			if (micRequired == 'No') buttonRow.addComponents(new ButtonBuilder().setCustomId('MicType').setLabel('Mic Optional').setStyle(ButtonStyle.Success).setDisabled(true));
+			db.query(linkedUserRow, [interaction.user.id], async (err, linkedUserRow) => {
+				const buttonRow = new ActionRowBuilder();
 
-			setVCLimit(mode, interaction);
+				if (vcLinkButtonBuilder(interaction) != null) buttonRow.addComponents(vcLinkButtonBuilder(interaction));
+				if (micRequired == 'Yes')
+					buttonRow.addComponents(new ButtonBuilder().setCustomId('MicType').setLabel('Mic Required').setStyle(ButtonStyle.Danger).setDisabled(true));
+				if (micRequired == 'No')
+					buttonRow.addComponents(new ButtonBuilder().setCustomId('MicType').setLabel('Mic Optional').setStyle(ButtonStyle.Success).setDisabled(true));
+				var vcLink = vcLinkButtonBuilder(interaction) != null ? `<#${interaction.member.voice.channel.id}>` : '';
+				if (linkedUserRow.length != 0) buttonRow.addComponents(new ButtonBuilder().setCustomId(interaction.user.id).setLabel('User Stats').setStyle(ButtonStyle.Primary));
 
-			let playersNeededText = !playersNeeded ? `is looking for a team` : `is looking for ${playersNeeded} more`;
+				setVCLimit(mode, interaction);
 
-			const lfgEmbed = new EmbedBuilder()
-				.setAuthor({
-					name: `${interaction.member.displayName} ${playersNeededText}`,
-					iconURL: interaction.member.displayAvatarURL({ dynamic: true }),
-				})
-				.setDescription(`<@${interaction.member.id}>'s Message: ${description}`)
-				.setThumbnail(`attachment://${mode}.png`)
-				.setTimestamp()
-				.setFooter({
-					text: 'Read channel pins!',
-					iconURL: 'attachment://pin.png',
-				});
+				let playersNeededText = !playersNeeded ? `is looking for a team` : `is looking for ${playersNeeded} more`;
 
-			if (playstyle)
-				lfgEmbed.addFields({
-					name: '__Playstyle__',
-					value: `${playstyle}`,
-					inline: true,
-				});
+				const lfgEmbed = new EmbedBuilder()
+					.setAuthor({
+						name: `${interaction.member.displayName} ${playersNeededText}`,
+						iconURL: interaction.member.displayAvatarURL({ dynamic: true }),
+					})
+					.setDescription(`<@${interaction.member.id}>'s Message: ${description}`)
+					.setThumbnail(`attachment://${mode}.png`)
+					.setTimestamp()
+					.setFooter({
+						text: 'Read channel pins!',
+						iconURL: 'attachment://pin.png',
+					});
 
-			if (mains)
-				lfgEmbed.addFields({
-					name: '__Main(s)__',
-					value: `${mains}`,
-					inline: true,
-				});
+				if (playstyle)
+					lfgEmbed.addFields({
+						name: '__Playstyle__',
+						value: `${playstyle}`,
+						inline: true,
+					});
 
-			if (gamertag)
-				lfgEmbed.addFields({
-					name: '__Gamertag__',
-					value: `${gamertag}`,
-					inline: true,
-				});
+				if (mains)
+					lfgEmbed.addFields({
+						name: '__Main(s)__',
+						value: `${mains}`,
+						inline: true,
+					});
 
-			if (save == 'Yes') {
-				saveCasualLFGPost(interaction, mode, description, playersNeeded, micRequired, playstyle, mains, gamertag);
+				if (gamertag)
+					lfgEmbed.addFields({
+						name: '__Gamertag__',
+						value: `${gamertag}`,
+						inline: true,
+					});
 
-				await interaction.editReply({
-					content: 'Your LFG message has been posted and saved, use the `/rc` command to post it again!',
-					ephemeral: true,
-				});
-			} else {
-				await interaction.editReply({
-					content: 'Your LFG message has been posted!',
-					ephemeral: true,
-				});
-			}
+				if (save == 'Yes') {
+					saveCasualLFGPost(interaction, mode, description, playersNeeded, micRequired, playstyle, mains, gamertag);
 
-			if (buttonRow.components.length == 0) {
-				await interaction.channel.send({
-					embeds: [lfgEmbed],
-					files: [
-						{
-							attachment: `${__dirname}/../../images/nonRanked/${mode}.png`,
-							name: `${mode}.png`,
-						},
-						{
-							attachment: `${__dirname}/../../images/other/pin.png`,
-							name: `pin.png`,
-						},
-					],
-				});
-			} else {
-				await interaction.channel.send({
-					embeds: [lfgEmbed],
-					components: [buttonRow],
-					files: [
-						{
-							attachment: `${__dirname}/../../images/nonRanked/${mode}.png`,
-							name: `${mode}.png`,
-						},
-						{
-							attachment: `${__dirname}/../../images/other/pin.png`,
-							name: `pin.png`,
-						},
-					],
-				});
-			}
+					await interaction.editReply({
+						content: 'Your LFG message has been posted and saved, use the `/rc` command to post it again!',
+						ephemeral: true,
+					});
+				} else {
+					await interaction.editReply({
+						content: 'Your LFG message has been posted!',
+						ephemeral: true,
+					});
+				}
+
+				if (buttonRow.components.length == 0) {
+					await interaction.channel.send({
+						content: `${vcLink}`,
+						embeds: [lfgEmbed],
+						files: [
+							{
+								attachment: `${__dirname}/../../images/nonRanked/${mode}.png`,
+								name: `${mode}.png`,
+							},
+							{
+								attachment: `${__dirname}/../../images/other/pin.png`,
+								name: `pin.png`,
+							},
+						],
+					});
+				} else {
+					await interaction.channel.send({
+						content: `${vcLink}`,
+						embeds: [lfgEmbed],
+						components: [buttonRow],
+						files: [
+							{
+								attachment: `${__dirname}/../../images/nonRanked/${mode}.png`,
+								name: `${mode}.png`,
+							},
+							{
+								attachment: `${__dirname}/../../images/other/pin.png`,
+								name: `pin.png`,
+							},
+						],
+					});
+				}
+			});
 		});
 	},
 };

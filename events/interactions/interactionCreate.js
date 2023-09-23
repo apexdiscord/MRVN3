@@ -1,5 +1,7 @@
+const axios = require('axios');
 const chalk = require('chalk');
 const Database = require('better-sqlite3');
+const db = require('../../functions/database.js');
 const { InteractionType } = require('discord.js');
 
 const db_vcOwnerList = new Database(`${__dirname}/../../databases/vcOwnerList.sqlite`);
@@ -8,6 +10,26 @@ module.exports = {
 	name: 'interactionCreate',
 	once: false,
 	async execute(interaction, client) {
+		if (interaction.isButton()) {
+			const linkedUserRow = `SELECT * FROM specter WHERE discordID = ?`;
+
+			db.query(linkedUserRow, [interaction.user.id], async (err, linkedUserRow) => {
+				try {
+					const response = await axios.get(
+						`https://api.jumpmaster.xyz/user/MRVN_ID?platform=${linkedUserRow[0].platform}&id=${linkedUserRow[0].playerID}&key=${process.env.SPYGLASS}`,
+					);
+					const data = response.data;
+
+					interaction.reply({
+						content: `username: ${data.user.username}\nstatus: ${data.user.status.online}\nlevel: ${data.account.level.total}\nrank: ${data.ranked.name} ${data.ranked.score}`,
+						ephemeral: true,
+					});
+				} catch (e) {
+					console.log(e);
+				}
+			});
+		}
+
 		if (interaction.type === InteractionType.ApplicationCommand) {
 			const command = client.commands.get(interaction.commandName);
 

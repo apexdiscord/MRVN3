@@ -221,7 +221,7 @@ module.exports = {
 
 			if (buttonRow.components.length == 0) {
 				await interaction.channel.send({
-					content: `${vcLink}`,
+					// content: `${vcLink}`,
 					embeds: [lfgRankedEmbed],
 					files: [
 						{
@@ -236,7 +236,7 @@ module.exports = {
 				});
 			} else {
 				await interaction.channel.send({
-					content: `${vcLink}`,
+					// content: `${vcLink}`,
 					embeds: [lfgRankedEmbed],
 					components: [buttonRow],
 					files: [

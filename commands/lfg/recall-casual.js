@@ -108,7 +108,7 @@ module.exports = {
 
 				if (buttonRow.components.length == 0) {
 					await interaction.channel.send({
-						content: `${vcLink}`,
+						// content: `${vcLink}`,
 						embeds: [savedPostEmbed],
 						files: [
 							{
@@ -123,7 +123,7 @@ module.exports = {
 					});
 				} else {
 					await interaction.channel.send({
-						content: `${vcLink}`,
+						// content: `${vcLink}`,
 						embeds: [savedPostEmbed],
 						components: [buttonRow],
 						files: [

@@ -172,7 +172,7 @@ module.exports = {
 
 			if (buttonRow.components.length == 0) {
 				await interaction.channel.send({
-					content: `${vcLink}`,
+					// content: `${vcLink}`,
 					embeds: [lfgMixtapeEmbed],
 					files: [
 						{
@@ -187,7 +187,7 @@ module.exports = {
 				});
 			} else {
 				await interaction.channel.send({
-					content: `${vcLink}`,
+					// content: `${vcLink}`,
 					embeds: [lfgMixtapeEmbed],
 					components: [buttonRow],
 					files: [

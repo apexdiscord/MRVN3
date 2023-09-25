@@ -21,7 +21,7 @@ module.exports = {
 					const data = response.data;
 
 					interaction.reply({
-						content: `username: ${data.user.username}\nstatus: ${data.user.status.online}\nlevel: ${data.account.level.total}\nrank: ${data.ranked.name} ${data.ranked.score}`,
+						content: `username: ${data.user.username}\nstatus: ${data.user.status.online} (probs offline LMAO)\nlevel: ${data.account.level.total}\nrank: ${data.ranked.name} ${data.ranked.score}\nlegend: ${data.active.legend}\n\n**trackers:**\nfirst: ${data.active.trackers[0].name}: ${data.active.trackers[0].value}\nsecond: ${data.active.trackers[1].name}: ${data.active.trackers[1].value}\nthird: ${data.active.trackers[2].name}: ${data.active.trackers[2].value}`,
 						ephemeral: true,
 					});
 				} catch (e) {

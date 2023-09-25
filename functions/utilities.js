@@ -39,18 +39,18 @@ function checkBannedWords(message, interaction) {
 	const findBannedWords = bannedWords.find(i => message.toLowerCase().includes(i));
 
 	if (findBannedWords) {
-		console.log(chalk.red(`${chalk.bold('[USER WARNING]')} ${interaction.user.username} tried to use a banned word in their LFG message`));
+		console.log(chalk.red(`${chalk.bold('[USER WARNING]')} ${interaction.user.username} tried to use blocked content in their LFG message`));
 
 		interaction.editReply({
 			content:
-				'Your LFG message contains a banned word. Please try again.\n\n*Note: You do not need to include a link in your LFG post. A link will automatically be generated.*',
+				'Your LFG message contains blocked content. Please try again.\n\n*Note: You do not need to include a link in your LFG post. A link will automatically be generated.*',
 			ephemeral: true,
 		});
 
 		if (process.env.LFG_ALERTS !== undefined) {
 			const lfgAlertChannel = interaction.guild.channels.cache.get(process.env.LFG_ALERTS);
 
-			const alertEmbed = new EmbedBuilder().setTitle('LFG Command - Blocked Banned Word').addFields([
+			const alertEmbed = new EmbedBuilder().setTitle('LFG Command - Blocked Banned Content').addFields([
 				{
 					name: `User`,
 					value: `<@${interaction.user.id}>\n${interaction.user.username}\n\`${interaction.user.id}\``,
@@ -88,12 +88,12 @@ function checkBannedWordsCustom(message, interaction) {
 	const findBannedWords = bannedWords.find(i => message.toLowerCase().includes(i));
 
 	if (findBannedWords) {
-		console.log(chalk.red(`${chalk.bold('[USER WARNING]')} ${interaction.member.displayName} tried to use a banned word in their LFG message`));
+		console.log(chalk.red(`${chalk.bold('[USER WARNING]')} ${interaction.member.displayName} tried to use banned content in their LFG message`));
 
 		if (process.env.LFG_ALERTS !== undefined) {
 			const lfgAlertChannel = interaction.guild.channels.cache.get(process.env.LFG_ALERTS);
 
-			const alertEmbed = new EmbedBuilder().setTitle('LFG Command - Blocked Banned Word').addFields([
+			const alertEmbed = new EmbedBuilder().setTitle('LFG Command - Blocked Banned Content').addFields([
 				{
 					name: `User`,
 					value: `<@${interaction.user.id}>\n${interaction.user.username}\n\`${interaction.user.id}\``,

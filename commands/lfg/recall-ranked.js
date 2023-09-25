@@ -72,7 +72,7 @@ module.exports = {
 					buttonRow.addComponents(new ButtonBuilder().setCustomId('MicType').setLabel('Mic Required').setStyle(ButtonStyle.Danger).setDisabled(true));
 				if (savedDataRow[0].micRequired == 'No')
 					buttonRow.addComponents(new ButtonBuilder().setCustomId('MicType').setLabel('Mic Optional').setStyle(ButtonStyle.Success).setDisabled(true));
-				var vcLink = vcLinkButtonBuilder(interaction) != null ? `<#${interaction.member.voice.channel.id}>` : '';
+				var vcLink = vcLinkButtonBuilder(interaction) != null ? `\n\nVoice Channel: <#${interaction.member.voice.channel.id}>` : '';
 
 				setVCLimit(savedDataRow[0].mode, interaction);
 
@@ -83,7 +83,7 @@ module.exports = {
 						name: `${interaction.user.username} ${playersNeededText}`,
 						iconURL: interaction.user.displayAvatarURL({ dynamic: true }),
 					})
-					.setDescription(`<@${interaction.member.id}>'s Message: ${savedDataRow[0].message}`)
+					.setDescription(`<@${interaction.member.id}>'s Message: ${savedDataRow[0].message} ${vcLink}`)
 					.setThumbnail(`attachment://Ranked_${savedDataRow[0].currentRank}.png`)
 					.setTimestamp()
 					.setFooter({
@@ -121,7 +121,6 @@ module.exports = {
 
 				if (buttonRow.components.length == 0) {
 					await interaction.channel.send({
-						// content: `${vcLink}`,
 						embeds: [savedPostEmbed],
 						files: [
 							{
@@ -136,7 +135,6 @@ module.exports = {
 					});
 				} else {
 					await interaction.channel.send({
-						// content: `${vcLink}`,
 						embeds: [savedPostEmbed],
 						components: [buttonRow],
 						files: [

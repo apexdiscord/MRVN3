@@ -134,7 +134,7 @@ module.exports = {
 					buttonRow.addComponents(new ButtonBuilder().setCustomId('MicType').setLabel('Mic Required').setStyle(ButtonStyle.Danger).setDisabled(true));
 				if (micRequired == 'No')
 					buttonRow.addComponents(new ButtonBuilder().setCustomId('MicType').setLabel('Mic Optional').setStyle(ButtonStyle.Success).setDisabled(true));
-				var vcLink = vcLinkButtonBuilder(interaction) != null ? `<#${interaction.member.voice.channel.id}>` : '';
+				var vcLink = vcLinkButtonBuilder(interaction) != null ? `\n\nVoice Channel: <#${interaction.member.voice.channel.id}>` : '';
 				if (linkedUserRow.length != 0) buttonRow.addComponents(new ButtonBuilder().setCustomId(interaction.user.id).setLabel('User Stats').setStyle(ButtonStyle.Primary));
 
 				setVCLimit(mode, interaction);
@@ -146,7 +146,7 @@ module.exports = {
 						name: `${interaction.member.displayName} ${playersNeededText}`,
 						iconURL: interaction.member.displayAvatarURL({ dynamic: true }),
 					})
-					.setDescription(`<@${interaction.member.id}>'s Message: ${description}`)
+					.setDescription(`<@${interaction.member.id}>'s Message: ${description} ${vcLink}`)
 					.setThumbnail(`attachment://${mode}.png`)
 					.setTimestamp()
 					.setFooter({
@@ -191,7 +191,6 @@ module.exports = {
 
 				if (buttonRow.components.length == 0) {
 					await interaction.channel.send({
-						// content: `${vcLink}`,
 						embeds: [lfgEmbed],
 						files: [
 							{
@@ -206,7 +205,6 @@ module.exports = {
 					});
 				} else {
 					await interaction.channel.send({
-						// content: `${vcLink}`,
 						embeds: [lfgEmbed],
 						components: [buttonRow],
 						files: [

@@ -13,7 +13,7 @@
 	},
 	"dependencies": {
 		"@discordjs/rest": "2.0.1",
-		"axios": "^1.5.0",
+		"axios": "^1.5.1",
 		"better-sqlite3": "^8.6.0",
 		"chalk": "4.1.2",
 		"console-table-printer": "2.11.2",

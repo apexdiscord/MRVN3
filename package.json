@@ -12,13 +12,13 @@
 		"node": "18.12.1"
 	},
 	"dependencies": {
-		"@discordjs/rest": "2.0.1",
-		"axios": "^1.6.0",
-		"better-sqlite3": "^9.0.0",
+		"@discordjs/rest": "^2.1.0",
+		"axios": "^1.6.1",
+		"better-sqlite3": "^9.1.1",
 		"chalk": "4.1.2",
 		"console-table-printer": "2.11.2",
-		"discord-api-types": "^0.37.62",
-		"discord.js": "14.13.0",
+		"discord-api-types": "^0.37.63",
+		"discord.js": "^14.14.1",
 		"dotenv": "16.3.1",
 		"moment": "2.29.4",
 		"mysql2": "^3.6.3"

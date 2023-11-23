@@ -1,11 +1,17 @@
 const chalk = require('chalk');
 const moment = require('moment');
+const { Axiom } = require('@axiomhq/js');
 const Database = require('better-sqlite3');
 
 const db_vcOwnerList = new Database(`${__dirname}/../../databases/vcOwnerList.sqlite`);
 
 const { logFormatter, checkVoiceChannel, movedLogFormatter } = require('../../functions/utilities.js');
 var categoryWhitelist = require('../../data/categoryWhitelist.json');
+
+const axiomIngest = new Axiom({
+	token: process.env.AXIOM_TOKEN,
+	orgId: process.env.AXIOM_ORG,
+});
 
 module.exports = {
 	name: 'voiceStateUpdate',
@@ -34,6 +40,9 @@ module.exports = {
 				db_vcOwnerList.prepare('INSERT OR REPLACE INTO vcOwnerList (id, timestamp) VALUES (?, ?)').run(newState.member.user.id, dbTimestamp);
 
 				console.log(chalk.blue(`${chalk.bold('[DATABASE]')} Added ${oldState.member.user.username} to vcOwnerList`));
+
+				// Axiom Ingest
+				axiomIngest.ingest('mrvn.lfg', [{ voice: 'join' }]);
 			} else {
 				// User join a non-empty VC
 				console.log(chalk.green(`${chalk.bold('[JOIN]')} ${newState.member.user.username} joined occupied voice channel "${newState.channel.name}"`));
@@ -44,6 +53,9 @@ module.exports = {
 
 					logChannel.send(logFormatter(newState, 'Joined'));
 				}
+
+				// Axiom Ingest
+				axiomIngest.ingest('mrvn.lfg', [{ voice: 'join' }]);
 			}
 		} else if (newState.channelId === null) {
 			// User left VC
@@ -77,6 +89,9 @@ module.exports = {
 					console.log(chalk.yellow(`${chalk.bold('[VOICE]')} Set user limit of "${oldState.channel.name}" to 3`));
 				}
 			}
+
+			// Axiom Ingest
+			axiomIngest.ingest('mrvn.lfg', [{ voice: 'left' }]);
 		} else if (oldState.channelId != newState.channelId) {
 			// User moved
 			// If the parent category of the voice channel is
@@ -89,6 +104,9 @@ module.exports = {
 
 				return;
 			}
+
+			// Axiom Ingest
+			axiomIngest.ingest('mrvn.lfg', [{ voice: 'moved' }]);
 
 			// If the new VC is not in the whitelist, remove
 			// any VC owner entries for the user

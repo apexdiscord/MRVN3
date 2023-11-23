@@ -3,7 +3,7 @@ const { Axiom } = require('@axiomhq/js');
 const db = require('../../functions/database.js');
 const { ButtonStyle, EmbedBuilder, ButtonBuilder, ActionRowBuilder, SlashCommandBuilder } = require('discord.js');
 
-const { setVCLimit, checkBannedWords, checkVoiceChannel, saveRankedLFGPost, vcLinkButtonBuilder, doesUserHaveSlowmode } = require('../../functions/utilities.js');
+const { setVCLimit, splitChannelName, checkBannedWords, checkVoiceChannel, saveRankedLFGPost, vcLinkButtonBuilder, doesUserHaveSlowmode } = require('../../functions/utilities.js');
 
 const axiomIngest = new Axiom({
 	token: process.env.AXIOM_TOKEN,
@@ -225,7 +225,7 @@ module.exports = {
 				});
 			}
 
-			axiomIngest.ingest('mrvn.lfg', [{ rank: currentRank }]);
+			axiomIngest.ingest('mrvn.lfg', [{ rank: currentRank, region: splitChannelName(interaction.channel.name) }]);
 
 			if (buttonRow.components.length == 0) {
 				await interaction.channel.send({

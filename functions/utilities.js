@@ -33,6 +33,13 @@ function logFormatter(state, text) {
 	return `<t:${logTimestamp}:f> :microphone2: ${emotes[text]} <@${state.member.user.id}> (**${state.member.user.username}**, \`${state.member.user.id}\`) ${text} <#${state.channel.id}> (**${state.channel.name}**, \`${state.channel.id}\`)`;
 }
 
+function splitChannelName(name) {
+	let parts = name.split('-');
+	let firstPart = parts[0].trim();
+
+	return firstPart;
+}
+
 function checkBannedWords(message, interaction) {
 	if (!message) return false;
 
@@ -304,6 +311,7 @@ function doesUserHaveSlowmode(interaction, time) {
 module.exports = {
 	setVCLimit,
 	logFormatter,
+	splitChannelName,
 	checkBannedWords,
 	checkEntryPlural,
 	checkVoiceChannel,

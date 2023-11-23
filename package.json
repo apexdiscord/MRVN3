@@ -1,6 +1,6 @@
 {
 	"name": "mrvn",
-	"version": "1.1.5",
+	"version": "1.1.6",
 	"description": "Apex Legends Discord LFG Bot",
 	"main": "index.js",
 	"scripts": {
@@ -12,6 +12,7 @@
 		"node": "18.12.1"
 	},
 	"dependencies": {
+		"@axiomhq/js": "^1.0.0-rc.1",
 		"@discordjs/rest": "^2.2.0",
 		"axios": "^1.6.2",
 		"better-sqlite3": "^9.1.1",

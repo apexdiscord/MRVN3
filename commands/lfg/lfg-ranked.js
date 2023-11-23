@@ -1,8 +1,14 @@
 const moment = require('moment');
+const { Axiom } = require('@axiomhq/js');
 const db = require('../../functions/database.js');
 const { ButtonStyle, EmbedBuilder, ButtonBuilder, ActionRowBuilder, SlashCommandBuilder } = require('discord.js');
 
 const { setVCLimit, checkBannedWords, checkVoiceChannel, saveRankedLFGPost, vcLinkButtonBuilder, doesUserHaveSlowmode } = require('../../functions/utilities.js');
+
+const axiomIngest = new Axiom({
+	token: process.env.AXIOM_TOKEN,
+	orgId: process.env.AXIOM_ORG,
+});
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -218,6 +224,8 @@ module.exports = {
 					ephemeral: true,
 				});
 			}
+
+			axiomIngest.ingest('mrvn.lfg', [{ rank: currentRank }]);
 
 			if (buttonRow.components.length == 0) {
 				await interaction.channel.send({

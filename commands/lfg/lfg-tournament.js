@@ -1,9 +1,15 @@
 const chalk = require('chalk');
 const moment = require('moment');
+const { Axiom } = require('@axiomhq/js');
 const db = require('../../functions/database.js');
 const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
 
-const { checkBannedWordsCustom, checkVoiceChannel } = require('../../functions/utilities.js');
+const { splitChannelName, checkBannedWordsCustom, checkVoiceChannel } = require('../../functions/utilities.js');
+
+const axiomIngest = new Axiom({
+	token: process.env.AXIOM_TOKEN,
+	orgId: process.env.AXIOM_ORG,
+});
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -241,6 +247,8 @@ module.exports = {
 			// if (process.env.PRIVATEMATCH_PING !== undefined) {
 			// 	await interaction.channel.send({ content: `<@&${process.env.PRIVATEMATCH_PING}>` });
 			// }
+
+			axiomIngest.ingest('mrvn.lfg', [{ region: splitChannelName(interaction.channel.name) }]);
 
 			await interaction.editReply({
 				embeds: [lfgTournamentEmbed],

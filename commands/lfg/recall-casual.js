@@ -3,7 +3,7 @@ const { Axiom } = require('@axiomhq/js');
 const db = require('../../functions/database.js');
 const { ButtonStyle, ButtonBuilder, ActionRowBuilder, SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
-const { setVCLimit, checkVoiceChannel, vcLinkButtonBuilder, doesUserHaveSlowmode } = require('../../functions/utilities.js');
+const { setVCLimit, splitChannelName, checkVoiceChannel, vcLinkButtonBuilder, doesUserHaveSlowmode } = require('../../functions/utilities.js');
 
 const axiomIngest = new Axiom({
 	token: process.env.AXIOM_TOKEN,

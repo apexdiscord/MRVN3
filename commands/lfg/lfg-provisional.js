@@ -204,7 +204,7 @@ module.exports = {
 				ephemeral: true,
 			});
 
-			axiomIngest.ingest('mrvn.lfg', [{ region: splitChannelName(interaction.channel.name) }]);
+			axiomIngest.ingest('mrvn.lfg', [{ region: splitChannelName(interaction.channel.name, 0), platform: splitChannelName(interaction.channel.name, 1) }]);
 
 			if (buttonRow.components.length == 0) {
 				await interaction.channel.send({

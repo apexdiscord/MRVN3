@@ -33,9 +33,9 @@ function logFormatter(state, text) {
 	return `<t:${logTimestamp}:f> :microphone2: ${emotes[text]} <@${state.member.user.id}> (**${state.member.user.username}**, \`${state.member.user.id}\`) ${text} <#${state.channel.id}> (**${state.channel.name}**, \`${state.channel.id}\`)`;
 }
 
-function splitChannelName(name) {
+function splitChannelName(name, position) {
 	let parts = name.split('-');
-	let firstPart = parts[0].trim();
+	let firstPart = parts[position].trim();
 
 	return firstPart;
 }

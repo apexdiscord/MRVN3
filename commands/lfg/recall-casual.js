@@ -1,8 +1,14 @@
 const moment = require('moment');
+const { Axiom } = require('@axiomhq/js');
 const db = require('../../functions/database.js');
 const { ButtonStyle, ButtonBuilder, ActionRowBuilder, SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 const { setVCLimit, checkVoiceChannel, vcLinkButtonBuilder, doesUserHaveSlowmode } = require('../../functions/utilities.js');
+
+const axiomIngest = new Axiom({
+	token: process.env.AXIOM_TOKEN,
+	orgId: process.env.AXIOM_ORG,
+});
 
 module.exports = {
 	data: new SlashCommandBuilder().setName('rc').setDescription('Recall your saved casual LFG post. These posts are deleted after they have been saved for 28 days.'),
@@ -105,6 +111,8 @@ module.exports = {
 						value: `${savedDataRow[0].gamertag}`,
 						inline: true,
 					});
+
+				axiomIngest.ingest('mrvn.lfg', [{ region: splitChannelName(interaction.channel.name, 0), platform: splitChannelName(interaction.channel.name, 1) }]);
 
 				if (buttonRow.components.length == 0) {
 					await interaction.channel.send({

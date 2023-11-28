@@ -1,11 +1,16 @@
 const chalk = require('chalk');
 const moment = require('moment');
-const Database = require('better-sqlite3');
+const { Axiom } = require('@axiomhq/js');
 const { ButtonStyle, EmbedBuilder, ButtonBuilder } = require('discord.js');
 
 const emotes = require('../data/emotes.json');
 const db = require('../functions/database.js');
 var bannedWords = require('../data/bannedWords.json');
+
+const axiomIngest = new Axiom({
+	token: process.env.AXIOM_TOKEN,
+	orgId: process.env.AXIOM_ORG,
+});
 
 function setVCLimit(mode, channel) {
 	if (!channel.member.voice.channel) return;
@@ -192,11 +197,15 @@ async function timeoutController(length, lengthFull, memberKicked, interaction, 
 		var textInfo = `Thier timeout will expire <t:${unmuteTimestamp}:R>, <t:${unmuteTimestamp}:d> at <t:${unmuteTimestamp}:t>`;
 		var embedColor = 'CA2128';
 
+		axiomIngest.ingest('mrvn.lfg', [{ action: 'kick', duration: '28 days' }]);
+
 		memberKicked.timeout(length, 'User was timed out for 28 days due to being kicked from an LFG channel 9 or more times in the past 24 hours.').catch(console.error);
 	} else if (length == 3600_000) {
 		var textTitle = `${memberKicked.user.username} was issued a 1 hour timeout!`;
 		var textInfo = `Their timeout will expire <t:${unmuteTimestamp}:R>, at <t:${unmuteTimestamp}:t>`;
 		var embedColor = 'E9BE1A';
+
+		axiomIngest.ingest('mrvn.lfg', [{ action: 'kick', duration: '1 hour' }]);
 
 		memberKicked.timeout(length, 'User was timed out for 1 hour due to being kicked from an LFG channel 6 or more times in the past 24 hours.').catch(console.error);
 	} else if (length == 600_000) {
@@ -204,11 +213,15 @@ async function timeoutController(length, lengthFull, memberKicked, interaction, 
 		var textInfo = `Their timeout will expire <t:${unmuteTimestamp}:R>, at <t:${unmuteTimestamp}:t>`;
 		var embedColor = '1A6EC8';
 
+		axiomIngest.ingest('mrvn.lfg', [{ action: 'kick', duration: '10 minutes' }]);
+
 		memberKicked.timeout(length, 'User was timed out for 10 minutes due to being kicked from an LFG channel 3 or more times in the past hour.').catch(console.error);
 	} else {
 		var textTitle = `${memberKicked.user.username} was kicked from a voice channel!`;
 		var textInfo = 'They were kicked, but were not issued a timeout.';
 		var embedColor = '1A6EC8';
+
+		axiomIngest.ingest('mrvn.lfg', [{ action: 'kick', duration: 'none' }]);
 	}
 
 	const kickChannel = interaction.guild.channels.cache.get(process.env.VC_KICK);

@@ -1,7 +1,6 @@
 const chalk = require('chalk');
 const moment = require('moment');
 const Database = require('better-sqlite3');
-const { Table } = require('console-table-printer');
 const { SlashCommandBuilder } = require('discord.js');
 
 const { timeoutController } = require('../../functions/utilities.js');
@@ -51,25 +50,6 @@ module.exports = {
 			const entryCount1 = db_memberDecay.prepare(`SELECT COUNT(*) FROM memberDecay1 WHERE id = ?`).get(userToKickID)['COUNT(*)'];
 			const entryCount2 = db_memberDecay.prepare(`SELECT COUNT(*) FROM memberDecay2 WHERE id = ?`).get(userToKickID)['COUNT(*)'];
 			const entryCount3 = db_memberDecay.prepare(`SELECT COUNT(*) FROM memberDecay3 WHERE id = ?`).get(userToKickID)['COUNT(*)'];
-
-			const entryCountTable = new Table({
-				title: `Kick Count for ${memberToKick.user.username} (${memberToKick.user.id})`,
-				columns: [
-					{ name: 'entryCount1', title: '10m Timeout Count', color: 'blue' },
-					{ name: 'entryCount2', title: '1h Timeout Count', color: 'yellow' },
-					{ name: 'entryCount3', title: '28d Timeout Count', color: 'red' },
-				],
-			});
-
-			entryCountTable.addRows([
-				{
-					entryCount1: entryCount1,
-					entryCount2: entryCount2,
-					entryCount3: entryCount3,
-				},
-			]);
-
-			entryCountTable.printTable();
 
 			// Set timeouts for kicked user
 			if (entryCount3 >= 9) {

@@ -3,7 +3,6 @@ const dotenv = require('dotenv');
 const moment = require('moment');
 const Database = require('better-sqlite3');
 const db = require('./functions/database.js');
-const { Table } = require('console-table-printer');
 const { Client, GatewayIntentBits } = require('discord.js');
 
 // Load utilities
@@ -218,86 +217,6 @@ function deleteSlowmodeEntries() {
 		}
 	});
 }
-
-function currentBotStats() {
-	// The idea is to run a command that spits out information to
-	// the console about current DB counts and such. Maybe in the
-	// future it'll update a message in the server for easier
-	// viewing.
-	const minutes = moment().minute();
-
-	if (minutes % 30 == 0) {
-		const oneHourAgo = moment().subtract(1, 'hour').unix();
-		const twoHoursAgo = moment().subtract(2, 'hour').unix();
-
-		// const savedCasualPostCount = db_savedLFGPosts.prepare(`SELECT COUNT(*) FROM casualLFG`).get()['COUNT(*)'];
-		// const savedRankedPostCount = db_savedLFGPosts.prepare(`SELECT COUNT(*) FROM rankedLFG`).get()['COUNT(*)'];
-		const timeoutEntryCount1 = db_memberDecay.prepare(`SELECT COUNT(*) FROM memberDecay1`).get()['COUNT(*)'];
-		const timeoutEntryCount2 = db_memberDecay.prepare(`SELECT COUNT(*) FROM memberDecay2`).get()['COUNT(*)'];
-		const timeoutEntryCount3 = db_memberDecay.prepare(`SELECT COUNT(*) FROM memberDecay3`).get()['COUNT(*)'];
-		const vcOwnerCountTotal = db_vcOwnerList.prepare(`SELECT COUNT(*) FROM vcOwnerList`).get()['COUNT(*)'];
-		const vcOwnerCountOneHour = db_vcOwnerList.prepare(`SELECT COUNT(*) FROM vcOwnerList WHERE timestamp <= ${oneHourAgo}`).get()['COUNT(*)'];
-		const vcOwnerCountTwoHours = db_vcOwnerList.prepare(`SELECT COUNT(*) FROM vcOwnerList WHERE timestamp <= ${twoHoursAgo}`).get()['COUNT(*)'];
-
-		// const savedPostCountTable = new Table({
-		// 	title: `Saved LFG Post Count`,
-		// 	columns: [
-		// 		{ name: 'casualSavedCount', title: 'Saved Casual LFG Posts' },
-		// 		{ name: 'rankedSavedCount', title: 'Saved Ranked LFG Posts' },
-		// 	],
-		// });
-
-		// savedPostCountTable.addRows([
-		// 	{
-		// 		casualSavedCount: savedCasualPostCount,
-		// 		rankedSavedCount: savedRankedPostCount,
-		// 	},
-		// ]);
-
-		const timeoutCountTable = new Table({
-			title: `Timeout Entry Count`,
-			columns: [
-				{ name: 'timeoutCount1', title: '10m Timeout Entries' },
-				{ name: 'timeoutCount2', title: '1h Timeout Entries' },
-				{ name: 'timeoutCount3', title: '28d Timeout Entries' },
-			],
-		});
-
-		timeoutCountTable.addRows([
-			{
-				timeoutCount1: timeoutEntryCount1,
-				timeoutCount2: timeoutEntryCount2,
-				timeoutCount3: timeoutEntryCount3,
-			},
-		]);
-
-		const vcOwnerCountTable = new Table({
-			title: `Number of VC Owners`,
-			columns: [
-				{ name: 'vcOwnerCountTotal', title: 'Total VC Owners' },
-				{ name: 'vcOwnerCountOneHour', title: 'VC Owners [1+ Hours]' },
-				{ name: 'vcOwnerCountTwoHours', title: 'VC Owners [2+ Hours]' },
-			],
-		});
-
-		vcOwnerCountTable.addRows([
-			{
-				vcOwnerCountTotal: vcOwnerCountTotal,
-				vcOwnerCountOneHour: vcOwnerCountOneHour,
-				vcOwnerCountTwoHours: vcOwnerCountTwoHours,
-			},
-		]);
-
-		// savedPostCountTable.printTable();
-		timeoutCountTable.printTable();
-		vcOwnerCountTable.printTable();
-	}
-}
-
-// Bot Stats Timer
-// Runs once a minute, but only actually prints to the console
-// on the 30th minute of the hour
-setInterval(currentBotStats, 60 * 1000);
 
 // 10 Minute Kick Counter Timer
 // Ran every 10 minutes

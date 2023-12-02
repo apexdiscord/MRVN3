@@ -189,7 +189,7 @@ function saveRankedLFGPost(interaction, mode, description, currentRank, previous
 	console.log(chalk.blue(`${chalk.bold(`[OVERWATCH]`)} Saved LFG post from ${interaction.user.username} to savedRankedLFGPosts table`));
 }
 
-async function timeoutController(length, lengthFull, memberKicked, interaction, entryOne, entryTwo, entryThree) {
+async function timeoutController(length, lengthFull, memberKicked, interaction, entryOne, entryTwo, entryThree, reason) {
 	const unmuteTimestamp = Math.floor(new Date(Date.now() + lengthFull) / 1000);
 
 	if (length == 2419199_000) {
@@ -263,6 +263,8 @@ async function timeoutController(length, lengthFull, memberKicked, interaction, 
 		])
 		.setTimestamp()
 		.setColor(embedColor);
+
+	if (reason != null) timeoutEmbed.addFields({ name: 'Reason', value: reason, inline: false });
 
 	kickChannel.send({ embeds: [timeoutEmbed] });
 

@@ -38,7 +38,7 @@ module.exports = {
 			return await interaction.editReply({ content: `You must be in the same voice channel as <@${memberToKick.id}> to kick them.`, ephemeral: true });
 
 		// If the person the user mentioned is server staff, do nothing
-		if (memberToKick.roles.cache.some(role => role.name === 'Discord Moderator'))
+		if (memberToKick.roles.cache.some(role => role.name === 'Staff'))
 			return await interaction.editReply({ content: `You cannot kick <@${memberToKick.id}> as they are server staff.`, ephemeral: true });
 
 		try {

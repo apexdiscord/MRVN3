@@ -1,6 +1,6 @@
 {
 	"name": "mrvn",
-	"version": "1.1.13",
+	"version": "1.1.14",
 	"description": "Apex Legends Discord LFG Bot",
 	"main": "index.js",
 	"scripts": {
@@ -14,13 +14,13 @@
 	"dependencies": {
 		"@axiomhq/js": "^1.0.0-rc.1",
 		"@discordjs/rest": "^2.2.0",
-		"axios": "^1.6.2",
+		"axios": "^1.6.3",
 		"better-sqlite3": "^9.2.2",
 		"chalk": "4.1.2",
-		"discord-api-types": "^0.37.66",
+		"discord-api-types": "^0.37.67",
 		"discord.js": "^14.14.1",
 		"dotenv": "16.3.1",
-		"moment": "2.29.4",
+		"moment": "2.30.1",
 		"mysql2": "^3.6.5"
 	},
 	"devDependencies": {

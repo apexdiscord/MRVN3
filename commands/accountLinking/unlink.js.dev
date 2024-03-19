@@ -9,13 +9,13 @@ module.exports = {
 
 		const discordID = interaction.user.id;
 
-		Database.query('SELECT COUNT(*) AS count FROM specter WHERE discordID = ?', [discordID], async (err, row) => {
+		Database.query('SELECT COUNT(*) AS count FROM specter_mrvn WHERE discordID = ?', [discordID], async (err, row) => {
 			if (err) console.log(err);
 
 			if (row[0]['count'] >= 1) {
 				console.log('delete linked account');
 
-				Database.query('DELETE FROM specter WHERE discordID = ?', [discordID], async (err, row) => {
+				Database.query('DELETE FROM specter_mrvn WHERE discordID = ?', [discordID], async (err, row) => {
 					if (err) console.log(err);
 
 					console.log('deleted :P');

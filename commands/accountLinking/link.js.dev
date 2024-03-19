@@ -127,7 +127,7 @@ module.exports = {
 					return;
 				}
 
-				Database.query('SELECT COUNT(*) AS count FROM specter WHERE discordID = ?', [discordID], async (err, row) => {
+				Database.query('SELECT COUNT(*) AS count FROM specter_mrvn WHERE discordID = ?', [discordID], async (err, row) => {
 					if (err) console.log(err);
 
 					if (row[0]['count'] >= 1) {

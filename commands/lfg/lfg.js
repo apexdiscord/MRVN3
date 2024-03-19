@@ -130,7 +130,7 @@ module.exports = {
 			}
 
 			// Check if the user has stats in the DB
-			const linkedUserRow = `SELECT * FROM specter WHERE discordID = ?`;
+			const linkedUserRow = `SELECT * FROM specter_mrvn WHERE discordID = ?`;
 
 			db.query(linkedUserRow, [interaction.user.id], async (err, linkedUserRow) => {
 				const buttonRow = new ActionRowBuilder();

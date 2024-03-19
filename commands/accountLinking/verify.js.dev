@@ -16,7 +16,7 @@ module.exports = {
 		// check second tracker, api and database match, move onto third tracker
 		// check third tracker, api and database match, verification complete
 
-		// FIRST: add the discord id, player id, and platform to specter
+		// FIRST: add the discord id, player id, and platform to specter_mrvn
 		// remove the temp link from temp_linking
 		// send an embed, "success!!!!!!"
 
@@ -26,7 +26,7 @@ module.exports = {
 
 		const discordID = interaction.user.id;
 
-		Database.query('SELECT COUNT(*) AS count FROM specter WHERE discordID = ?', [discordID], async (err, row) => {
+		Database.query('SELECT COUNT(*) AS count FROM specter_mrvn WHERE discordID = ?', [discordID], async (err, row) => {
 			if (err) console.log(err);
 
 			if (row[0]['count'] >= 1) {
@@ -174,12 +174,12 @@ module.exports = {
 								await interaction.editReply({ content: '', embeds: [verifyEmbed] });
 
 								Database.query(
-									'INSERT INTO specter (discordID, playerID, platform) VALUES (?, ?, ?)',
+									'INSERT INTO specter_mrvn (discordID, playerID, platform) VALUES (?, ?, ?)',
 									[discordID, row[0]['playerID'], row[0]['platform']],
 									async (err, row) => {
 										if (err) console.log(err);
 
-										console.log('inserted into specter :3');
+										console.log('inserted into specter_mrvn :3');
 
 										Database.query('DELETE FROM temp_linking WHERE discordID = ?', [discordID], async (err, row) => {
 											if (err) console.log(err);

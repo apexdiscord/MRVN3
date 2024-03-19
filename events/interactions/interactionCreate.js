@@ -11,7 +11,7 @@ module.exports = {
 	once: false,
 	async execute(interaction, client) {
 		if (interaction.isButton()) {
-			const linkedUserRow = `SELECT * FROM specter WHERE discordID = ?`;
+			const linkedUserRow = `SELECT * FROM specter_mrvn WHERE discordID = ?`;
 
 			db.query(linkedUserRow, [interaction.user.id], async (err, linkedUserRow) => {
 				try {

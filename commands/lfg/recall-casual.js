@@ -28,7 +28,7 @@ module.exports = {
 		}
 
 		// Retrieve the saved LFG data from the database
-		const savedPostData = `SELECT * FROM savedCasualLFGPosts WHERE discordID = ?`;
+		const savedPostData = `SELECT * FROM savedCasualLFGPosts WHERE discordID = ? ORDER BY timestamp DESC LIMIT 1`;
 
 		db.query(savedPostData, [interaction.user.id], async (err, savedDataRow) => {
 			// If there is no saved post, return an error

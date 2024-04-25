@@ -28,7 +28,7 @@ module.exports = {
 		}
 
 		// Retrieve the saved LFG data from the database
-		const savedPostData = `SELECT * FROM savedRankedLFGPosts WHERE discordID = ?`;
+		const savedPostData = `SELECT * FROM savedRankedLFGPosts WHERE discordID = ? ORDER BY timestamp DESC LIMIT 1`;
 
 		db.query(savedPostData, [interaction.user.id], async (err, savedDataRow) => {
 			// If there is no saved post, return an error
@@ -51,7 +51,7 @@ module.exports = {
 			// If false, continue with the command and add a slowmode to the user
 			await doesUserHaveSlowmode(interaction, slowmodeAmount);
 
-			let slowmodeQuery = 'SELECT postTimestamp FROM userPostSlowmode WHERE discordID = ? ORDER BY timestamp DESC LIMIT 1';
+			let slowmodeQuery = 'SELECT postTimestamp FROM userPostSlowmode WHERE discordID = ?';
 
 			db.query(slowmodeQuery, [interaction.user.id], async (err, slowmodeRow) => {
 				if (slowmodeRow.length != 0) {

@@ -29,6 +29,12 @@ function setVCLimit(mode, channel) {
 
 			return console.log(chalk.yellow(`${chalk.bold('[VOICE]')} Set user limit of "${channel.member.voice.channel.name}" to 3`));
 		}
+	} else if (mode == 'Quads') {
+		if (channel.member.voice.channel.userLimit != 4) {
+			channel.member.voice.channel.setUserLimit(4);
+
+			return console.log(chalk.yellow(`${chalk.bold('[VOICE]')} Set user limit of "${channel.member.voice.channel.name}" to 4`));
+		}
 	}
 }
 

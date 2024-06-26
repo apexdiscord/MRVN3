@@ -16,13 +16,17 @@ module.exports = {
 		.setDescription('Create an LFG prompt for Battle Royale Trios and Duos.')
 		.addStringOption(option =>
 			option.setName('mode').setDescription('Select the mode you want to play.').setRequired(true).addChoices(
-				{
-					name: 'Duos',
-					value: 'Duos',
-				},
+				// {
+				// 	name: 'Duos',
+				// 	value: 'Duos',
+				// },
 				{
 					name: 'Trios',
 					value: 'Trios',
+				},
+				{
+					name: 'Quads',
+					value: 'Quads',
 				},
 			),
 		)

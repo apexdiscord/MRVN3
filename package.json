@@ -13,18 +13,18 @@
 	},
 	"dependencies": {
 		"@axiomhq/js": "^1.0.0-rc.3",
-		"@discordjs/rest": "^2.2.0",
-		"axios": "^1.6.8",
-		"better-sqlite3": "^9.5.0",
+		"@discordjs/rest": "^2.3.0",
+		"axios": "^1.7.2",
+		"better-sqlite3": "^11.0.0",
 		"chalk": "4.1.2",
-		"discord-api-types": "^0.37.79",
-		"discord.js": "^14.14.1",
+		"discord-api-types": "^0.37.90",
+		"discord.js": "^14.15.3",
 		"dotenv": "16.4.5",
 		"moment": "2.30.1",
-		"mysql2": "^3.9.6"
+		"mysql2": "^3.10.1"
 	},
 	"devDependencies": {
-		"eslint": "^9.1.0",
-		"nodemon": "^3.1.0"
+		"eslint": "^9.5.0",
+		"nodemon": "^3.1.4"
 	}
 }

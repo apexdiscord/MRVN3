@@ -52,6 +52,8 @@ module.exports = {
 					{ name: "World's Edge", value: "World's Edge" },
 					{ name: 'Olympus', value: 'Olympus' },
 					{ name: 'Broken Moon', value: 'Broken Moon' },
+					{ name: 'Storm Point', value: 'Storm Point' },
+					{ name: 'E-District', value: 'E-District' },
 					{ name: 'Phase Runner', value: 'Phase Runner' },
 					{ name: 'Hammond Labs', value: 'Hammond Labs' },
 					{ name: 'Skull Town', value: 'Skull Town' },

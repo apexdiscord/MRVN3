@@ -39,10 +39,6 @@ module.exports = {
 					name: '2',
 					value: '2',
 				},
-				{
-					name: '3',
-					value: '3',
-				},
 			),
 		)
 		.addStringOption(option =>

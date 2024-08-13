@@ -35,11 +35,17 @@ module.exports = {
 				.setDescription('What is the game mode for the lobby?')
 				.setRequired(true)
 				.addChoices(
-					{ name: 'Battle Royale Trios', value: 'Battle Royale Trios' },
-					{ name: 'Battle Royale Duos', value: 'Battle Royale Duos' },
+					{ name: 'Battle Royale: Trios', value: 'Battle Royale: Trios' },
+					{ name: 'Battle Royale: Duos', value: 'Battle Royale: Duos' },
 					{ name: 'Team Deathmatch', value: 'Team Deathmatch' },
-					{ name: 'Control', value: 'Control' },
 					{ name: 'Gun Run', value: 'Gun Run' },
+					{ name: 'Control', value: 'Control' },
+					{ name: 'ALGS', value: 'ALGS' },
+					{ name: 'Straight Shot - Revival', value: 'Straight Shot - Revival' },
+					{ name: 'Trios - Revival', value: 'Trios - Revival' },
+					{ name: 'Battle Royale: Quads', value: 'Battle Royale: Quads' },
+					{ name: 'Big Team Deathmatch', value: 'Big Team Deathmatch' },
+					{ name: 'Other', value: 'Other' },
 				),
 		)
 		.addStringOption(option =>
@@ -61,6 +67,11 @@ module.exports = {
 					{ name: 'Estates', value: 'Estates' },
 					{ name: 'The Core', value: 'The Core' },
 					{ name: 'Production Yard', value: 'Production Yard' },
+					{ name: 'Thunderdome', value: 'Thunderdome' },
+					{ name: "Wattson's Pylon", value: "Wattson's Pylon" },
+					{ name: 'Zeus Station', value: 'Zeus Station' },
+					{ name: 'Habitat 4', value: 'Habitat 4' },
+					{ name: 'Monument', value: 'Monument' },
 				),
 		)
 		.addStringOption(option =>

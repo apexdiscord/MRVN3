@@ -8,23 +8,16 @@
 	},
 	"author": "zod",
 	"license": "ISC",
-	"engines": {
-		"node": "18.18.2"
-	},
 	"dependencies": {
 		"@axiomhq/js": "^1.0.0-rc.3",
 		"@discordjs/rest": "^2.3.0",
 		"axios": "^1.7.3",
 		"better-sqlite3": "^11.1.2",
 		"chalk": "4.1.2",
-		"discord-api-types": "^0.37.93",
+		"discord-api-types": "^0.37.94",
 		"discord.js": "^14.15.3",
 		"dotenv": "^16.4.5",
 		"moment": "^2.30.1",
 		"mysql2": "^3.11.0"
-	},
-	"devDependencies": {
-		"eslint": "^9.9.0",
-		"nodemon": "^3.1.4"
 	}
 }

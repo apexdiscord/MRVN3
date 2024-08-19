@@ -11,7 +11,7 @@ module.exports = {
 		.setName('kick')
 		.setDescription('Removes a user from your channel. You must have joined an empty channel first to use this command.')
 		.addUserOption(option => option.setName('member-name').setDescription('The username of the user you want to kick.').setRequired(true))
-		.addStringOption(option => option.setName('reason').setDescription('The reason for kicking the user.').setRequired(false)),
+		.addStringOption(option => option.setName('reason').setDescription('The reason for kicking the user.').setRequired(true)),
 
 	async execute(interaction) {
 		await interaction.deferReply({ ephemeral: true });

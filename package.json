@@ -1,6 +1,6 @@
 {
 	"name": "mrvn",
-	"version": "1.1.23",
+	"version": "1.1.24",
 	"description": "Apex Legends Discord LFG Bot",
 	"main": "index.js",
 	"scripts": {

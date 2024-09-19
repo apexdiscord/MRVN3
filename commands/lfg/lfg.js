@@ -16,18 +16,18 @@ module.exports = {
 		.setDescription('Create an LFG prompt for Battle Royale Trios and Duos.')
 		.addStringOption(option =>
 			option.setName('mode').setDescription('Select the mode you want to play.').setRequired(true).addChoices(
-				// {
-				// 	name: 'Duos',
-				// 	value: 'Duos',
-				// },
+				{
+					name: 'Duos',
+					value: 'Duos',
+				},
 				{
 					name: 'Trios',
 					value: 'Trios',
 				},
-				{
-					name: 'Quads',
-					value: 'Quads',
-				},
+				// {
+				// 	name: 'Quads',
+				// 	value: 'Quads',
+				// },
 			),
 		)
 		.addStringOption(option => option.setName('message').setDescription('Enter any information you want others to know.').setRequired(true))
@@ -53,10 +53,10 @@ module.exports = {
 					name: '2',
 					value: '2',
 				},
-				{
-					name: '3',
-					value: '3',
-				},
+				// {
+				// 	name: '3',
+				// 	value: '3',
+				// },
 			),
 		)
 		.addStringOption(option =>

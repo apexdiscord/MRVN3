@@ -1,7 +1,7 @@
 const chalk = require('chalk');
 const moment = require('moment');
 const Database = require('better-sqlite3');
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, MessageFlags } = require('discord.js');
 
 const { timeoutController } = require('../../functions/utilities.js');
 const db_memberDecay = new Database(`${__dirname}/../../databases/memberDecay.sqlite`);
@@ -14,7 +14,7 @@ module.exports = {
 		.addStringOption(option => option.setName('reason').setDescription('The reason for kicking the user.').setRequired(true)),
 
 	async execute(interaction) {
-		await interaction.deferReply({ ephemeral: true });
+		await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
 		// Get reason for kick
 		const kickReason = interaction.options.getString('reason') || null;
@@ -27,19 +27,20 @@ module.exports = {
 		const kickUser = interaction.guild.members.cache.get(interaction.user.id);
 
 		// If the person the user mentioned is themselves, do nothing
-		if (kickUser.id == userToKick.id) return await interaction.editReply({ content: `You cannot kick yourself from the voice channel.`, ephemeral: true });
+		if (kickUser.id == userToKick.id) return await interaction.editReply({ content: `You cannot kick yourself from the voice channel.`, flags: MessageFlags.Ephemeral });
 
 		// If the person the user wants to kick is not in a voice channel, display an error
-		if (!memberToKick.voice.channel) return await interaction.editReply({ content: `<@${memberToKick.id}> is not connected to a voice channel.`, ephemeral: true });
+		if (!memberToKick.voice.channel)
+			return await interaction.editReply({ content: `<@${memberToKick.id}> is not connected to a voice channel.`, flags: MessageFlags.Ephemeral });
 
 		// If the person the user mentioned is in a voice channel but
 		// not the one the user is in, display an error
 		if (!memberToKick.voice.channel || memberToKick.voice.channel.id !== kickUser.voice.channel.id)
-			return await interaction.editReply({ content: `You must be in the same voice channel as <@${memberToKick.id}> to kick them.`, ephemeral: true });
+			return await interaction.editReply({ content: `You must be in the same voice channel as <@${memberToKick.id}> to kick them.`, flags: MessageFlags.Ephemeral });
 
 		// If the person the user mentioned is server staff, do nothing
 		if (memberToKick.roles.cache.some(role => role.name === 'Staff'))
-			return await interaction.editReply({ content: `You cannot kick <@${memberToKick.id}> as they are server staff.`, ephemeral: true });
+			return await interaction.editReply({ content: `You cannot kick <@${memberToKick.id}> as they are server staff.`, flags: MessageFlags.Ephemeral });
 
 		try {
 			const timestamp = moment().unix();
@@ -71,7 +72,7 @@ module.exports = {
 
 			await interaction.editReply({
 				content: `Successfully removed <@${userToKick.id}> from the voice channel.${kickModMailText}`,
-				ephemeral: true,
+				flags: MessageFlags.Ephemeral,
 			});
 
 			// Send a DM to the user when they are kicked
@@ -85,7 +86,7 @@ module.exports = {
 		} catch (error) {
 			console.log(error);
 
-			await interaction.editReply({ content: 'There was an error while executing this command!', ephemeral: true });
+			await interaction.editReply({ content: 'There was an error while executing this command!', flags: MessageFlags.Ephemeral });
 		}
 	},
 };

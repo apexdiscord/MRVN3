@@ -1,7 +1,7 @@
 const chalk = require('chalk');
 const moment = require('moment');
 const { Axiom } = require('@axiomhq/js');
-const { ButtonStyle, EmbedBuilder, ButtonBuilder } = require('discord.js');
+const { ButtonStyle, EmbedBuilder, ButtonBuilder, MessageFlags } = require('discord.js');
 
 const emotes = require('../data/emotes.json');
 const db = require('../functions/database.js');
@@ -62,7 +62,7 @@ function checkBannedWords(message, interaction) {
 		interaction.editReply({
 			content:
 				'Your LFG message contains blocked content. Please try again.\n\n*Note: You do not need to include a link in your LFG post. A link will automatically be generated.*',
-			ephemeral: true,
+			flags: MessageFlags.Ephemeral,
 		});
 
 		if (process.env.LFG_ALERTS !== undefined) {
@@ -298,7 +298,7 @@ function doesUserHaveSlowmode(interaction, time) {
 				// If it is, send a message saying they have to wait to post again
 				interaction.editReply({
 					content: `You are posting too quickly. You will be able to post again <t:${slowmodeRow[0].postTimestamp + time}:R>.`,
-					ephemeral: true,
+					flags: MessageFlags.Ephemeral,
 				});
 			} else {
 				// If it isn't, update their entry in the database with the current time and allow the post to be posted

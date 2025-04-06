@@ -22,7 +22,7 @@ module.exports = {
 			const daysSince = moment().diff(moment('2014-03-18'), 'days');
 
 			// Set bot status to "X Days since Last Directive"
-			client.user.setActivity(`${daysSince.toLocaleString()} Days since Last Directive`, { type: ActivityType.Custom });
+			client.user.setActivity(`${daysSince.toLocaleString()} DAYS SINCE LAST DIRECTIVE`, { type: ActivityType.Custom });
 
 			console.log(chalk.green(`${chalk.bold('[BOT]')} Updated bot presence`));
 		}

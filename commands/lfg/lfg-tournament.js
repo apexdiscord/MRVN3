@@ -2,7 +2,7 @@ const chalk = require('chalk');
 const moment = require('moment');
 const { Axiom } = require('@axiomhq/js');
 const db = require('../../functions/database.js');
-const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
+const { EmbedBuilder, SlashCommandBuilder, MessageFlags } = require('discord.js');
 
 const { splitChannelName, checkBannedWordsCustom, checkVoiceChannel } = require('../../functions/utilities.js');
 
@@ -94,11 +94,11 @@ module.exports = {
 		// Check to see if they are in a VC that in a category
 		// that is not allowed to be edited.
 		if (checkVoiceChannel(interaction.member.voice) == true) {
-			await interaction.deferReply({ ephemeral: true });
+			await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
 			await interaction.editReply({
 				content: `You cannot use this command while in <#${interaction.member.voice.channel.id}>.\nPlease disconnect or move to an LFG voice channel.`,
-				ephemeral: true,
+				flags: MessageFlags.Ephemeral,
 			});
 
 			return;
@@ -125,11 +125,11 @@ module.exports = {
 			checkBannedWordsCustom(tournamentName, interaction, false) == true ||
 			checkBannedWordsCustom(tournamentDate, interaction, false) == true
 		) {
-			await interaction.deferReply({ ephemeral: true });
+			await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
 			await interaction.editReply({
 				content: 'Your LFG message contains a banned word. Please try again.',
-				ephemeral: true,
+				flags: MessageFlags.Ephemeral,
 			});
 
 			return;
@@ -145,11 +145,11 @@ module.exports = {
 			if (slowmodeRow.length != 0) {
 				// If the time since is less than the slowmode should be active for, return an error
 				if (slowmodeRow[0].postTimestamp + slowmodeAmount > moment().unix()) {
-					await interaction.deferReply({ ephemeral: true });
+					await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
 					await interaction.editReply({
 						content: `You are posting too quickly. You will be able to post again <t:${slowmodeRow[0].postTimestamp + slowmodeAmount}:R>.`,
-						ephemeral: true,
+						flags: MessageFlags.Ephemeral,
 					});
 
 					return;
@@ -180,7 +180,7 @@ module.exports = {
 				console.log(chalk.blue(`${chalk.bold(`OVERWATCH:`)} Added ${interaction.user.username} to userPostSlowmode table`));
 			}
 
-			await interaction.deferReply({ ephemeral: false });
+			await interaction.deferReply();
 
 			const lfgTournamentEmbed = new EmbedBuilder()
 				.setAuthor({

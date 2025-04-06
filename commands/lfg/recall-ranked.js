@@ -1,7 +1,7 @@
 const moment = require('moment');
 const { Axiom } = require('@axiomhq/js');
 const db = require('../../functions/database.js');
-const { ButtonStyle, EmbedBuilder, ButtonBuilder, ActionRowBuilder, SlashCommandBuilder } = require('discord.js');
+const { ButtonStyle, EmbedBuilder, ButtonBuilder, ActionRowBuilder, SlashCommandBuilder, MessageFlags } = require('discord.js');
 
 const { setVCLimit, splitChannelName, checkVoiceChannel, vcLinkButtonBuilder, doesUserHaveSlowmode } = require('../../functions/utilities.js');
 
@@ -14,14 +14,14 @@ module.exports = {
 	data: new SlashCommandBuilder().setName('rr').setDescription('Recall your saved ranked LFG post. These posts are deleted after they have been saved for 7 days.'),
 
 	async execute(interaction) {
-		await interaction.deferReply({ ephemeral: true });
+		await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
 		// Check to see if they are in a VC that in a category
 		// that is not allowed to be edited.
 		if (checkVoiceChannel(interaction.member.voice) == true) {
 			await interaction.editReply({
 				content: `You cannot use this command while in <#${interaction.member.voice.channel.id}>.\nPlease disconnect or move to an LFG voice channel.`,
-				ephemeral: true,
+				flags: MessageFlags.Ephemeral,
 			});
 
 			return;
@@ -35,7 +35,7 @@ module.exports = {
 			if (savedDataRow.length === 0) {
 				await interaction.editReply({
 					content: 'You have not saved an LFG post. Use an LFG command and select `Yes` for the "save" option to save a post!',
-					ephemeral: true,
+					flags: MessageFlags.Ephemeral,
 				});
 
 				return;
@@ -62,7 +62,7 @@ module.exports = {
 
 				await interaction.editReply({
 					content: 'Posted your saved LFG post below.',
-					ephemeral: true,
+					flags: MessageFlags.Ephemeral,
 				});
 
 				const currentRankText = function () {

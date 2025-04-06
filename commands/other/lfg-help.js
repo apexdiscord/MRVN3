@@ -1,10 +1,10 @@
-const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
+const { EmbedBuilder, SlashCommandBuilder, MessageFlags } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder().setName('lfg-help').setDescription('Shows the help menu for the LFG command'),
 
 	async execute(interaction) {
-		await interaction.deferReply({ ephemeral: true });
+		await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
 		const helpEmbed = new EmbedBuilder()
 			.setTitle('MRVN³ LFG - Help')

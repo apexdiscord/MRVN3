@@ -2,7 +2,7 @@ const axios = require('axios');
 const chalk = require('chalk');
 const Database = require('better-sqlite3');
 const db = require('../../functions/database.js');
-const { InteractionType } = require('discord.js');
+const { InteractionType, MessageFlags } = require('discord.js');
 
 const db_vcOwnerList = new Database(`${__dirname}/../../databases/vcOwnerList.sqlite`);
 
@@ -22,7 +22,7 @@ module.exports = {
 
 					interaction.reply({
 						content: `username: ${data.user.username}\nstatus: ${data.user.status.online} (probs offline LMAO)\nlevel: ${data.account.level.total}\nrank: ${data.ranked.name} ${data.ranked.score}\nlegend: ${data.active.legend}\n\n**trackers:**\nfirst: ${data.active.trackers[0].name}: ${data.active.trackers[0].value}\nsecond: ${data.active.trackers[1].name}: ${data.active.trackers[1].value}\nthird: ${data.active.trackers[2].name}: ${data.active.trackers[2].value}`,
-						ephemeral: true,
+						flags: MessageFlags.Ephemeral,
 					});
 				} catch (e) {
 					console.log(e);
@@ -44,31 +44,31 @@ module.exports = {
 				} catch (error) {
 					console.log(chalk.red(`${chalk.bold('[BOT]')} Error running /${command.data.name}: ${error}`));
 
-					// await interaction.deferReply({ ephemeral: true });
+					// await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
 					await interaction.editReply({
 						content: 'There was an error while executing this command!',
-						ephemeral: true,
+						flags: MessageFlags.Ephemeral,
 					});
 				}
 			} else {
 				// If the user is not in a voice channel, reply with an error. This should only happen on commands where the commands requires permission to run
 				if (!interaction.member.voice.channel) {
-					await interaction.deferReply({ ephemeral: true });
+					await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
 					await interaction.editReply({
 						content: 'You must be in a voice channel to use this command.',
-						ephemeral: true,
+						flags: MessageFlags.Ephemeral,
 					});
 
 					return;
 				}
 
-				await interaction.deferReply({ ephemeral: true });
+				await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
 				await interaction.editReply({
 					content: 'You do not have permission to use this command.',
-					ephemeral: true,
+					flags: MessageFlags.Ephemeral,
 				});
 			}
 		}

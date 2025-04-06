@@ -1,7 +1,7 @@
 const moment = require('moment');
 const { Axiom } = require('@axiomhq/js');
 const db = require('../../functions/database.js');
-const { ButtonStyle, ButtonBuilder, ActionRowBuilder, SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { ButtonStyle, ButtonBuilder, ActionRowBuilder, SlashCommandBuilder, EmbedBuilder, MessageFlags } = require('discord.js');
 
 const { setVCLimit, splitChannelName, checkBannedWords, saveCasualLFGPost, checkVoiceChannel, vcLinkButtonBuilder, doesUserHaveSlowmode } = require('../../functions/utilities.js');
 
@@ -43,14 +43,14 @@ module.exports = {
 		.addStringOption(option => option.setName('gamertag').setDescription('Enter your gamertag.').setRequired(false)),
 
 	async execute(interaction) {
-		await interaction.deferReply({ ephemeral: true });
+		await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
 		// Check to see if they are in a VC that in a category
 		// that is not allowed to be edited.
 		if (checkVoiceChannel(interaction.member.voice) == true) {
 			await interaction.editReply({
 				content: `You cannot use this command while in <#${interaction.member.voice.channel.id}>.\nPlease disconnect or move to an LFG voice channel.`,
-				ephemeral: true,
+				flags: MessageFlags.Ephemeral,
 			});
 
 			return;
@@ -128,12 +128,12 @@ module.exports = {
 
 				await interaction.editReply({
 					content: 'Your LFG message has been posted and saved, use the `/rc` command to post it again!',
-					ephemeral: true,
+					flags: MessageFlags.Ephemeral,
 				});
 			} else {
 				await interaction.editReply({
 					content: 'Your LFG message has been posted!',
-					ephemeral: true,
+					flags: MessageFlags.Ephemeral,
 				});
 			}
 

@@ -24,10 +24,10 @@ module.exports = {
 					name: 'Trios',
 					value: 'Trios',
 				},
-				// {
-				// 	name: 'Quads',
-				// 	value: 'Quads',
-				// },
+				{
+					name: 'Quads',
+					value: 'Quads',
+				},
 			),
 		)
 		.addStringOption(option => option.setName('message').setDescription('Enter any information you want others to know.').setRequired(true))
@@ -53,10 +53,10 @@ module.exports = {
 					name: '2',
 					value: '2',
 				},
-				// {
-				// 	name: '3',
-				// 	value: '3',
-				// },
+				{
+					name: '3',
+					value: '3',
+				},
 			),
 		)
 		.addStringOption(option =>

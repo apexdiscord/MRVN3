@@ -78,7 +78,7 @@ module.exports = {
 			// Send a DM to the user when they are kicked
 			userToKick
 				.send(
-					'You were kicked from a voice channel by another user. Repeated kicks may lead to a timeout.\n\n*The user who kicked you is not a mod. Please refer to https://discord.com/channels/541484311354933258/542256155125219339/1118325007999827968 for information.*',
+					'You were kicked from a voice channel by another user. Repeated kicks may lead to a timeout.\n-# The user who kicked you is not a mod. Please refer to https://discord.com/channels/541484311354933258/542256155125219339/1118325007999827968 for information.',
 				)
 				.catch(error => {
 					console.log(chalk.yellow(`${chalk.bold(`BOT:`)} Could not DM user.`));

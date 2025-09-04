@@ -25,8 +25,8 @@ module.exports = {
 					value: 'Trios',
 				},
 				{
-					name: 'Arenas',
-					value: 'Arenas',
+					name: 'Wildcard',
+					value: 'Wildcard',
 				},
 			),
 		)

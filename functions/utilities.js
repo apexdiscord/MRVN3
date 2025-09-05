@@ -23,7 +23,7 @@ function setVCLimit(mode, channel) {
 		}
 
 		return;
-	} else if (mode == 'Trios' || mode == 'LTM' || mode == 'Mixtape' || mode == 'Provisional' || mode == 'Ranked') {
+	} else if (mode == 'Trios' || mode == 'LTM' || mode == 'Mixtape' || mode == 'Provisional' || mode == 'Ranked' || mode == 'Wildcard') {
 		if (channel.member.voice.channel.userLimit != 3) {
 			channel.member.voice.channel.setUserLimit(3);
 

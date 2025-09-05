@@ -12,7 +12,7 @@ const db_vcOwnerList = new Database(`${__dirname}/../../databases/vcOwnerList.sq
 const db_memberDecay = new Database(`${__dirname}/../../databases/memberDecay.sqlite`);
 
 module.exports = {
-	name: 'ready',
+	name: 'clientReady',
 	once: true,
 	async execute(client) {
 		console.log(chalk.green(`${chalk.bold('[BOT]')} Logged in as ${client.user.username}`));

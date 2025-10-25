@@ -2,7 +2,7 @@
 	"name": "mrvn",
 	"version": "2.0.0",
 	"description": "Apex Legends Discord LFG Bot",
-	"main": "MRVN.js",
+	"main": "src/MRVN.js",
 	"scripts": {
 		"dev": "nodemon --trace-warnings ."
 	},

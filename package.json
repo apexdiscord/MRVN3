@@ -11,12 +11,13 @@
 	"dependencies": {
 		"@axiomhq/js": "^1.0.0-rc.3",
 		"@discordjs/rest": "^2.6.0",
-		"axios": "^1.12.2",
+		"axios": "^1.13.0",
 		"better-sqlite3": "^12.4.1",
 		"chalk": "4.1.2",
 		"discord-api-types": "^0.38.31",
 		"discord.js": "^14.24.0",
 		"dotenv": "^17.2.3",
+		"luxon": "^3.7.2",
 		"mysql2": "^3.15.3"
 	}
 }

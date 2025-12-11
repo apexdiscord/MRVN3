@@ -31,7 +31,7 @@ module.exports = {
 
 		// Load and Register Slash Commands
 		const commands = [];
-		const rest = new REST({ version: 10 }).setToken(process.env.DISCORD_BOT_TOKEN);
+		const rest = new REST({ version: 10 }).setToken(Bun.env.DISCORD_BOT_TOKEN);
 		const folders = fs.readdirSync(`${__dirname}/../../commands`);
 
 		client.commands = new Collection();
@@ -53,14 +53,14 @@ module.exports = {
 
 		(async () => {
 			try {
-				if (process.env.DEBUG == 'false') {
+				if (Bun.env.DEBUG == 'false') {
 					// Production, register global slash commands
 					await rest.put(Routes.applicationCommands(client.user.id), { body: commands });
 
 					console.log(`${chalk.green.bold(`[MRVN]`)} Deployed global slash commands`);
 				} else {
 					// Development, register guild slash commands
-					await rest.put(Routes.applicationGuildCommands(client.user.id, process.env.DEV_GUILD_ID), { body: commands });
+					await rest.put(Routes.applicationGuildCommands(client.user.id, Bun.env.DEV_GUILD_ID), { body: commands });
 
 					console.log(`${chalk.yellow.bold(`[MRVN]`)} Deployed guild slash commands for dev environment`);
 				}

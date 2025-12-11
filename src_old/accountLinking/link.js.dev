@@ -47,7 +47,7 @@ module.exports = {
 		}
 
 		try {
-			const response = await axios.get(`https://api.jumpmaster.xyz/user/MRVN_Link?platform=${platform}&player=${encodeURIComponent(username)}&key=${process.env.SPYGLASS}`);
+			const response = await axios.get(`https://api.jumpmaster.xyz/user/MRVN_Link?platform=${platform}&player=${encodeURIComponent(username)}&key=${Bun.env.SPYGLASS}`);
 			const data = response.data;
 
 			const playerID = data.user.id;

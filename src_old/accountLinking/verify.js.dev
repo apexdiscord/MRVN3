@@ -69,7 +69,7 @@ module.exports = {
 				await interaction.editReply({ content: '', embeds: [verifyEmbed] });
 
 				const response = await axios.get(
-					`https://api.jumpmaster.xyz/user/MRVN_ID?platform=${row[0]['platform']}&id=${encodeURIComponent(row[0]['playerID'])}&key=${process.env.SPYGLASS}`,
+					`https://api.jumpmaster.xyz/user/MRVN_ID?platform=${row[0]['platform']}&id=${encodeURIComponent(row[0]['playerID'])}&key=${Bun.env.SPYGLASS}`,
 				);
 				const data = response.data;
 

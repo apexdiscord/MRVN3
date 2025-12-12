@@ -11,7 +11,7 @@ client
 		loadEvents(client);
 	})
 	.catch(error => {
-		console.log(`${chalk.red.bold('[MRVN]')} Discord Gateway Error: ${chalk.red(error)}`);
+		console.log(`${chalk.red.bold('[MRVN_BOT]')} Discord Gateway Error: ${chalk.red(error)}`);
 	});
 
 module.exports = { client };

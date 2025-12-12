@@ -10,7 +10,7 @@ module.exports = {
 	once: true,
 
 	execute(client) {
-		console.log(`${chalk.green.bold('[MRVN]')} Logged in as ${chalk.cyan(client.user.username)}`);
+		console.log(`${chalk.green.bold('[MRVN_BOT]')} Logged in as ${chalk.cyan(client.user.username)}`);
 
 		function updatePresence() {
 			// Calculate amount of days since March 18th, 2014
@@ -21,7 +21,7 @@ module.exports = {
 
 			client.user.setActivity(`${daysSinceLaunch} DAYS SINCE LAST DIRECTIVE`, { type: ActivityType.Custom });
 
-			console.log(`${chalk.green.bold('[MRVN]')} Updated bot presence`);
+			console.log(`${chalk.green.bold('[MRVN_BOT]')} Updated bot presence`);
 		}
 
 		updatePresence();
@@ -57,15 +57,15 @@ module.exports = {
 					// Production, register global slash commands
 					await rest.put(Routes.applicationCommands(client.user.id), { body: commands });
 
-					console.log(`${chalk.green.bold(`[MRVN]`)} Deployed global slash commands`);
+					console.log(`${chalk.green.bold(`[MRVN_BOT]`)} Deployed global slash commands`);
 				} else {
 					// Development, register guild slash commands
 					await rest.put(Routes.applicationGuildCommands(client.user.id, Bun.env.DEV_GUILD_ID), { body: commands });
 
-					console.log(`${chalk.yellow.bold(`[MRVN]`)} Deployed guild slash commands for dev environment`);
+					console.log(`${chalk.yellow.bold(`[MRVN_BOT]`)} Deployed guild slash commands for dev environment`);
 				}
 			} catch (error) {
-				if (error) console.log(`${chalk.red.bold(`[MRVN]`)} Error pushing commands to Discord: ${chalk.red(error)}`);
+				if (error) console.log(`${chalk.red.bold(`[MRVN_BOT]`)} Error pushing commands to Discord: ${chalk.red(error)}`);
 			}
 		})();
 	},

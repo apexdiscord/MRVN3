@@ -2,7 +2,7 @@ const fs = require('fs');
 const chalk = require('chalk');
 
 function loadEvents(client) {
-	console.log(`${chalk.yellow.bold('[MRVN]')} Loading Event Handler...`);
+	console.log(`${chalk.yellow.bold('[MRVN_EVENTS]')} Loading Event Handler...`);
 
 	const folders = fs.readdirSync(`${__dirname}/events`);
 
@@ -26,7 +26,7 @@ function loadEvents(client) {
 				}
 			}
 
-			console.log(`${chalk.green.bold('[MRVN]')} Loaded ${chalk.green(file)} Event Handler`);
+			console.log(`${chalk.green.bold('[MRVN_EVENTS]')} Loaded ${chalk.green(file)} Event Handler`);
 		}
 	}
 }

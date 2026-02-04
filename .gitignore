@@ -1,5 +1,6 @@
 node_modules
 .env
+.env.old
 config.json
 *.sqlite
 .vscode

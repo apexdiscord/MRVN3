@@ -1,6 +1,6 @@
 const { DateTime } = require('luxon');
 const { uptimeText, errorDisplay } = require('../../utilities/misc.js');
-const { checkVoiceChannelCategory } = require('../../utilities/lfg.js');
+const { stitchEmotes, checkVoiceChannelCategory } = require('../../utilities/lfg.js');
 const { MessageFlags, SectionBuilder, ContainerBuilder, ThumbnailBuilder, TextDisplayBuilder, SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
@@ -41,6 +41,15 @@ module.exports = {
 				],
 				flags: MessageFlags.IsComponentsV2,
 			});
+
+			return;
 		}
+
+		const errorContainer = new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`## ${stitchEmotes('nomic', '10')}`));
+
+		await interaction.channel.send({
+			components: [errorContainer],
+			flags: MessageFlags.IsComponentsV2,
+		});
 	},
 };

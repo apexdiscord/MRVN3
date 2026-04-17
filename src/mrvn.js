@@ -1,12 +1,12 @@
 const chalk = require('chalk');
 const dotenv = require('dotenv');
 const { loadEvents } = require('./events.js');
-const { uptime } = require('./utilities/misc.js');
+const { uptimeConsole } = require('./utilities/misc.js');
 const { Client, GatewayIntentBits } = require('discord.js');
 
 dotenv.config({ quiet: true });
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates] });
 
 client
 	.login(process.env.DISCORD_TOKEN)
@@ -21,6 +21,6 @@ client
 		}
 	});
 
-uptime(client);
+uptimeConsole();
 
 module.exports = { client };

@@ -1,7 +1,7 @@
 const { DateTime } = require('luxon');
 const { uptimeText, errorDisplay } = require('../../utilities/misc.js');
 const { stitchEmotes, checkVoiceChannelCategory } = require('../../utilities/lfg.js');
-const { MessageFlags, SectionBuilder, ContainerBuilder, ThumbnailBuilder, TextDisplayBuilder, SlashCommandBuilder } = require('discord.js');
+const { ButtonStyle, MessageFlags, ButtonBuilder, SectionBuilder, ContainerBuilder, ThumbnailBuilder, TextDisplayBuilder, SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -45,10 +45,18 @@ module.exports = {
 			return;
 		}
 
-		const errorContainer = new ContainerBuilder().addTextDisplayComponents(new TextDisplayBuilder().setContent(`## ${stitchEmotes('nomic', '10')}`));
+		const lfgContainer = new ContainerBuilder()
+			.addSectionComponents(
+				new SectionBuilder()
+					.setButtonAccessory(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel('join voice chat').setEmoji('🔊').setURL(`https://discord.com/channels/${interaction.guild.id}/$1111562569098997770`))
+					.addTextDisplayComponents(new TextDisplayBuilder().setContent('# Bread is looking for Bread')),
+			)
+			.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${stitchEmotes('nomic', '10')}`))
+			.addSeparatorComponents({ size: 'small' })
+			.addTextDisplayComponents(new TextDisplayBuilder().setContent(`-# Server rules, Respawn, and EA ToS apply.\n-# Report rule breaking behaviour to ModMail.`));
 
 		await interaction.channel.send({
-			components: [errorContainer],
+			components: [lfgContainer],
 			flags: MessageFlags.IsComponentsV2,
 		});
 	},

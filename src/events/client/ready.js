@@ -52,7 +52,7 @@ module.exports = {
 			} else {
 				// // Delete all guild-base commands
 				// await rest
-				// 	.put(Routes.applicationGuildCommands(clientID, discord.devGuild), { body: [] })
+				// 	.put(Routes.applicationGuildCommands(clientID, process.env.DEV_SERVER), { body: [] })
 				// 	.then(() => console.log('Successfully deleted all guild commands.'))
 				// 	.catch(console.error);
 

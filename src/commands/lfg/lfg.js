@@ -1,7 +1,9 @@
 const { DateTime } = require('luxon');
-const { uptimeText, errorDisplay } = require('../../utilities/misc.js');
-const { stitchEmotes, checkVoiceChannelCategory } = require('../../utilities/lfg.js');
+const { uptimeText, errorDisplay, emoteFileName } = require('../../utilities/misc.js');
+const { stitchEmotes, isMicRequired, teammatesNeeded, createVoiceButton, checkVoiceChannelCategory } = require('../../utilities/lfg.js');
 const { ButtonStyle, MessageFlags, ButtonBuilder, SectionBuilder, ContainerBuilder, ThumbnailBuilder, TextDisplayBuilder, SlashCommandBuilder } = require('discord.js');
+
+const emotes = require(`../../data/emotes/${emoteFileName(process.env.DEBUG)}.json`);
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -28,7 +30,7 @@ module.exports = {
 		const micRequired = interaction.options.getBoolean('mic-required') ?? false;
 		const gamertag = interaction.options.getString('gamertag') ?? null;
 
-		console.log(`mode: ${mode}\nmessage: ${message}\nsave: ${save}\nplayersNeeded: ${playersNeeded}\nmicRequired: ${micRequired}\ngamertag: ${gamertag}`);
+		console.log(`mode: ${mode}\nsave: ${save}`);
 
 		if (checkVoiceChannelCategory(interaction.member) == true) {
 			await interaction.editReply({
@@ -46,18 +48,24 @@ module.exports = {
 		}
 
 		const lfgContainer = new ContainerBuilder()
+			.addTextDisplayComponents(new TextDisplayBuilder().setContent(`# ${teammatesNeeded(interaction.user.id, playersNeeded)}`))
+			.addTextDisplayComponents(new TextDisplayBuilder().setContent(`### ${stitchEmotes('trios', 3)} ${stitchEmotes('na', 2)} ${isMicRequired(micRequired)}`))
 			.addSectionComponents(
 				new SectionBuilder()
-					.setButtonAccessory(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel('join voice chat').setEmoji('🔊').setURL(`https://discord.com/channels/${interaction.guild.id}/$1111562569098997770`))
-					.addTextDisplayComponents(new TextDisplayBuilder().setContent('# Bread is looking for Bread')),
+					.setButtonAccessory(createVoiceButton(interaction))
+					.addTextDisplayComponents(new TextDisplayBuilder().setContent(`**Message from <@${interaction.user.id}>**\n${message}${gamertag ? `\n\n**Gamertag**\n${gamertag}` : ''}`)),
 			)
-			.addTextDisplayComponents(new TextDisplayBuilder().setContent(`${stitchEmotes('nomic', '10')}`))
 			.addSeparatorComponents({ size: 'small' })
-			.addTextDisplayComponents(new TextDisplayBuilder().setContent(`-# Server rules, Respawn, and EA ToS apply.\n-# Report rule breaking behaviour to ModMail.`));
+			.addSectionComponents(
+				new SectionBuilder()
+					.setButtonAccessory(new ButtonBuilder().setStyle(ButtonStyle.Danger).setLabel('Report Post').setCustomId('report_lfg_post').setDisabled(true))
+					.addTextDisplayComponents(new TextDisplayBuilder().setContent(`-# Server rules, Respawn, and EA ToS apply.\n-# Help us promote a positive environment by reporting rule breaking behavior.`)),
+			);
 
 		await interaction.channel.send({
 			components: [lfgContainer],
 			flags: MessageFlags.IsComponentsV2,
+			allowedMentions: { parse: [] },
 		});
 	},
 };

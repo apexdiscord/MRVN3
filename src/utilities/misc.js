@@ -47,4 +47,10 @@ function uptimeConsole() {
 	})();
 }
 
-module.exports = { uptimeText, errorDisplay, emoteFileName, uptimeConsole };
+function splitChannelName(name, position) {
+	let parts = name.split('-');
+
+	return parts[position].trim();
+}
+
+module.exports = { uptimeText, errorDisplay, emoteFileName, uptimeConsole, splitChannelName };

@@ -1,6 +1,6 @@
 const { DateTime } = require('luxon');
-const { uptimeText, errorDisplay, emoteFileName } = require('../../utilities/misc.js');
-const { stitchEmotes, isMicRequired, teammatesNeeded, createVoiceButton, checkVoiceChannelCategory } = require('../../utilities/lfg.js');
+const { uptimeText, errorDisplay, emoteFileName, splitChannelName } = require('../../utilities/misc.js');
+const { modeBadge, regionBadge, stitchEmotes, isMicRequired, teammatesNeeded, createVoiceButton, checkVoiceChannelCategory } = require('../../utilities/lfg.js');
 const { ButtonStyle, MessageFlags, ButtonBuilder, SectionBuilder, ContainerBuilder, ThumbnailBuilder, TextDisplayBuilder, SlashCommandBuilder } = require('discord.js');
 
 const emotes = require(`../../data/emotes/${emoteFileName(process.env.DEBUG)}.json`);
@@ -30,7 +30,9 @@ module.exports = {
 		const micRequired = interaction.options.getBoolean('mic-required') ?? false;
 		const gamertag = interaction.options.getString('gamertag') ?? null;
 
-		console.log(`mode: ${mode}\nsave: ${save}`);
+		// TODO: Set Voice Channel Status based on message
+
+		console.log(`save: ${save}`);
 
 		if (checkVoiceChannelCategory(interaction.member) == true) {
 			await interaction.editReply({
@@ -49,23 +51,27 @@ module.exports = {
 
 		const lfgContainer = new ContainerBuilder()
 			.addTextDisplayComponents(new TextDisplayBuilder().setContent(`# ${teammatesNeeded(interaction.user.id, playersNeeded)}`))
-			.addTextDisplayComponents(new TextDisplayBuilder().setContent(`### ${stitchEmotes('trios', 3)} ${stitchEmotes('na', 2)} ${isMicRequired(micRequired)}`))
+			.addTextDisplayComponents(new TextDisplayBuilder().setContent(`### ${regionBadge(splitChannelName(interaction.channel.name, 0))} ${modeBadge(mode)} ${isMicRequired(micRequired)}`))
 			.addSectionComponents(
 				new SectionBuilder()
 					.setButtonAccessory(createVoiceButton(interaction))
 					.addTextDisplayComponents(new TextDisplayBuilder().setContent(`**Message from <@${interaction.user.id}>**\n${message}${gamertag ? `\n\n**Gamertag**\n${gamertag}` : ''}`)),
-			)
-			.addSeparatorComponents({ size: 'small' })
-			.addSectionComponents(
-				new SectionBuilder()
-					.setButtonAccessory(new ButtonBuilder().setStyle(ButtonStyle.Danger).setLabel('Report Post').setCustomId('report_lfg_post').setDisabled(true))
-					.addTextDisplayComponents(new TextDisplayBuilder().setContent(`-# Server rules, Respawn, and EA ToS apply.\n-# Help us promote a positive environment by reporting rule breaking behavior.`)),
 			);
 
+		const reportContainer = new ContainerBuilder().addSectionComponents(
+			new SectionBuilder()
+				.setButtonAccessory(new ButtonBuilder().setStyle(ButtonStyle.Danger).setLabel('Report Above Post').setCustomId('report_lfg_post').setDisabled(true))
+				.addTextDisplayComponents(new TextDisplayBuilder().setContent(`Server Rules, Discord, Respawn, and EA ToS apply.\n-# Help us promote a positive environment by reporting rule breaking behavior.`)),
+		);
+
 		await interaction.channel.send({
-			components: [lfgContainer],
+			components: [lfgContainer, reportContainer],
 			flags: MessageFlags.IsComponentsV2,
 			allowedMentions: { parse: [] },
+		});
+
+		await interaction.editReply({
+			content: `${emotes.success} LFG Post Created!`,
 		});
 	},
 };
